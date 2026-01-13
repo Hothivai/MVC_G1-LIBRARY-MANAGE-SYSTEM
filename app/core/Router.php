@@ -24,8 +24,38 @@ class Router
         $this->add('POST', $path, $controller, $action);
     }
 
-    public function dispatch()
-    {
-        // Dispatch routes
+    public function dispatch() {
+    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $method = $_SERVER['REQUEST_METHOD'];
+
+    foreach ($this->routes as $route) {
+        // Sử dụng str_ends_with để khớp phần cuối của URL với path đã khai báo
+        if (str_ends_with($uri, $route['path']) && $route['method'] === $method) {
+            $controllerName = $route['controller'];
+            $action = $route['action'];
+
+            $controllerFile = "../app/controllers/" . $controllerName . ".php";
+            if (file_exists($controllerFile)) {
+                require_once $controllerFile;
+                $controller = new $controllerName();
+                $controller->$action();
+                return;
+            }
+        }
     }
+    echo "404 - Trang không tồn tại.";
 }
+}
+
+// KHỞI TẠO VÀ ĐỊNH NGHĨA CÁC ĐƯỜNG DẪN (ROUTES)
+$router = new Router();
+
+// Trang hiển thị Form đăng ký
+$router->get('/register', 'AuthController', 'register');
+
+// Xử lý khi người dùng nhấn nút Đăng ký
+$router->post('/register', 'AuthController', 'handleRegister');
+
+// Chạy bộ điều hướng
+$router->dispatch();
+?>
