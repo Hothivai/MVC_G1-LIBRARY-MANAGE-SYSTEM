@@ -46,16 +46,3 @@ class Router
     echo "404 - Trang không tồn tại.";
 }
 }
-
-// KHỞI TẠO VÀ ĐỊNH NGHĨA CÁC ĐƯỜNG DẪN (ROUTES)
-$router = new Router();
-
-// Trang hiển thị Form đăng ký
-$router->get('/register', 'AuthController', 'register');
-
-// Xử lý khi người dùng nhấn nút Đăng ký
-$router->post('/register', 'AuthController', 'handleRegister');
-
-// Chạy bộ điều hướng
-$router->dispatch();
-?>

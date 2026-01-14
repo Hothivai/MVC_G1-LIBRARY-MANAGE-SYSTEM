@@ -1,7 +1,6 @@
 <?php
 class User {
     private $db;
-
     public function __construct($db_connection) {
         $this->db = $db_connection;
     }
