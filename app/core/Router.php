@@ -2,61 +2,50 @@
 
 class Router
 {
-    protected $routes = [];
+    protected array $routes = [];
 
-    public function get($path, $controller, $action)
+    public function get(string $path, string $controller, string $action): void
     {
-        $this->routes[] = ['GET', $path, $controller, $action];
+        $this->routes[] = [
+            'method' => 'GET',
+            'path' => $path,
+            'controller' => $controller,
+            'action' => $action
+        ];
     }
 
-    public function post($path, $controller, $action)
+    public function post(string $path, string $controller, string $action): void
     {
-        $this->routes[] = ['POST', $path, $controller, $action];
+        $this->routes[] = [
+            'method' => 'POST',
+            'path' => $path,
+            'controller' => $controller,
+            'action' => $action
+        ];
     }
 
-    private function getUri()
+    public function dispatch(): void
     {
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $method = $_SERVER['REQUEST_METHOD'];
 
-        // bỏ thư mục public
-        $publicDir = dirname($_SERVER['SCRIPT_NAME']);
-        if ($publicDir !== '/' && strpos($uri, $publicDir) === 0) {
-            $uri = substr($uri, strlen($publicDir));
+        // tự động bỏ /MVC_G1-LIBRARY-MANAGE-SYSTEM/public
+        $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
+        if (strpos($uri, $scriptDir) === 0) {
+            $uri = substr($uri, strlen($scriptDir));
         }
 
-        // bỏ index.php nếu có
-        if ($uri === '/index.php') {
+        if ($uri === '') {
             $uri = '/';
         }
 
-        return $uri ?: '/';
-    }
+        foreach ($this->routes as $route) {
+            if ($route['method'] === $method && $route['path'] === $uri) {
 
-    public function dispatch()
-    {
-        $uri = $this->getUri();
-        $method = $_SERVER['REQUEST_METHOD'];
+                require_once "../app/controllers/{$route['controller']}.php";
 
-        foreach ($this->routes as [$m, $path, $controller, $action]) {
-            if ($m === $method && $path === $uri) {
-
-                // HỖ TRỢ CONTROLLER TRONG SUBFOLDER
-                $controllerPath = dirname(__DIR__) . "/controllers/$controller.php";
-
-                if (!file_exists($controllerPath)) {
-                    http_response_code(500);
-                    die("Controller not found: $controller");
-                }
-
-                require_once $controllerPath;
-                $obj = new $controller();
-
-                if (!method_exists($obj, $action)) {
-                    http_response_code(500);
-                    die("Action not found: $action");
-                }
-
-                $obj->$action();
+                $controller = new $route['controller']();
+                $controller->{$route['action']}();
                 return;
             }
         }
