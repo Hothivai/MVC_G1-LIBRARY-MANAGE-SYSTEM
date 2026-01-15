@@ -8,7 +8,7 @@ class AuthController extends Controller
     // 1. Hàm hiển thị trang đăng ký (GET /register)
     public function register()
     {
-        echo "REGISTER OK"; die;
+
         // Sử dụng hàm view từ class Controller cha của bạn
         return $this->view('auth/register');
     }
@@ -60,11 +60,11 @@ class AuthController extends Controller
         // Bước tiếp theo ở đây sẽ là gọi Model User để lưu dữ liệu
     }
 
-    public function login()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Logic đăng nhập sau này
-        }
-        return $this->view('auth/login');
-    }
+    // public function login()
+    // {
+    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    //         // Logic đăng nhập sau này
+    //     }
+    //     return $this->view('auth/login');
+    // }
 }

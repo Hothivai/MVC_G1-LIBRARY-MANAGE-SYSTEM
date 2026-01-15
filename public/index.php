@@ -1,6 +1,5 @@
 <?php
 
-session_start();
 
 // require_once '../config/config.php';
 // require_once '../app/core/Database.php';
@@ -22,6 +21,7 @@ session_start();
 session_start();
 
 require_once '../config/config.php';
+require_once '../config/routes.php';
 require_once '../app/core/Router.php';
 
 require_once '../app/core/Database.php';

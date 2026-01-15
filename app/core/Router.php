@@ -24,25 +24,34 @@ class Router
         $this->add('POST', $path, $controller, $action);
     }
 
-    public function dispatch() {
-    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $method = $_SERVER['REQUEST_METHOD'];
+    public function dispatch()
+    {
+        $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $request_method = $_SERVER['REQUEST_METHOD'];
 
-    foreach ($this->routes as $route) {
-        // Sử dụng str_ends_with để khớp phần cuối của URL với path đã khai báo
-        if (str_ends_with($uri, $route['path']) && $route['method'] === $method) {
-            $controllerName = $route['controller'];
-            $action = $route['action'];
+        foreach ($this->routes as $route) {
+            if ($route['method'] === $request_method && $route['path'] === $request_uri) {
+                $controllerName = $route['controller'];
+                $actionName = $route['action'];
 
-            $controllerFile = "../app/controllers/" . $controllerName . ".php";
-            if (file_exists($controllerFile)) {
-                require_once $controllerFile;
-                $controller = new $controllerName();
-                $controller->$action();
-                return;
+                if (class_exists($controllerName)) {
+                    $controller = new $controllerName();
+                    if (method_exists($controller, $actionName)) {
+                        return $controller->$actionName();
+                    } else {
+                        http_response_code(404);
+                        echo "Action not found.";
+                        return;
+                    }
+                } else {
+                    http_response_code(404);
+                    echo "Controller not found.";
+                    return;
+                }
             }
         }
+
+        http_response_code(404);
+        echo "Route not found.";
     }
-    echo "404 - Trang không tồn tại.";
-}
 }

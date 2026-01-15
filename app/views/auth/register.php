@@ -14,7 +14,7 @@
 <section class="register">
     <img src="/public/images/logo.jpg" alt="Library Logo" class="logo">
     <h5>LIBRARY MANAGEMENT SYSTEM</h5>
-    <form method="POST" action="/controller/authController.php">
+    <form method="POST" action="/register">
     <div class="mb-3 mt-3">
       <label for="fullname" class="form-label">Fullname</label>
       <input type="text" class="form-control" id="fullname" placeholder="Enter fullname" name="fullname">

@@ -1,12 +1,9 @@
 <?php
-require_once __DIR__ . '/../app/core/Router.php';
 
 $router = new Router();
 
-// SỬA: Đúng cú pháp
+// Hiển thị form đăng ký
 $router->get('/register', 'AuthController', 'register');
-$router->post('/register', 'AuthController', 'handleRegister');
-$router->get('/login', 'AuthController', 'login');
 
-// Route mặc định
-$router->get('/', 'HomeController', 'index');
+// Xử lý submit đăng ký
+$router->post('/register', 'AuthController', 'handleRegister');
