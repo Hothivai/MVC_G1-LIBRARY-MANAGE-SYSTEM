@@ -4,66 +4,64 @@ class Router
 {
     protected $routes = [];
 
-    public function add($method, $path, $controller, $action)
-    {
-        $this->routes[] = [
-            'method' => $method,
-            'path' => $path,
-            'controller' => $controller,
-            'action' => $action
-        ];
-    }
-
     public function get($path, $controller, $action)
     {
-        $this->add('GET', $path, $controller, $action);
+        $this->routes[] = ['GET', $path, $controller, $action];
     }
 
     public function post($path, $controller, $action)
     {
-        $this->add('POST', $path, $controller, $action);
+        $this->routes[] = ['POST', $path, $controller, $action];
+    }
+
+    private function getUri()
+    {
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+        // bỏ thư mục public
+        $publicDir = dirname($_SERVER['SCRIPT_NAME']);
+        if ($publicDir !== '/' && strpos($uri, $publicDir) === 0) {
+            $uri = substr($uri, strlen($publicDir));
+        }
+
+        // bỏ index.php nếu có
+        if ($uri === '/index.php') {
+            $uri = '/';
+        }
+
+        return $uri ?: '/';
     }
 
     public function dispatch()
-{
-    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $method = $_SERVER['REQUEST_METHOD'];
+    {
+        $uri = $this->getUri();
+        $method = $_SERVER['REQUEST_METHOD'];
 
-    $basePath = '/MVC_G1-LIBRARY-MANAGEMENT/public';
-    if (strpos($uri, $basePath) === 0) {
-        $uri = substr($uri, strlen($basePath));
-    }
+        foreach ($this->routes as [$m, $path, $controller, $action]) {
+            if ($m === $method && $path === $uri) {
 
-    if ($uri === '') {
-        $uri = '/';
-    }
+                // HỖ TRỢ CONTROLLER TRONG SUBFOLDER
+                $controllerPath = dirname(__DIR__) . "/controllers/$controller.php";
 
-    foreach ($this->routes as $route) {
-        if ($uri === $route['path'] && $method === $route['method']) {
+                if (!file_exists($controllerPath)) {
+                    http_response_code(500);
+                    die("Controller not found: $controller");
+                }
 
-            $controllerName = $route['controller'];
-            $action = $route['action'];
+                require_once $controllerPath;
+                $obj = new $controller();
 
-            $controllerFile = __DIR__ . "/../controllers/{$controllerName}.php";
+                if (!method_exists($obj, $action)) {
+                    http_response_code(500);
+                    die("Action not found: $action");
+                }
 
-            if (!file_exists($controllerFile)) {
-                die("Controller $controllerName not found");
+                $obj->$action();
+                return;
             }
-
-            require_once $controllerFile;
-            $controller = new $controllerName();
-
-            if (!method_exists($controller, $action)) {
-                die("Method $action not found in $controllerName");
-            }
-
-            $controller->$action();
-            return;
         }
+
+        http_response_code(404);
+        echo "Route not found.";
     }
-
-    http_response_code(404);
-    echo "Route not found.";
-}
-
 }

@@ -2,8 +2,8 @@
 
 $router = new Router();
 
-// Hiển thị form đăng ký
-$router->get('/register', 'AuthController', 'register');
+$router->get('/', 'AuthController', 'register');
 
-// Xử lý submit đăng ký
+// Register
+$router->get('/register', 'AuthController', 'register');
 $router->post('/register', 'AuthController', 'handleRegister');
