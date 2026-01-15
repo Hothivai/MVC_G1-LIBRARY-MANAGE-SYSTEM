@@ -1,32 +1,27 @@
 <?php
-
 class Auth
 {
-    protected $db;
-
-    public function __construct()
+    public static function login($user)
     {
-        $database = new Database();
-        $this->db = $database->connect();
+        session_start();
+        $_SESSION['user'] = $user;
     }
 
-    public function login($email, $password)
+    public static function logout()
     {
-        // Login logic
+        session_start();
+        session_destroy();
     }
 
-    public function logout()
+    public static function user()
     {
-        // Logout logic
+        return $_SESSION['user'] ?? null;
     }
 
-    public function isAuthenticated()
+    public static function check()
     {
-        return isset($_SESSION['user_id']);
-    }
-
-    public function getCurrentUser()
-    {
-        // Get current user
+        return isset($_SESSION['user']);
     }
 }
+?>
+<!-- Lưu user vào session -->
