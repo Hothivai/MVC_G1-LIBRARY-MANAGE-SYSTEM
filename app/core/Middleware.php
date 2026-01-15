@@ -1,30 +1,35 @@
 <?php
+require_once './app/core/Auth.php';
 
 class Middleware
 {
-    public static function checkAuth()
+    public static function requireLogin()
     {
-        if (!isset($_SESSION['user_id'])) {
-            header('Location: /login');
-            exit();
+        if (!Auth::check()) {
+            header('Location: /auth/login');
+            exit;
         }
     }
 
-    public static function checkAdmin()
+    public static function requireAdmin()
     {
-        self::checkAuth();
-        if ($_SESSION['role'] !== 'admin') {
-            header('Location: /');
-            exit();
+        self::requireLogin();
+
+        if (Auth::user()['role'] !== 'admin') {
+            echo "Access denied";
+            exit;
         }
     }
 
-    public static function checkUser()
+    public static function requireUser()
     {
-        self::checkAuth();
-        if ($_SESSION['role'] !== 'user') {
-            header('Location: /');
-            exit();
+        self::requireLogin();
+
+        if (Auth::user()['role'] !== 'user') {
+            echo "Access denied";
+            exit;
         }
     }
 }
+?>
+<!-- Kiểm tra đăng nhập và role (admin, user) -->
