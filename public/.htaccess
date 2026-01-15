@@ -1,12 +1,6 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    # Nếu thư mục dự án của bạn nằm trong thư mục con (VD: localhost/MVC_G1...), 
-    # hãy đổi thành: RewriteBase /tên-thư-mục/ hoặc xóa dòng này.
-    RewriteBase / 
-    
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    
-    # Chuyển mọi request về index.php
-    RewriteRule ^(.*)$ index.php [QSA,L]
+    RewriteRule ^ index.php [L]
 </IfModule>

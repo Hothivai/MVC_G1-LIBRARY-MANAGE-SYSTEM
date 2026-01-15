@@ -25,33 +25,45 @@ class Router
     }
 
     public function dispatch()
-    {
-        $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $request_method = $_SERVER['REQUEST_METHOD'];
+{
+    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $method = $_SERVER['REQUEST_METHOD'];
 
-        foreach ($this->routes as $route) {
-            if ($route['method'] === $request_method && $route['path'] === $request_uri) {
-                $controllerName = $route['controller'];
-                $actionName = $route['action'];
-
-                if (class_exists($controllerName)) {
-                    $controller = new $controllerName();
-                    if (method_exists($controller, $actionName)) {
-                        return $controller->$actionName();
-                    } else {
-                        http_response_code(404);
-                        echo "Action not found.";
-                        return;
-                    }
-                } else {
-                    http_response_code(404);
-                    echo "Controller not found.";
-                    return;
-                }
-            }
-        }
-
-        http_response_code(404);
-        echo "Route not found.";
+    $basePath = '/MVC_G1-LIBRARY-MANAGEMENT/public';
+    if (strpos($uri, $basePath) === 0) {
+        $uri = substr($uri, strlen($basePath));
     }
+
+    if ($uri === '') {
+        $uri = '/';
+    }
+
+    foreach ($this->routes as $route) {
+        if ($uri === $route['path'] && $method === $route['method']) {
+
+            $controllerName = $route['controller'];
+            $action = $route['action'];
+
+            $controllerFile = __DIR__ . "/../controllers/{$controllerName}.php";
+
+            if (!file_exists($controllerFile)) {
+                die("Controller $controllerName not found");
+            }
+
+            require_once $controllerFile;
+            $controller = new $controllerName();
+
+            if (!method_exists($controller, $action)) {
+                die("Method $action not found in $controllerName");
+            }
+
+            $controller->$action();
+            return;
+        }
+    }
+
+    http_response_code(404);
+    echo "Route not found.";
+}
+
 }
