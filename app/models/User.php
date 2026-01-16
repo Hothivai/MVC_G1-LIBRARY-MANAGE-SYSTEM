@@ -1,9 +1,12 @@
 <?php
-
 class User extends Model
 {
     protected $table = 'users';
-    protected $fillable = ['name', 'email', 'password', 'phone', 'address', 'role', 'status'];
 
-    // Relationships and custom methods
+    public function countUsers()
+    {
+        $stmt = $this->db->query("SELECT COUNT(*) FROM users WHERE role = 'user'");
+        return $stmt->fetchColumn();
+    }
 }
+?>
