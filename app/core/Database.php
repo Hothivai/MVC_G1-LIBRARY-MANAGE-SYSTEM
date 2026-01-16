@@ -10,10 +10,10 @@ class Database
 
     public function __construct()
     {
-        $this->host = DB_HOST;
-        $this->db_name = DB_NAME;
-        $this->user = DB_USER;
-        $this->pass = DB_PASS;
+    $this->host = "localhost";
+	$this->user = "root";
+	$this->pass = "";
+	$this->db_name = "library_db";
     }
 
     public function connect()
