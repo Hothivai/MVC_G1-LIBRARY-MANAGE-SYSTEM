@@ -13,11 +13,17 @@ class AuthController extends Controller
             $userModel = $this->model('User');
             $user = $userModel->findByEmail($email);
 
-            if ($user && password_verify($password, $user['password'])) {
-                Auth::login($user);
-                header('Location: /home/index');
-                exit;
+        // Điều hướng theo role (admin, user)
+        if ($user && password_verify($password, $user['password'])) {
+            Auth::login($user);
+
+            if ($user['role'] === 'admin') {
+                header('Location: /admin/dashboard/index');
+            } else {
+                header('Location: /user/home/index');
             }
+            exit;
+        }
 
             $error = "Wrong email or password";
         }
