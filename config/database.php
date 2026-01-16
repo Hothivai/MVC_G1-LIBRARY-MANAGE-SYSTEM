@@ -16,5 +16,5 @@ class Database {
             die("Lỗi kết nối Database: " . $e->getMessage());
         }
         return $this->conn;
-    }5
+    }
 }
