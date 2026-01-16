@@ -1,21 +1,26 @@
 <?php
+class User extends Model {
+    public function findByEmail($email) {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
-class User extends Model
-{
-    public function register(array $data): bool
-    {
-        $sql = "INSERT INTO users 
-            (username, email, password, full_name, phone)
-            VALUES (:username, :email, :password, :full_name, :phone)";
+    public function register($data) {
+        // Tự tạo username từ email (vì form không có ô username)
+        $username = explode('@', $data['email'])[0] . rand(100, 999);
+        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
 
+        $sql = "INSERT INTO users (username, email, password, full_name, phone, role, status) 
+                VALUES (?, ?, ?, ?, ?, 'member', 'active')";
+        
         $stmt = $this->db->prepare($sql);
-
         return $stmt->execute([
-            ':username' => $data['username'],
-            ':email' => $data['email'],
-            ':password' => $data['password'],
-            ':full_name' => $data['full_name'],
-            ':phone' => $data['phone']
+            $username,
+            $data['email'],
+            $hashedPassword,
+            $data['fullname'],
+            $data['phone']
         ]);
     }
 }

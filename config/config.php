@@ -15,4 +15,12 @@
 	} catch(PDOException $e) {
 		die("Connection failed: " . $e->getMessage());
 	}
+// Thông số Database
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'library_db'); // Hãy đảm bảo tên DB này khớp với DB bạn tạo trong phpMyAdmin
+
+// Đường dẫn gốc dự án
+define('URLROOT', '/MVC_G1-LIBRARY-MANAGE-SYSTEM');
 ?>
