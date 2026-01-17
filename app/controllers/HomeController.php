@@ -1,14 +1,25 @@
 <?php
+namespace App\Controllers;
 
-class HomeController extends Controller
-{
-    public function index()
-    {
-        return $this->view('home/index');
+use App\Models\Book;
+use App\Models\Category;
+
+class HomeController extends Controller {
+    
+    public function index() {
+        $bookModel = new Book();
+        $categoryModel = new Category();
+        
+        $data = [
+            'featuredBooks' => $bookModel->getFeaturedBooks(4),
+            'latestBooks' => $bookModel->getLatestBooks(8),
+            'categories' => $categoryModel->all()
+        ];
+        
+        $this->view('home/index', $data);
     }
-
-    public function about()
-    {
-        return $this->view('home/about');
+    
+    public function about() {
+        $this->view('home/about');
     }
 }

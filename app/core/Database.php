@@ -1,30 +1,29 @@
 <?php
-
-class Database
-{
-    private $host;
-    private $db_name;
-    private $user;
-    private $pass;
-    private $pdo;
-
-    public function __construct()
-    {
-    $this->host = "localhost";
-	$this->user = "root";
-	$this->pass = "";
-	$this->db_name = "library_db";
-    }
-
-    public function connect()
-    {
-        // PDO Connection
+class Database {
+    private static $instance = null;
+    private $connection;
+    
+    private function __construct() {
         try {
-            $this->pdo = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->db_name, $this->user, $this->pass);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            return $this->pdo;
+            $this->connection = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+                DB_USER,
+                DB_PASS,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false
+                ]
+            );
         } catch (PDOException $e) {
-            echo 'Connection Error: ' . $e->getMessage();
+            die("Connection failed: " . $e->getMessage());
         }
+    }
+    
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new Database();
+        }
+        return self::$instance->connection;
     }
 }
