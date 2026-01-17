@@ -1,6 +1,5 @@
 <?php
-require_once './app/core/Auth.php';
-
+// require_once './app/core/Auth.php';
 class Middleware
 {
     public static function requireLogin()
@@ -20,7 +19,15 @@ class Middleware
             exit;
         }
     }
+        public static function checkAdmin()
+    {
+        session_start();
 
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+            header('Location: ' . URLROOT . '/public/auth/login');
+            exit;
+        }
+    }
     public static function requireUser()
     {
         self::requireLogin();

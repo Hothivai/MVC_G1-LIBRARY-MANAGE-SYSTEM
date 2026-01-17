@@ -1,13 +1,18 @@
 <?php
-require_once './app/core/Model.php';
-class User extends Model
+
+class User
 {
-    protected $table = 'users';
+    private $db;
+
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
 
     // Lấy user theo email
     public function findByEmail($email)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE email = ?";
+        $sql = "SELECT * FROM users WHERE email = ?";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$email]);
         return $stmt->fetch(PDO::FETCH_ASSOC);

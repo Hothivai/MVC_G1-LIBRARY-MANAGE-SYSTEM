@@ -1,30 +1,20 @@
 <?php
+class Database {
+    private $host = DB_HOST;
+    private $user = DB_USER;
+    private $pass = DB_PASS;
+    private $dbname = DB_NAME;
+    public $conn;
 
-class Database
-{
-    private $host;
-    private $db_name;
-    private $user;
-    private $pass;
-    private $pdo;
-
-    public function __construct()
-    {
-        $this->host = DB_HOST;
-        $this->db_name = DB_NAME;
-        $this->user = DB_USER;
-        $this->pass = DB_PASS;
-    }
-
-    public function connect()
-    {
-        // PDO Connection
+    public function getConnection() {
+        $this->conn = null;
         try {
-            $this->pdo = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->db_name, $this->user, $this->pass);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            return $this->pdo;
-        } catch (PDOException $e) {
-            echo 'Connection Error: ' . $e->getMessage();
+            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->dbname, $this->user, $this->pass);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->conn->exec("set names utf8");
+        } catch(PDOException $e) {
+            die("Lỗi kết nối: " . $e->getMessage());
         }
+        return $this->conn;
     }
 }

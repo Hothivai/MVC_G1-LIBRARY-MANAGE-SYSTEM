@@ -1,6 +1,6 @@
 <?php
-require_once './app/core/Controller.php';
-require_once './app/core/Middleware.php';
+require_once __DIR__ . '/../../core/Controller.php';
+require_once __DIR__ . '/../../core/Middleware.php';
 
 class DashboardController extends Controller
 {

@@ -1,44 +1,48 @@
 <?php
-require_once './app/core/Controller.php';
-require_once './app/core/Auth.php';
+
+require_once __DIR__ . '/../core/Controller.php';
+require_once __DIR__ . '/../core/Auth.php';
 
 class AuthController extends Controller
 {
+    // GET /auth/login
     public function login()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'] ?? '';
-            $password = $_POST['password'] ?? '';
+        $this->view('auth/login', [
+            'error' => null
+        ]);
+    }
 
-            $userModel = $this->model('User');
-            $user = $userModel->findByEmail($email);
+    // POST /auth/login
+    public function loginPost()
+    {
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
 
-        // Điều hướng theo role (admin, user)
+        $userModel = $this->model('User');
+        $user = $userModel->findByEmail($email);
+
         if ($user && password_verify($password, $user['password'])) {
             Auth::login($user);
 
             if ($user['role'] === 'admin') {
-                header('Location: /admin/dashboard/index');
+                header('Location: ' . URLROOT . '/public/admin/dashboard/index');
             } else {
-                header('Location: /user/home/index');
+                header('Location: ' . URLROOT . '/public/home/index');
             }
             exit;
         }
 
-            $error = "Wrong email or password";
-        }
-
+        // Sai thì quay lại login
         $this->view('auth/login', [
-            'error' => $error ?? null
+            'error' => 'Wrong email or password'
         ]);
     }
 
     public function logout()
     {
         Auth::logout();
-        header('Location: /auth/login');
+        header('Location: ' . URLROOT . '/public/home/index');
         exit;
     }
 }
-?>
-<!-- Xử lý đăng nhập, check email và password -->

@@ -1,14 +1,13 @@
 <?php
-
 class HomeController extends Controller
 {
     public function index()
     {
-        return $this->view('home/index');
-    }
+        $user = $_SESSION['user'] ?? null;
 
-    public function about()
-    {
-        return $this->view('home/about');
+        $this->view('home/index', [
+            'user' => $user
+        ]);
     }
 }
+?>

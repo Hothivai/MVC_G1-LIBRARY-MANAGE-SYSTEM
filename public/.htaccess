@@ -1,11 +1,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
-    
-    # Skip rewrite for real files and directories
+    RewriteBase /MVC_G1-LIBRARY-MANAGE-SYSTEM/public
+
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    
-    # Rewrite all requests to index.php
-    RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+    RewriteRule ^(.+)$ index.php [QSA,L]
 </IfModule>

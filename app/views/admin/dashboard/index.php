@@ -7,7 +7,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="/public/css/admin.css">
+    <link rel="stylesheet" href="<?= URLROOT ?>/public/css/admin.css">
 </head>
 
 <body>
@@ -15,7 +15,7 @@
         <!-- sidebar -->
         <aside class="sidebar p-3">
             <div class="text-center mb-4">
-                <img src="/public/images/logo.png" class="logo">
+                <img src="/public/images/logo.jpg" class="logo">
                 <h5 class="mt-2">ADMIN PANEL</h5>
             </div>
 
@@ -139,10 +139,10 @@
                     <tbody>
                         <?php foreach ($recentTransactions as $row): ?>
                             <tr>
-                                <td>#<?= $row['id'] ?></td>
+                                <td><?= $row['transaction_id'] ?></td>
                                 <td><?= htmlspecialchars($row['member_name']) ?></td>
                                 <td><?= htmlspecialchars($row['book_title']) ?></td>
-                                <td><?= $row['borrowed_date'] ?></td>
+                                <td><?= $row['borrow_date'] ?></td>
                                 <td><?= $row['due_date'] ?></td>
                                 <td>
                                     <span class="badge bg-<?= $row['status'] === 'overdue' ? 'danger' : 'success' ?>">
@@ -177,7 +177,7 @@
                     <tbody>
                         <?php foreach ($overdueList as $row): ?>
                             <tr>
-                                <td>#<?= $row['id'] ?></td>
+                                <td>#<?= $row['transaction_id'] ?></td>
                                 <td><?= htmlspecialchars($row['member_name']) ?></td>
                                 <td><?= htmlspecialchars($row['book_title']) ?></td>
                                 <td><?= $row['due_date'] ?></td>
