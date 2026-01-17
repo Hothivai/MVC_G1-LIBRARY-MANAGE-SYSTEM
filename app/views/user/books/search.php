@@ -1,87 +1,72 @@
-<?php
-/**
- * Search Books View
- */
-require_once __DIR__ . '/../../layouts/header.php';
-?>
+<?php require_once __DIR__ . '/../../layouts/header.php'; ?>
+<?php require_once __DIR__ . '/../../layouts/navbar.php'; ?>
 
-<section class="search-books">
-    <div class="container" style="padding: 2rem 0;">
-        <h1 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-search"></i> Tìm Kiếm Sách
-        </h1>
-
-        <form method="GET" action="/book/search" style="margin-bottom: 2rem;">
-            <div style="display: flex; gap: 10px; max-width: 600px;">
-                <input type="text" name="q" placeholder="Tìm kiếm sách theo tên, tác giả, ISBN..." 
-                       value="<?= htmlspecialchars($_GET['q'] ?? '') ?>" 
-                       style="flex: 1; padding: 12px 20px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;">
-                <button type="submit" class="btn btn-primary" style="padding: 12px 30px;">
-                    <i class="fas fa-search"></i> Tìm Kiếm
-                </button>
+<div class="container" style="min-height: 600px; padding-bottom: 50px;">
+    
+    <div class="row" style="margin-top: 30px;">
+        <div class="col-md-12">
+            <div style="border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 30px;">
+                <h2 style="margin: 0; color: var(--dark-green);">
+                    Kết quả tìm kiếm cho: "<span style="color: var(--primary-green);"><?= htmlspecialchars($keyword) ?></span>"
+                </h2>
+                <p class="text-muted" style="margin-top: 10px;">
+                    Tìm thấy <strong><?= count($books) ?></strong> kết quả phù hợp.
+                </p>
+                
+                <form action="/books/search" method="GET" class="form-inline" style="margin-top: 15px;">
+                    <div class="form-group" style="width: 50%;">
+                        <input type="text" name="q" class="form-control" value="<?= htmlspecialchars($keyword) ?>" placeholder="Nhập từ khóa khác..." style="width: 100%;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="background: var(--dark-green); border: none;">Tìm lại</button>
+                    <a href="/books" class="btn btn-default">Về danh sách</a>
+                </form>
             </div>
-        </form>
+        </div>
+    </div>
 
-        <?php if (isset($books) && is_array($books)): ?>
-            <?php if (!empty($books)): ?>
-                <!-- Results Info -->
-                <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
-                    <p style="color: var(--text-light); margin: 0;">
-                        <i class="fas fa-info-circle"></i>
-                        Tìm thấy <strong><?= count($books) ?></strong> kết quả cho từ khóa 
-                        "<strong><?= htmlspecialchars($searchQuery) ?></strong>"
-                    </p>
-                </div>
-
-                <!-- Books Grid -->
-                <div class="books-grid">
-                    <?php foreach ($books as $book): ?>
-                        <a href="/book/show/<?= $book['book_id'] ?>" class="book-card">
-                            <div class="book-cover">
-                                <?php if (!empty($book['image_url'])): ?>
-                                    <img src="<?= htmlspecialchars($book['image_url']) ?>"
-                                        alt="<?= htmlspecialchars($book['title']) ?>">
-                                <?php else: ?>
-                                    <div class="book-placeholder">
-                                        <span><?= strtoupper(substr($book['title'], 0, 1)) ?></span>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="book-info">
-                                <h3 class="book-title"><?= htmlspecialchars($book['title']) ?></h3>
-                                <p class="book-author"><?= htmlspecialchars($book['author']) ?></p>
-                                <p class="book-availability">
-                                    <i class="fas fa-book"></i> 
-                                    <?= $book['available_copies'] ?> sách có sẵn
-                                </p>
-                                <p class="book-category" style="font-size: 0.9rem; color: #7f8c8d; margin-top: 8px;">
-                                    <i class="fas fa-folder"></i> <?= htmlspecialchars($book['category_name']) ?>
-                                </p>
-                            </div>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <!-- No Results -->
-                <div class="empty-state">
-                    <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V4.5A2.5 2.5 0 0 1 6.5 2H17l5 5v10"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <h3>Không tìm thấy sách</h3>
-                    <p>Không có kết quả phù hợp với từ khóa "<strong><?= htmlspecialchars($searchQuery) ?></strong>"</p>
-                    <div style="display: flex; gap: 10px; margin-top: 20px;">
-                        <a href="/book" class="btn btn-primary">
-                            <i class="fas fa-book"></i> Xem tất cả sách
-                        </a>
-                        <a href="/book/search" class="btn btn-outline">
-                            <i class="fas fa-redo"></i> Tìm kiếm lại
+    <div class="row">
+        <?php if (!empty($books)): ?>
+            <?php foreach ($books as $book): ?>
+            <div class="col-md-3 col-sm-6">
+                <div class="book-card">
+                    <div class="book-img-wrapper">
+                        <a href="/books/show/<?= $book['book_id'] ?>">
+                            <img src="<?= htmlspecialchars($book['image_url'] ?? '/images/books/default.jpg') ?>" 
+                                 class="book-img" 
+                                 onerror="this.src='/images/books/default.jpg'">
                         </a>
                     </div>
+                    
+                    <div class="book-body">
+                        <h4 class="book-title">
+                            <a href="/books/show/<?= $book['book_id'] ?>">
+                                <?= htmlspecialchars($book['title']) ?>
+                            </a>
+                        </h4>
+                        <p class="book-author">
+                            <?= htmlspecialchars($book['author']) ?>
+                        </p>
+                        <p class="book-availability">
+                            <?= ($book['available_copies'] ?? 0) ?> bản có sẵn
+                        </p>
+                        
+                        <?php if(isset($book['category_name'])): ?>
+                            <span class="label label-success" style="background: var(--light-green-bg); color: var(--dark-green); border: 1px solid var(--primary-green);">
+                                <?= htmlspecialchars($book['category_name']) ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
                 </div>
-            <?php endif; ?>
+            </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="col-md-12 text-center" style="margin-top: 50px;">
+                <i class="fa fa-search fa-4x" style="color: #ddd;"></i>
+                <h3 style="color: #7f8c8d; margin-top: 20px;">Rất tiếc, không tìm thấy kết quả nào.</h3>
+                <p>Hãy thử tìm kiếm với từ khóa khác hoặc kiểm tra lỗi chính tả.</p>
+                <a href="/books" class="btn btn-lg btn-primary" style="background: var(--primary-green); border: none; margin-top: 20px;">Xem tất cả sách</a>
+            </div>
         <?php endif; ?>
     </div>
-</section>
-
+</div>
 <?php require_once __DIR__ . '/../../layouts/footer.php'; ?>

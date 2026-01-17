@@ -4,28 +4,12 @@ namespace App\Models;
 class Book extends Model {
     protected $table = 'books';
     protected $primaryKey = 'book_id';
-    
-    // Hàm này giữ nguyên
-    public function getAvailableCopies($bookId) {
-        $sql = "SELECT COUNT(*) as count FROM book_copies 
-                WHERE book_id = ? AND status = 'available'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$bookId]);
-        return $stmt->fetch()['count'];
-    }
-    
-    // Hàm này giữ nguyên
-    public function getTotalCopies($bookId) {
-        $sql = "SELECT COUNT(*) as count FROM book_copies WHERE book_id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$bookId]);
-        return $stmt->fetch()['count'];
-    }
-    
-    // Đã sửa JOIN -> LEFT JOIN
+
+    // 1. Lấy danh sách sách (có tìm kiếm + lọc danh mục + đếm số lượng có sẵn)
     public function search($keyword, $categoryId = null) {
-        // Sử dụng LEFT JOIN để lấy cả sách chưa có danh mục
-        $sql = "SELECT b.*, c.category_name FROM books b 
+        $sql = "SELECT b.*, c.category_name, 
+                (SELECT COUNT(*) FROM book_copies bc WHERE bc.book_id = b.book_id AND bc.status = 'available') as available_copies
+                FROM books b 
                 LEFT JOIN categories c ON b.category_id = c.category_id 
                 WHERE (b.title LIKE ? OR b.author LIKE ? OR b.isbn LIKE ?)";
         
@@ -36,30 +20,27 @@ class Book extends Model {
             $params[] = $categoryId;
         }
         
-        $sql .= " ORDER BY b.title";
+        $sql .= " ORDER BY b.book_id DESC";
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
     }
     
-    // Đã sửa JOIN -> LEFT JOIN
-    public function getFeaturedBooks($limit = 4) {
-        // Sử dụng LEFT JOIN
-        $sql = "SELECT b.*, c.category_name, 
-                (SELECT COUNT(*) FROM book_copies bc WHERE bc.book_id = b.book_id AND bc.status = 'available') as available_copies
+    // 2. Lấy chi tiết 1 cuốn sách (kèm tên danh mục)
+    public function findWithCategory($id) {
+        $sql = "SELECT b.*, c.category_name 
                 FROM books b 
                 LEFT JOIN categories c ON b.category_id = c.category_id 
-                ORDER BY b.book_id DESC LIMIT ?";
+                WHERE b.book_id = ?";
         
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([$limit]);
-        return $stmt->fetchAll();
+        $stmt->execute([$id]);
+        return $stmt->fetch();
     }
     
-    // Đã sửa JOIN -> LEFT JOIN
+    // 3. Lấy sách mới nhất (cho trang Home)
     public function getLatestBooks($limit = 8) {
-        // Sử dụng LEFT JOIN
         $sql = "SELECT b.*, c.category_name, 
                 (SELECT COUNT(*) FROM book_copies bc WHERE bc.book_id = b.book_id AND bc.status = 'available') as available_copies
                 FROM books b 
@@ -69,5 +50,35 @@ class Book extends Model {
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$limit]);
         return $stmt->fetchAll();
+    }
+    
+    // 4. Lấy sách nổi bật (Ở đây lấy ngẫu nhiên cho phong phú)
+    public function getFeaturedBooks($limit = 4) {
+        $sql = "SELECT b.*, c.category_name, 
+                (SELECT COUNT(*) FROM book_copies bc WHERE bc.book_id = b.book_id AND bc.status = 'available') as available_copies
+                FROM books b 
+                LEFT JOIN categories c ON b.category_id = c.category_id 
+                ORDER BY RAND() LIMIT ?"; // Lấy ngẫu nhiên
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$limit]);
+        return $stmt->fetchAll();
+    }
+
+    // 5. Đếm số lượng cụ thể (Hỗ trợ trang Show)
+    public function getAvailableCopies($bookId) {
+        $sql = "SELECT COUNT(*) as count FROM book_copies WHERE book_id = ? AND status = 'available'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$bookId]);
+        $res = $stmt->fetch();
+        return $res['count'] ?? 0;
+    }
+
+    public function getTotalCopies($bookId) {
+        $sql = "SELECT COUNT(*) as count FROM book_copies WHERE book_id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$bookId]);
+        $res = $stmt->fetch();
+        return $res['count'] ?? 0;
     }
 }
