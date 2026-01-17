@@ -62,3 +62,4 @@ class BookController extends Controller {
         $this->view('user/books/search', $data);
     }
 }
+

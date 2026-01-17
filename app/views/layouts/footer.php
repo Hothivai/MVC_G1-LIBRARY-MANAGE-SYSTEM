@@ -1,16 +1,16 @@
-<footer class="main-footer" style="background: #2c3e50; color: #ecf0f1; margin-top: 60px; padding-top: 40px;">
+<footer class="main-footer" style="background: #145c38; color: #ecf0f1; margin-top: 60px; padding-top: 40px;">
     <div class="container">
         <div class="row">
             <div class="col-md-4 footer-col">
                 <h4 class="footer-title">THƯ VIỆN SỐ</h4>
                 <p>Hệ thống quản lý thư viện trực tuyến hiện đại. Kết nối độc giả với tri thức mọi lúc, mọi nơi.</p>
-                <img src="/images/logo.png" alt="Logo" style="max-width: 120px; margin-top: 15px;">
+                <img src="/public/images/logo.jpg" alt="Logo" style="max-width: 120px; margin-top: 15px;">
             </div>
             
             <div class="col-md-4 footer-col">
                 <h4 class="footer-title">LIÊN HỆ</h4>
                 <ul class="list-unstyled contact-list">
-                    <li><i class="fa fa-map-marker"></i> 123 Đường Sách, Quận 1, TP.HCM</li>
+                    <li><i class="fa fa-map-marker"></i> 99 Tô Hiến Thành Sơn Trà Đà Nẵng</li>
                     <li><i class="fa fa-phone"></i> (028) 1234 5678</li>
                     <li><i class="fa fa-envelope"></i> info@thuvienso.edu.vn</li>
                     <li><i class="fa fa-clock-o"></i> Mở cửa: 8:00 - 20:00 (T2 - T7)</li>
@@ -38,7 +38,7 @@
             </div>
         </div>
         
-        <hr style="border-color: #4a5f7a; margin: 30px 0;">
+        <hr style="border-color: #00af3a; margin: 30px 0;">
         
         <div class="row">
             <div class="col-md-6">
