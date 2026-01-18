@@ -6,6 +6,24 @@ $router = new Router();
 $router->get('/register', 'AuthController', 'register');
 $router->post('/register', 'AuthController', 'handleRegister');
 
-// LOGIN
-$router->get('/login', 'AuthController', 'login');
-$router->post('/login', 'AuthController', 'handleLogin');
+require_once __DIR__ . '/../app/core/Router.php';
+
+
+// AUTH
+$router->get('/auth/login', 'AuthController', 'login');
+$router->post('/auth/login', 'AuthController', 'loginPost');
+
+$router->get('/auth/logout', 'AuthController', 'logout');
+
+// DEFAULT
+$router->get('/', 'AuthController', 'login');
+
+// ADMIN
+$router->get('/admin/dashboard/index','admin/DashboardController','index');
+
+// HOME (USER)
+$router->get('/home/index', 'HomeController', 'index');
+
+// DEFAULT
+
+$router->get('/', 'HomeController', 'index');

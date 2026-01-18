@@ -64,7 +64,7 @@ if (session_status() == PHP_SESSION_NONE) session_start();
     
     <?php unset($_SESSION['old_data']); // Xóa dữ liệu cũ sau khi hiện ?>
     
-    <p class="mt-3 text-center"> Already have an account? <a href="/login">Login</a></p>
+    <p class="mt-3 text-center"> Already have an account? <a href="/MVC_G1-LIBRARY-MANAGE-SYSTEM/public/login">Login</a></p>
 </section>
 </body>
 </body>

@@ -1,8 +1,14 @@
 <?php
+echo "INDEX OK";
+exit;
 require_once '../config/config.php';
 require_once '../app/core/Database.php';
 require_once '../app/core/Controller.php';
 require_once '../app/core/Model.php';
+require_once __DIR__ . '/../app/core/Auth.php';
+
+// load routes
+require_once __DIR__ . '/../config/routes.php';
 
 // Giả sử Router đơn giản theo URL: domain/controller/method
 // → Quy ước URL có dạng: controller/method
@@ -49,3 +55,7 @@ if (file_exists('../app/controllers/' . $controllerName . '.php')) {
         // → Gọi method tương ứng trong controller
     }
 }
+
+
+// chạy router
+$router->dispatch();

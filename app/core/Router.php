@@ -1,5 +1,4 @@
 <?php
-
 class Router
 {
     protected array $routes = [];
@@ -24,15 +23,17 @@ class Router
         ];
     }
 
-    public function dispatch(): void
+    
+
+    public function dispatch()
     {
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
 
-        // tự động bỏ /MVC_G1-LIBRARY-MANAGE-SYSTEM/public
-        $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
-        if (strpos($uri, $scriptDir) === 0) {
-            $uri = substr($uri, strlen($scriptDir));
+        // Bỏ base path
+        $basePath = '/MVC_G1-LIBRARY-MANAGE-SYSTEM/public';
+        if (strpos($uri, $basePath) === 0) {
+            $uri = substr($uri, strlen($basePath));
         }
 
         if ($uri === '') {
@@ -45,12 +46,30 @@ class Router
                 require_once "../app/controllers/{$route['controller']}.php";
 
                 $controller = new $route['controller']();
+                // HỖ TRỢ CONTROLLER TRONG THƯ MỤC CON (admin/...)
+                $controllerPath = __DIR__ . '/../controllers/' . $route['controller'] . '.php';
+
+                if (!file_exists($controllerPath)) {
+                    die('Controller not found: ' . $controllerPath);
+                }
+
+                require_once $controllerPath;
+
+                // Lấy tên class (admin/DashboardController → DashboardController)
+                $className = basename($route['controller']);
+
+                $controller = new $className();
+
+                if (!method_exists($controller, $route['action'])) {
+                    die("Method {$route['action']} not found in {$className}");
+                }
+
                 $controller->{$route['action']}();
                 return;
             }
         }
 
         http_response_code(404);
-        echo "Route not found.";
+        echo "Route not found: " . htmlspecialchars($uri);
     }
 }
