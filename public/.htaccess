@@ -1,9 +1,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /MVC_G1-LIBRARY-MANAGE-SYSTEM/public
-
+    RewriteBase /MVC_G1-LIBRARY-MANAGE-SYSTEM/public/
+    
+    # Không rewrite các file thật (css, js, images, etc)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-
-    RewriteRule ^(.+)$ index.php [QSA,L]
+    
+    # Rewrite tất cả request về index.php với parameter url
+    RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
 </IfModule>

@@ -1,10 +1,8 @@
 <?php
+namespace App\Models;
+use PDO;
+
 class User extends Model {
-    public function findByEmail($email) {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
 
     public function register($data) {
         // Tự tạo username từ email (vì form không có ô username)
@@ -23,10 +21,6 @@ class User extends Model {
             $data['phone']
         ]);
     }
-}
-class User
-{
-    private $db;
 
     public function __construct($db)
     {
@@ -47,5 +41,19 @@ class User
         $stmt = $this->db->query("SELECT COUNT(*) FROM users WHERE role = 'user'");
         return $stmt->fetchColumn();
     }
+
+    protected string $table = 'users';
+    protected string $primaryKey = 'user_id';
+    
+    public function findByUsername($username) {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    public function isSuspended($userId) {
+        $user = $this->find($userId);
+        return $user && $user['is_suspended'] == 1 && 
+               (!empty($user['suspended_until']) && strtotime($user['suspended_until']) > time());
+    }
 }
-?>

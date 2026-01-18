@@ -1,4 +1,7 @@
 <?php
+
+namespace App\Core;
+
 class Auth
 {
     protected static function startSession()

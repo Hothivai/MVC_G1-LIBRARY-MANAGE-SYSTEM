@@ -1,31 +1,43 @@
 <?php
+namespace App\Core;
+
+use PDO;
+use PDOException;
 
 class Database
 {
-    private $host;
-    private $db_name;
-    private $user;
-    private $pass;
-    private $pdo;
+    private static ?Database $instance = null;
+    private PDO $conn;
 
-    public function __construct()
+    private function __construct()
     {
-    $this->host = "localhost";
-	$this->user = "root";
-	$this->pass = "";
-	$this->db_name = "library_db";
+        try {
+            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
+
+            $this->conn = new PDO(
+                $dsn,
+                DB_USER,
+                DB_PASS,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                ]
+            );
+        } catch (PDOException $e) {
+            die('Database connection failed: ' . $e->getMessage());
+        }
     }
 
-    public function connect()
+    public static function getInstance(): Database
     {
-        // PDO Connection
-        try {
-            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->dbname, $this->user, $this->pass);
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->conn->exec("set names utf8");
-        } catch(PDOException $e) {
-            die("Lỗi kết nối: " . $e->getMessage());
+        if (self::$instance === null) {
+            self::$instance = new Database();
         }
+        return self::$instance;
+    }
+
+    public function getConnection(): PDO
+    {
         return $this->conn;
     }
 }

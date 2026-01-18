@@ -1,9 +1,16 @@
 <?php
+namespace App\Models;
+
+use PDO;
 
 class Category extends Model
 {
-    protected $table = 'categories';
-    protected $fillable = ['name', 'description', 'status'];
+    protected string $table = 'categories';
+    protected string $primaryKey = 'category_id';
 
-    // Relationships and custom methods
+    public function all(): array
+    {
+        $stmt = $this->db->query("SELECT * FROM categories ORDER BY category_name");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
