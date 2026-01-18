@@ -23,7 +23,7 @@ require_once '../app/core/Controller.php';
 if (file_exists('../app/core/Middleware.php')) {
     require_once '../app/core/Middleware.php';
 }
-if (file_exists('../app/core/AdminMiddleware.php')) {
+if (file_exists(filename: '../app/core/AdminMiddleware.php')) {
     require_once '../app/core/AdminMiddleware.php';
 }
 

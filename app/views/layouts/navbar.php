@@ -29,11 +29,11 @@ function isActive($uri, $keyword) {
             <div class="collapse navbar-collapse" id="main-navbar">
                 <ul class="nav navbar-nav" style="float: none; display: inline-block; left: 50%; transform: translateX(-50%); position: absolute;">
                     <li class="<?= isActive($current_uri, '/') ?>">
-                        <a href="/app/views/home/index.php">Home</a>
+                        <a href="<?= $current_uri == '/' ? '/' : '/app/views/home/index.php' ?>">Home</a>
                     </li>
                     
                     <li class="<?= isActive($current_uri, '/books') ?>">
-                        <a href="/app/views/user/books/index.php">Books</a>
+                        <a href="<?=  $current_uri == "/user/books" ? "/user/books" : "/app/views/user/books/index.php" ?>">Books</a>
                     </li>
 
                     <li class="<?= isActive($current_uri, '/about') ?>">

@@ -28,10 +28,10 @@
                     <div class="book-card">
                         <div class="book-img-wrapper">
                             <a href="/user/books/show/<?= $book['book_id'] ?>">
-                                <img src="<?= htmlspecialchars($book['image_url'] ?? '/images/books') ?>" 
+                                <img src="../../../public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
                                      class="book-img"
                                      alt="<?= htmlspecialchars($book['title']) ?>"
-                                     onerror="this.src='/images/books/default.jpg'">
+                                     onerror="this.src='../../../public/images/books/1984.jpg'">
                             </a>
                         </div>
                         <div class="book-body">
@@ -88,10 +88,10 @@
                     <div class="book-card">
                         <div class="book-img-wrapper">
                             <a href="/user/books/show/<?= $book['book_id'] ?>">
-                                <img src="<?= htmlspecialchars($book['image_url'] ?? '/images/books/default.jpg') ?>" 
+                                <img src="../../../public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
                                      class="book-img"
                                      alt="<?= htmlspecialchars($book['title']) ?>"
-                                     onerror="this.src='/images/books/default.jpg'">
+                                     onerror="this.src='../../../public/images/books/1984.jpg'">
                             </a>
                         </div>
                         <div class="book-body">
