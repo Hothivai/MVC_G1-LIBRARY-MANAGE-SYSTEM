@@ -1,27 +1,34 @@
 <?php
 class Auth
 {
-    public static function login($user)
+    protected static function startSession()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+    }
+
+    public static function login($user)
+    {
+        self::startSession();
         $_SESSION['user'] = $user;
     }
 
     public static function logout()
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        self::startSession();
         session_destroy();
     }
 
     public static function user()
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        self::startSession();
         return $_SESSION['user'] ?? null;
+    }
+
+    public static function check()
+    {
+        self::startSession();
+        return isset($_SESSION['user']);
     }
 }

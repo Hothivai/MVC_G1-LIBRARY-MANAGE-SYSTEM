@@ -6,7 +6,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        Middleware::checkAdmin();
+        Middleware::requireAdmin();
 
         $bookModel = $this->model('Book');
         $userModel = $this->model('User');
