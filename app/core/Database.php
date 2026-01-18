@@ -1,14 +1,24 @@
 <?php
-class Database {
-    private $host = DB_HOST;
-    private $user = DB_USER;
-    private $pass = DB_PASS;
-    private $dbname = DB_NAME;
-    public $conn;
 
-    // Đảm bảo chữ 'C' trong getConnection phải viết HOA
-    public function getConnection() {
-        $this->conn = null;
+class Database
+{
+    private $host;
+    private $db_name;
+    private $user;
+    private $pass;
+    private $pdo;
+
+    public function __construct()
+    {
+    $this->host = "localhost";
+	$this->user = "root";
+	$this->pass = "";
+	$this->db_name = "library_db";
+    }
+
+    public function connect()
+    {
+        // PDO Connection
         try {
             $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->dbname, $this->user, $this->pass);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
