@@ -1,11 +1,11 @@
 <?php
 // Lấy URL hiện tại để xử lý Active State
-$current_uri = $_SERVER['REQUEST_URI'];
+$current_uri = $_SERVER['REQUEST_URI'] ?? '/';
 
 // Hàm kiểm tra active đơn giản
 function isActive($uri, $keyword) {
     if ($keyword == '/' && ($uri == '/' || $uri == '/index.php')) return 'active';
-    if ($keyword != '/' && strpos($uri, $keyword) !== false) return 'active';
+    if ($keyword != '/' && strpos((string)$uri, $keyword) !== false) return 'active';
     return '';
 }
 ?>

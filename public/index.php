@@ -1,61 +1,74 @@
 <?php
-// public/index.php
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Define base path
-define('BASE_PATH', dirname(__DIR__));
-define('APP_PATH', BASE_PATH . '/app');
-define('PUBLIC_PATH', __DIR__);
+// Start session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Load configuration
-require_once BASE_PATH . '/config/config.php';
-require_once BASE_PATH . '/config/database.php';
+require_once '../config/database.php';
+require_once '../config/config.php';
 
-// Autoload classes (SỬA LẠI PHẦN NÀY)
-spl_autoload_register(function($className) {
-    // Chuyển namespace prefix "App\" thành đường dẫn thực tế
-    // Ví dụ: App\Controllers\HomeController => app/controllers/HomeController.php
-    $prefix = 'App\\';
-    $base_dir = APP_PATH . '/';
+// Load CORE classes
+require_once '../app/core/Database.php';
+require_once '../app/core/Router.php';
+require_once '../app/core/Model.php';
+require_once '../app/core/Controller.php';
 
-    // Kiểm tra xem class có sử dụng prefix 'App\' không
-    $len = strlen($prefix);
-    if (strncmp($prefix, $className, $len) !== 0) {
-        // Nếu không có namespace App, thử load trực tiếp từ thư mục app (dành cho các class cũ chưa chuẩn hóa)
-        $file = APP_PATH . '/' . str_replace('\\', '/', $className) . '.php';
-        if (file_exists($file)) {
-            require_once $file;
-        }
-        return;
-    }
 
-    // Lấy phần tên class sau prefix
-    $relative_class = substr($className, $len);
+// Load Middleware (optional)
+if (file_exists('../app/core/Middleware.php')) {
+    require_once '../app/core/Middleware.php';
+}
+if (file_exists('../app/core/AdminMiddleware.php')) {
+    require_once '../app/core/AdminMiddleware.php';
+}
 
-    // Tạo đường dẫn file
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+// Load MODELS
+require_once '../app/models/Category.php';
+require_once '../app/models/Book.php';
+require_once '../app/models/User.php';
+require_once '../app/models/Transaction.php';
 
-    // Fix lỗi viết hoa/thường (Linux case-sensitive): 
-    // Chuẩn hóa folder Controllers, Models thành chữ thường nếu thư mục thực tế là chữ thường
-    // Tuy nhiên, tốt nhất là sửa tên thư mục cho khớp Namespace.
-    
-    if (file_exists($file)) {
-        require_once $file;
-    }
-});
+// Load CONTROLLERS - Base first
+require_once '../app/controllers/HomeController.php';
 
-// Include core files (Thứ tự quan trọng)
-require_once APP_PATH . '/core/Database.php'; // Load Database trước
-require_once APP_PATH . '/core/Model.php';
-require_once APP_PATH . '/core/Controller.php';
-require_once APP_PATH . '/core/Router.php';
-require_once APP_PATH . '/core/Auth.php';
-require_once APP_PATH . '/core/Middleware.php';
 
-// Initialize router
-$router = new Router();
+// Load User Controllers
+if (file_exists('../app/controllers/user/BookController.php')) {
+    require_once '../app/controllers/user/BookController.php';
+}
+
+// Debug: Log the request
+error_log("=== New Request ===");
+error_log("REQUEST_URI: " . $_SERVER['REQUEST_URI']);
+
+// Get request URI
+$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$base_path = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+
+if ($base_path !== '/') {
+    $request_uri = str_replace($base_path, '', $request_uri);
+}
+
+$_GET['url'] = trim($request_uri, '/');
+
+error_log("Processed URL: '" . $_GET['url'] . "'");
+
+$request_method = $_SERVER['REQUEST_METHOD'];
 
 // Load routes
-require_once BASE_PATH . '/config/routes.php';
+require_once '../config/routes.php';
 
-// Dispatch request
-$router->dispatch();
+// Dispatch router
+try {
+    $router->dispatch();
+} catch (Exception $e) {
+    error_log("Router Error: " . $e->getMessage());
+    echo "<h1>Router Error</h1>";
+    echo "<p>" . $e->getMessage() . "</p>";
+    echo "<pre>" . $e->getTraceAsString() . "</pre>";
+}

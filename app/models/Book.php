@@ -1,84 +1,163 @@
 <?php
 namespace App\Models;
 
-class Book extends Model {
-    protected $table = 'books';
-    protected $primaryKey = 'book_id';
+use PDO;
 
-    // 1. Lấy danh sách sách (có tìm kiếm + lọc danh mục + đếm số lượng có sẵn)
-    public function search($keyword, $categoryId = null) {
-        $sql = "SELECT b.*, c.category_name, 
-                (SELECT COUNT(*) FROM book_copies bc WHERE bc.book_id = b.book_id AND bc.status = 'available') as available_copies
-                FROM books b 
-                LEFT JOIN categories c ON b.category_id = c.category_id 
-                WHERE (b.title LIKE ? OR b.author LIKE ? OR b.isbn LIKE ?)";
-        
-        $params = ["%$keyword%", "%$keyword%", "%$keyword%"];
-        
+class Book extends Model
+{
+    protected string $table = 'books';
+    protected string $primaryKey = 'book_id';
+
+    /**
+     * Get books with category and availability stats (for book index page)
+     */
+    public function getAllWithStats(?int $categoryId = null): array
+    {
+        $sql = "
+            SELECT 
+                b.*,
+                c.category_name,
+                COUNT(bc.copy_id) AS total_copies,
+                SUM(bc.status = 'available') AS available_copies
+            FROM books b
+            JOIN categories c ON b.category_id = c.category_id
+            LEFT JOIN book_copies bc ON b.book_id = bc.book_id
+        ";
+
+        $params = [];
+
         if ($categoryId) {
-            $sql .= " AND b.category_id = ?";
+            $sql .= " WHERE b.category_id = ?";
             $params[] = $categoryId;
         }
-        
-        $sql .= " ORDER BY b.book_id DESC";
-        
+
+        $sql .= " GROUP BY b.book_id ORDER BY b.created_at DESC";
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
-    // 2. Lấy chi tiết 1 cuốn sách (kèm tên danh mục)
-    public function findWithCategory($id) {
-        $sql = "SELECT b.*, c.category_name 
-                FROM books b 
-                LEFT JOIN categories c ON b.category_id = c.category_id 
-                WHERE b.book_id = ?";
-        
+
+    /**
+     * Get featured books for homepage
+     */
+    public function getFeaturedBooks(int $limit): array
+    {
+        $sql = "
+            SELECT 
+                b.*,
+                c.category_name,
+                COUNT(bc.copy_id) AS total_copies,
+                SUM(bc.status = 'available') AS available_copies
+            FROM books b
+            JOIN categories c ON b.category_id = c.category_id
+            LEFT JOIN book_copies bc ON b.book_id = bc.book_id
+            GROUP BY b.book_id
+            ORDER BY RAND()
+            LIMIT :limit
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get latest books for homepage
+     */
+    public function getLatestBooks(int $limit): array
+    {
+        $sql = "
+            SELECT 
+                b.*,
+                c.category_name,
+                COUNT(bc.copy_id) AS total_copies,
+                SUM(bc.status = 'available') AS available_copies
+            FROM books b
+            JOIN categories c ON b.category_id = c.category_id
+            LEFT JOIN book_copies bc ON b.book_id = bc.book_id
+            GROUP BY b.book_id
+            ORDER BY b.created_at DESC
+            LIMIT :limit
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Search books by keyword and/or category
+     */
+    public function search(string $keyword = '', ?int $categoryId = null): array
+    {
+        $sql = "
+            SELECT 
+                b.*,
+                c.category_name,
+                COUNT(bc.copy_id) AS total_copies,
+                SUM(bc.status = 'available') AS available_copies
+            FROM books b
+            JOIN categories c ON b.category_id = c.category_id
+            LEFT JOIN book_copies bc ON b.book_id = bc.book_id
+        ";
+
+        $conditions = [];
+        $params = [];
+
+        if ($keyword) {
+            $conditions[] = "(b.title LIKE :kw OR b.author LIKE :kw OR b.isbn LIKE :kw)";
+            $params[':kw'] = "%$keyword%";
+        }
+
+        if ($categoryId) {
+            $conditions[] = "b.category_id = :cat";
+            $params[':cat'] = $categoryId;
+        }
+
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(' AND ', $conditions);
+        }
+
+        $sql .= " GROUP BY b.book_id ORDER BY b.created_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Find book with category information
+     */
+    public function findWithCategory(int $id): ?array
+    {
+        $sql = "
+            SELECT 
+                b.*,
+                c.category_name,
+                COUNT(bc.copy_id) AS total_copies,
+                SUM(bc.status = 'available') AS available_copies
+            FROM books b
+            JOIN categories c ON b.category_id = c.category_id
+            LEFT JOIN book_copies bc ON b.book_id = bc.book_id
+            WHERE b.book_id = ?
+            GROUP BY b.book_id
+        ";
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$id]);
-        return $stmt->fetch();
+        $book = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $book ?: null;
     }
     
-    // 3. Lấy sách mới nhất (cho trang Home)
-    public function getLatestBooks($limit = 8) {
-        $sql = "SELECT b.*, c.category_name, 
-                (SELECT COUNT(*) FROM book_copies bc WHERE bc.book_id = b.book_id AND bc.status = 'available') as available_copies
-                FROM books b 
-                LEFT JOIN categories c ON b.category_id = c.category_id 
-                ORDER BY b.created_at DESC LIMIT ?";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$limit]);
-        return $stmt->fetchAll();
-    }
-    
-    // 4. Lấy sách nổi bật (Ở đây lấy ngẫu nhiên cho phong phú)
-    public function getFeaturedBooks($limit = 4) {
-        $sql = "SELECT b.*, c.category_name, 
-                (SELECT COUNT(*) FROM book_copies bc WHERE bc.book_id = b.book_id AND bc.status = 'available') as available_copies
-                FROM books b 
-                LEFT JOIN categories c ON b.category_id = c.category_id 
-                ORDER BY RAND() LIMIT ?"; // Lấy ngẫu nhiên
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$limit]);
-        return $stmt->fetchAll();
-    }
-
-    // 5. Đếm số lượng cụ thể (Hỗ trợ trang Show)
-    public function getAvailableCopies($bookId) {
-        $sql = "SELECT COUNT(*) as count FROM book_copies WHERE book_id = ? AND status = 'available'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$bookId]);
-        $res = $stmt->fetch();
-        return $res['count'] ?? 0;
-    }
-
-    public function getTotalCopies($bookId) {
-        $sql = "SELECT COUNT(*) as count FROM book_copies WHERE book_id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$bookId]);
-        $res = $stmt->fetch();
-        return $res['count'] ?? 0;
+    /**
+     * Override find method to include category
+     */
+    public function find($id)
+    {
+        return $this->findWithCategory($id);
     }
 }

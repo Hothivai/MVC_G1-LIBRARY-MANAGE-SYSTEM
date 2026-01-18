@@ -1,9 +1,11 @@
 <?php
 namespace App\Models;
 
+use PDO;
+
 class Transaction extends Model {
-    protected $table = 'transactions';
-    protected $primaryKey = 'transaction_id';
+    protected string $table = 'transactions';
+    protected string $primaryKey = 'transaction_id';
     
     public function getBorrowedBooks($userId) {
         $sql = "SELECT t.*, b.title, b.author, bc.barcode, t.due_date 
@@ -15,7 +17,7 @@ class Transaction extends Model {
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$userId]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     public function getBorrowHistory($userId) {
@@ -28,7 +30,7 @@ class Transaction extends Model {
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$userId]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     public function getOverdueBooks() {
@@ -41,6 +43,6 @@ class Transaction extends Model {
                 WHERE t.return_date IS NULL AND t.due_date < CURDATE()";
         
         $stmt = $this->db->query($sql);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

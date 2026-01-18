@@ -1,5 +1,5 @@
 <?php
-namespace App\Controllers;
+namespace App\Controllers;  // ← Namespace đúng cho base Controller
 
 abstract class Controller {
     protected function view($viewPath, $data = []) {
@@ -9,7 +9,7 @@ abstract class Controller {
         if (file_exists($viewFile)) {
             require_once $viewFile;
         } else {
-            die("View file not found: $viewPath");
+            die("View file not found: $viewPath (looking for: $viewFile)");
         }
     }
     
@@ -32,7 +32,7 @@ abstract class Controller {
     
     protected function requireAdmin() {
         $this->requireAuth();
-        if ($_SESSION['user_role'] !== 'admin') {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
             $this->redirect('/');
         }
     }

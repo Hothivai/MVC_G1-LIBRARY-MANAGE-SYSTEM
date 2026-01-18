@@ -1,98 +1,109 @@
 <?php
-class Router {
-    private $routes = [];
-    
-    public function add($method, $path, $controller, $action, $middleware = null) {
-        $this->routes[] = [
-            'method' => $method,
-            'path' => $path,
-            'controller' => $controller,
-            'action' => $action,
-            'middleware' => $middleware
-        ];
+
+namespace App\Core;
+
+class Router
+{
+    private array $routes = [];
+
+    public function add(string $method, string $path, string $controller, string $action, $middleware = null): void
+    {
+        $this->routes[] = compact('method', 'path', 'controller', 'action', 'middleware');
     }
-    
-    public function dispatch() {
+
+    public function dispatch(): void
+    {
         $url = $_GET['url'] ?? '';
+        $url = trim($url, '/');
         $method = $_SERVER['REQUEST_METHOD'];
-        
-        // Remove trailing slash
-        $url = rtrim($url, '/');
-        
-        foreach ($this->routes as $route) {
-            if ($route['method'] === $method && $this->match($route['path'], $url)) {
-                // Apply middleware if exists
-                if ($route['middleware']) {
-                    $middlewareClass = $route['middleware'];
+
+        // Debug
+        error_log("Router dispatch - URL: '$url', Method: $method");
+        error_log("Total routes: " . count($this->routes));
+
+        foreach ($this->routes as $index => $route) {
+            // Debug each route check
+            error_log("Checking route #$index: {$route['method']} {$route['path']}");
+
+            if ($route['method'] !== $method) {
+                error_log("  - Method mismatch");
+                continue;
+            }
+
+            if (!$this->match($route['path'], $url)) {
+                error_log("  - Path doesn't match");
+                continue;
+            }
+
+            error_log("  ✓ MATCH FOUND!");
+
+            // Middleware
+            if ($route['middleware']) {
+                $middlewareClass = "App\\Core\\" . $route['middleware'];
+                if (class_exists($middlewareClass)) {
                     $middleware = new $middlewareClass();
                     if (!$middleware->handle()) {
+                        error_log("  - Middleware blocked request");
                         return;
                     }
                 }
-                
-                // Instantiate controller
-                $controllerName = "App\\Controllers\\" . $route['controller'];
-                if (!class_exists($controllerName)) {
-                    http_response_code(500);
-                    echo "Controller not found: " . $controllerName;
-                    return;
-                }
-                
-                $controller = new $controllerName();
-                $action = $route['action'];
-                
-                if (!method_exists($controller, $action)) {
-                    http_response_code(500);
-                    echo "Action not found: " . $action;
-                    return;
-                }
-                
-                // Call action with parameters
-                $params = $this->extractParams($route['path'], $url);
-                call_user_func_array([$controller, $action], $params);
-                return;
             }
+
+            $controllerClass = "App\\Controllers\\" . $route['controller'];
+            
+            error_log("  - Loading controller: $controllerClass");
+
+            if (!class_exists($controllerClass)) {
+                error_log("  ✗ Controller not found: $controllerClass");
+                die("Controller not found: $controllerClass");
+            }
+
+            $controller = new $controllerClass();
+            error_log("  - Controller instantiated");
+
+            if (!method_exists($controller, $route['action'])) {
+                error_log("  ✗ Action not found: {$route['action']}");
+                die("Action not found: {$route['action']}");
+            }
+
+            error_log("  - Calling action: {$route['action']}");
+            
+            $params = $this->extractParams($route['path'], $url);
+            call_user_func_array([$controller, $route['action']], $params);
+            return;
         }
-        
-        // 404 Not Found
+
+        // No route matched
+        error_log("✗ No route matched for URL: '$url'");
         http_response_code(404);
         $this->show404();
     }
-    
-    private function match($pattern, $url) {
-        // Convert route pattern to regex
-        $pattern = preg_replace('/\{([^}]+)\}/', '([^/]+)', $pattern);
-        $pattern = '#^' . $pattern . '$#';
-        return preg_match($pattern, $url);
+
+    private function match(string $pattern, string $url): bool
+    {
+        $pattern = preg_replace('/\{[^\/]+\}/', '([^/]+)', $pattern);
+        $result = preg_match('#^' . $pattern . '$#', $url);
+        error_log("    Pattern: '^$pattern$', URL: '$url', Result: " . ($result ? 'MATCH' : 'NO MATCH'));
+        return $result;
     }
-    
-    private function extractParams($pattern, $url) {
-        $pattern = preg_replace('/\{([^}]+)\}/', '([^/]+)', $pattern);
-        $pattern = '#^' . $pattern . '$#';
-        preg_match($pattern, $url, $matches);
+
+    private function extractParams(string $pattern, string $url): array
+    {
+        $pattern = preg_replace('/\{[^\/]+\}/', '([^/]+)', $pattern);
+        preg_match('#^' . $pattern . '$#', $url, $matches);
         array_shift($matches);
         return $matches;
     }
-    
-    private function show404() {
-        echo "<!DOCTYPE html>
-        <html>
-        <head>
-            <title>404 - Page Not Found</title>
-            <style>
-                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-                h1 { color: #e74c3c; font-size: 48px; }
-                p { font-size: 18px; color: #7f8c8d; }
-                a { color: #3498db; text-decoration: none; }
-                a:hover { text-decoration: underline; }
-            </style>
-        </head>
-        <body>
-            <h1>404</h1>
-            <h2>Trang không tìm thấy</h2>
-            <p>Xin lỗi, trang bạn đang tìm kiếm không tồn tại.</p>
-            <p><a href=\"/\">← Quay lại trang chủ</a></p>
-        </body>
-        </html>";
+
+    private function show404(): void
+    {
+        $file404 = __DIR__ . '/../views/errors/404.php';
+        if (file_exists($file404)) {
+            require $file404;
+        } else {
+            echo "<h1>404 - Page Not Found</h1>";
+            echo "<p>The page you are looking for does not exist.</p>";
+            echo "<p>URL requested: " . htmlspecialchars($_GET['url'] ?? '') . "</p>";
+        }
     }
 }
