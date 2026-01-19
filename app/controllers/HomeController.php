@@ -1,14 +1,27 @@
 <?php
+namespace App\Controllers;
+
+use App\Models\Book;
+use App\Models\Category;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        return $this->view('home/index');
-    }
+        $bookModel = new Book();
+        $categoryModel = new Category();
 
-    public function about()
-    {
-        return $this->view('home/about');
+        $data = [
+            'featuredBooks' => $bookModel->getFeaturedBooks(4),
+            'latestBooks' => $bookModel->getLatestBooks(8),
+            'categories' => $categoryModel->all()
+        ];
+
+        // Debug
+        // error_log('Featured Books: ' . count($data['featuredBooks']));
+        // error_log('Categories: ' . count($data['categories']));
+
+        $this->view('home/index', $data);
     }
+    
 }
