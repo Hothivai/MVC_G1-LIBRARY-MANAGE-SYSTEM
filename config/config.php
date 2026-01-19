@@ -22,5 +22,5 @@
 	define('DB_NAME', 'library_db'); // Hãy đảm bảo tên DB này khớp với DB bạn tạo trong phpMyAdmin
 
 	// Đường dẫn gốc dự án
-	define('URLROOT', '/MVC_G1-LIBRARY-MANAGE-SYSTEM');
+	// define('URLROOT', '/MVC_G1-LIBRARY-MANAGE-SYSTEM');
 ?>

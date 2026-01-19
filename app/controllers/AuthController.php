@@ -1,19 +1,23 @@
 <?php
 
-require_once __DIR__ . '/../core/Controller.php';
 require_once __DIR__ . '/../core/Auth.php';
 
 class AuthController extends Controller
 {
-    // GET /auth/login
+    // khi vào /
+    public function redirectToLogin()
+    {
+        header('Location: /auth/login');
+        exit;
+    }
+    
+    // hiển thị form login
     public function login()
     {
-        $this->view('auth/login', [
-            'error' => null
-        ]);
+        $this->view('auth/login');
     }
 
-    // POST /auth/login
+    // xử lý submit login
     public function loginPost()
     {
         $email = $_POST['email'] ?? '';
@@ -22,27 +26,28 @@ class AuthController extends Controller
         $userModel = $this->model('User');
         $user = $userModel->findByEmail($email);
 
-        if ($user && password_verify($password, $user['password'])) {
-            Auth::login($user);
-
-            if ($user['role'] === 'admin') {
-                header('Location: ' . URLROOT . '/public/admin/dashboard/index');
-            } else {
-                header('Location: ' . URLROOT . '/public/home/index');
-            }
-            exit;
+        if (!$user || !password_verify($password, $user['password'])) {
+            $this->view('auth/login', [
+                'error' => 'Invalid email or password'
+            ]);
+            return;
         }
 
-        // Sai thì quay lại login
-        $this->view('auth/login', [
-            'error' => 'Wrong email or password'
-        ]);
+        Auth::login($user);
+
+        // redirect theo role
+        if ($user['role'] === 'admin') {
+            header('Location: /admin/dashboard/index');
+        } else {
+            header('Location: /home/index');
+        }
+        exit;
     }
 
     public function logout()
     {
         Auth::logout();
-        header('Location: ' . URLROOT . '/public/home/index');
+        header('Location: /auth/login');
         exit;
     }
 }

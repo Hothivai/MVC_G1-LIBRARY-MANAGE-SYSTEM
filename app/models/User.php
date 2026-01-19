@@ -1,14 +1,7 @@
 <?php
 
-class User
+class User extends Model
 {
-    private $db;
-
-    public function __construct($db)
-    {
-        $this->db = $db;
-    }
-
     // Lấy user theo email
     public function findByEmail($email)
     {
@@ -17,11 +10,13 @@ class User
         $stmt->execute([$email]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
     // Đếm số lượng user
     public function countUsers()
     {
-        $stmt = $this->db->query("SELECT COUNT(*) FROM users WHERE role = 'user'");
+        $stmt = $this->db->query(
+            "SELECT COUNT(*) FROM users WHERE role = 'user'"
+        );
         return $stmt->fetchColumn();
     }
 }
-?>

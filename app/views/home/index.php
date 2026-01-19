@@ -17,8 +17,8 @@
         </div>
     <?php else: ?>
         <!-- CHƯA ĐĂNG NHẬP -->
-        <a href="<?= URLROOT ?>/public/auth/login">Login</a>
-        <a href="<?= URLROOT ?>/public/auth/register">Register</a>
+        <a href="/auth/login">Login</a>
+        <a href="/auth/register">Register</a>
     <?php endif; ?>
 </header>
 
