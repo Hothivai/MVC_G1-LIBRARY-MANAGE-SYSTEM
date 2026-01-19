@@ -10,12 +10,12 @@ if (session_status() == PHP_SESSION_NONE) session_start();
     <title>Register</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="/MVC_G1-LIBRARY-MANAGE-SYSTEM/public/css/Register.css">
+    <link rel="stylesheet" href="/public/css/Register.css">
 </head>
 <body>
 <body>
 <section class="register">
-   <img src="/MVC_G1-LIBRARY-MANAGE-SYSTEM/public/images/logo.jpg" alt="Library Logo" class="logo">
+   <img src="/public/images/logo.jpg" alt="Library Logo" class="logo">
     <h5>LIBRARY MANAGEMENT SYSTEM</h5>
 
     <?php if (isset($_SESSION['errors'])): ?>
@@ -29,7 +29,7 @@ if (session_status() == PHP_SESSION_NONE) session_start();
         <?php unset($_SESSION['errors']); ?>
     <?php endif; ?>
 
-    <form method="POST" action="/MVC_G1-LIBRARY-MANAGE-SYSTEM/auth/register">
+    <form method="POST" action="/auth/register">
         <div class="mb-3 mt-3">
           <label for="fullname" class="form-label">Fullname</label>
           <input type="text" class="form-control" name="fullname" 
