@@ -1,20 +1,46 @@
-<?php ?>
-<?php include '../app/views/layouts/header.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= URLROOT ?>/public/css/login.css">
+</head>
 
-<section class="login">
-    <h1>Đăng Nhập</h1>
-    <form method="POST" action="/login">
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+<body>
+<div class="container">
+    <div class="text-center mb-4">
+        <img src="<?= URLROOT ?>/public/images/logo.jpg" class="logo">
+        <h5 class="fw-bold">LIBRARY MANAGEMENT SYSTEM</h5>
+    </div>
+
+    <form action="<?= URLROOT ?>/public/auth/login" method="post">
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" class="form-control"
+                   placeholder="Enter email"
+                   name="email" required>
         </div>
-        <div class="form-group">
-            <label for="password">Mật Khẩu:</label>
-            <input type="password" id="password" name="password" required>
+
+        <div class="mb-3">
+            <label>Password</label>
+            <input type="password" class="form-control"
+                   placeholder="Enter password"
+                   name="password" required>
         </div>
-        <button type="submit" class="btn btn-primary">Đăng Nhập</button>
+
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger"><?= $error ?></div>
+        <?php endif; ?>
+
+        <button class="btn btn-primary w-100">LOG IN</button>
+
+        <div class="text-center mt-3">
+            Don't have an account?
+            <a href="<?= URLROOT ?>/auth/register">Register now</a>
+        </div>
     </form>
-    <p>Chưa có tài khoản? <a href="/register">Đăng ký tại đây</a></p>
-</section>
-
-<?php include '../app/views/layouts/footer.php'; ?>
+</div>
+</body>
+</html>

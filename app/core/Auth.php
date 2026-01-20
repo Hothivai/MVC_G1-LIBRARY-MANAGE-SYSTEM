@@ -1,32 +1,34 @@
 <?php
-
 class Auth
 {
-    protected $db;
-
-    public function __construct()
+    protected static function startSession()
     {
-        $database = new Database();
-        $this->db = $database->connect();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
-    public function login($email, $password)
+    public static function login($user)
     {
-        // Login logic
+        self::startSession();
+        $_SESSION['user'] = $user;
     }
 
-    public function logout()
+    public static function logout()
     {
-        // Logout logic
+        self::startSession();
+        session_destroy();
     }
 
-    public function isAuthenticated()
+    public static function user()
     {
-        return isset($_SESSION['user_id']);
+        self::startSession();
+        return $_SESSION['user'] ?? null;
     }
 
-    public function getCurrentUser()
+    public static function check()
     {
-        // Get current user
+        self::startSession();
+        return isset($_SESSION['user']);
     }
 }

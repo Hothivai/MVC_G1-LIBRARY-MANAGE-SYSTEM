@@ -6,7 +6,6 @@ class Database {
     private $dbname = DB_NAME;
     public $conn;
 
-    // Đảm bảo chữ 'C' trong getConnection phải viết HOA
     public function getConnection() {
         $this->conn = null;
         try {
