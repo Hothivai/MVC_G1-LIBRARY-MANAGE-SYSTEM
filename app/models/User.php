@@ -1,4 +1,5 @@
 <?php
+
 class User extends Model {
     public function findByEmail($email) {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
@@ -35,3 +36,4 @@ class User extends Model {
     ]);
 }
 }
+?>

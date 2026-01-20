@@ -1,6 +1,10 @@
 <?php
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/Database.php';
+class Controller {
+    public function model($model) {
+        require_once "../app/models/" . $model . ".php";
+        return new $model();
 class Controller
 {
     protected $db;
