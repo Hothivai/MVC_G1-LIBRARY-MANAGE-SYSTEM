@@ -1,40 +1,39 @@
 <?php
-namespace App\Controllers;
 
-abstract class Controller {
-    protected function view($viewPath, $data = []) {
-        extract($data);
-        $viewFile = APP_PATH . '/views/' . $viewPath . '.php';
+require_once __DIR__ . '/Database.php';
 
-        if (file_exists($viewFile)) {
-            require_once $viewFile;
-        } else {
-            die("View file not found: $viewPath");
-            die("View file not found: $viewPath (looking for: $viewFile)");
-        }
+class Controller
+{
+    protected $db;
+
+    public function __construct()
+    {
+        $database = new Database();
+        $this->db = $database->getConnection();
     }
 
-    protected function redirect($url) {
+    public function view($view, $data = [])
+    {
+        extract($data);
+        require_once __DIR__ . "/../views/$view.php";
+    }
+
+    public function model($model)
+    {
+        require_once __DIR__ . "/../models/$model.php";
+        return new $model($this->db);
+    }
+
+    protected function redirect($url)
+    {
         header("Location: $url");
         exit();
     }
 
-    protected function json($data) {
+    protected function json($data)
+    {
         header('Content-Type: application/json');
         echo json_encode($data);
         exit();
     }
-
-    protected function requireAuth() {
-        if (!isset($_SESSION['user_id'])) {
-            $this->redirect('/login');
-        }
-    }
-
-    protected function requireAdmin() {
-        $this->requireAuth();
-        if ($_SESSION['user_role'] !== 'admin') {
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            $this->redirect('/');
-        }
-    }}}
+}

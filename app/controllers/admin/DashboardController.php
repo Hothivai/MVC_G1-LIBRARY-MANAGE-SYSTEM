@@ -1,10 +1,27 @@
 <?php
+require_once __DIR__ . '/../../core/Controller.php';
+require_once __DIR__ . '/../../core/Middleware.php';
 
-class Admin_DashboardController extends Controller
+class DashboardController extends Controller
 {
     public function index()
     {
-        // Tổng quan hệ thống
-        return $this->view('admin/dashboard/index');
+        Middleware::requireAdmin();
+
+        $bookModel = $this->model('Book');
+        $userModel = $this->model('User');
+        $transactionModel = $this->model('Transaction');
+
+        $data = [
+            'totalBooks' => $bookModel->countAll(),
+            'borrowedBooks' => $transactionModel->countBorrowed(),
+            'members' => $userModel->countUsers(),
+            'overdue' => $transactionModel->countOverdue(),
+            'recentTransactions' => $transactionModel->getRecent(),
+            'overdueList' => $transactionModel->getOverdueList(),
+            'active' => 'dashboard'
+        ];
+
+        $this->view('admin/dashboard/index', $data);
     }
 }

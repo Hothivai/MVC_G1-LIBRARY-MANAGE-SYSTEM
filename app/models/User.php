@@ -1,11 +1,8 @@
 <?php
-namespace App\Models;
-
-use PDO;
 
 class User extends Model
 {
-    protected string $table = 'users';
+    protected $table = 'users';
     protected string $primaryKey = 'user_id';
 
     public function findByEmail($email)
@@ -49,5 +46,14 @@ class User extends Model
             $data['fullname'] ?? $data['full_name'] ?? null,
             $data['phone'] ?? null
         ]);
+    }
+
+    // Đếm số lượng user
+    public function countUsers()
+    {
+        $stmt = $this->db->query(
+            "SELECT COUNT(*) FROM users WHERE role = 'user'"
+        );
+        return $stmt->fetchColumn();
     }
 }

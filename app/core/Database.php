@@ -1,42 +1,23 @@
 <?php
-namespace App\Core;
-
-use PDO;
-use PDOException;
 
 class Database
 {
-    private static ?Database $instance = null;
-    private PDO $connection;
+    private $host = DB_HOST;
+    private $user = DB_USER;
+    private $pass = DB_PASS;
+    private $dbname = DB_NAME;
+    public $conn;
 
-    private function __construct()
+    public function getConnection()
     {
+        $this->conn = null;
         try {
-            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
-            $this->connection = new PDO(
-                $dsn,
-                DB_USER,
-                DB_PASS,
-                [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-                ]
-            );
-        } catch (PDOException $e) {
-            die('Database connection failed: ' . $e->getMessage());
+            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->dbname, $this->user, $this->pass);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->conn->exec("set names utf8");
+        } catch(PDOException $e) {
+            die("Database connection failed: " . $e->getMessage());
         }
-    }
-
-    public function getConnection(): PDO
-    {
-        return $this->connection;
-    }
-
-    public static function getInstance(): Database
-    {
-        if (self::$instance === null) {
-            self::$instance = new Database();
-        }
-        return self::$instance;
+        return $this->conn;
     }
 }

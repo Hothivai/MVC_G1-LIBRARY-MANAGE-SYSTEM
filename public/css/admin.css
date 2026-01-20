@@ -1,0 +1,37 @@
+body {
+    background: #f4f6f9;
+}
+
+.sidebar {
+    width: 320px;
+    min-height: 100vh;
+    background: #fff;
+}
+
+.sidebar .nav-item a {
+    padding: 15px 10px;
+    font-size: 20px;
+    display: block;
+    color: #333;
+    text-decoration: none;
+}
+
+.sidebar .nav-item.active {
+    background: #22C55E;
+}
+
+.sidebar .nav-item.active a {
+    color: #fff;
+}
+
+.sidebar .nav-item:hover {
+    background: #22C55E;
+}
+
+.sidebar .nav-item:hover a {
+    color: #fff;
+}
+
+.logo {
+    width: 80px;
+}

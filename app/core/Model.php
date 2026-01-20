@@ -10,12 +10,7 @@ abstract class Model
     protected string $table;
     protected string $primaryKey = 'id';
 
-    public function __construct()
-    {
-        // Lấy PDO từ Database singleton
-        $this->db = Database::getInstance()->getConnection();
-    }
-
+    
     // Lấy tất cả bản ghi
     public function all()
     {
@@ -33,3 +28,4 @@ abstract class Model
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
+
