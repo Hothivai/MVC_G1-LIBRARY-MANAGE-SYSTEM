@@ -1,5 +1,6 @@
 <?php
 // Start session first
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -10,6 +11,10 @@ $router = new Router();
 
 // ==================== PUBLIC ROUTES ====================
 // Home
+
+$router->add('GET', 'register', 'AuthController', 'register');
+$router->add('POST', 'register', 'AuthController', 'handleRegister');
+// Start session first
 $router->add('GET', '', 'HomeController', 'index');
 $router->add('GET', 'index.php', 'HomeController', 'index');
 $router->add('GET', 'home', 'HomeController', 'index');
@@ -65,4 +70,5 @@ $router->add('GET', 'admin/users/show/{id}', 'Admin\UserController', 'show', 'Ad
 // Transactions Management
 $router->add('GET', 'admin/transactions', 'Admin\TransactionController', 'index', 'AdminMiddleware');
 $router->add('POST', 'admin/transactions/approve/{id}', 'Admin\TransactionController', 'approve', 'AdminMiddleware');
+$router->add('POST', 'admin/transactions/return/{id}', 'Admin\TransactionController', 'returnBook', 'AdminMiddleware');
 $router->add('POST', 'admin/transactions/return/{id}', 'Admin\TransactionController', 'returnBook', 'AdminMiddleware');

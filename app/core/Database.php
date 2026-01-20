@@ -27,16 +27,16 @@ class Database
         }
     }
 
+    public function getConnection(): PDO
+    {
+        return $this->connection;
+    }
+
     public static function getInstance(): Database
     {
         if (self::$instance === null) {
             self::$instance = new Database();
         }
         return self::$instance;
-    }
-
-    public function getConnection(): PDO
-    {
-        return $this->connection;
     }
 }
