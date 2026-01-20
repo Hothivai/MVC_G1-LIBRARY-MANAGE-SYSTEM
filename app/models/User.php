@@ -23,4 +23,15 @@ class User extends Model {
             $data['phone']
         ]);
     }
+    public function updatePassword($userId, $newPassword) {
+    // Mã hóa mật khẩu trước khi lưu
+    $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+    
+    $sql = "UPDATE users SET password = :password WHERE id = :id";
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([
+        ':password' => $hashedPassword,
+        ':id' => $userId
+    ]);
+}
 }
