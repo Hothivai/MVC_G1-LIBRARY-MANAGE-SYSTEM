@@ -23,21 +23,20 @@ class User
     }
 
     // ⭐ LMS-32
-    public function findById($id)
-    {
-        $sql = "SELECT id, full_name, phone FROM users WHERE id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function updateContact($id, $full_name, $phone)
-    {
-        $sql = "UPDATE users 
-                SET full_name = ?, phone = ?
-                WHERE id = ?";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([$full_name, $phone, $id]);
-    }
+// ⭐ LMS-32
+public function findById($id)
+{
+    $sql = "SELECT id, full_name, email, phone FROM users WHERE id = ?";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
-?>
+
+public function updateContact($id, $full_name, $phone)
+{
+    $sql = "UPDATE users 
+            SET full_name = ?, phone = ?
+            WHERE id = ?";
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([$full_name, $phone, $id]);
+}}

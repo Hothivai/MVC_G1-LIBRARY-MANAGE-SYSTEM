@@ -66,3 +66,24 @@ label {
     gap: 6px;
     font-size: 14px;
 }
+
+.profile-card {
+            max-width: 450px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+.avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #adb5bd;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
