@@ -41,4 +41,6 @@ class User extends Model {
         $stmt->execute([$userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
 }
