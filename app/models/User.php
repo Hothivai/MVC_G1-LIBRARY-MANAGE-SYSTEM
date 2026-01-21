@@ -1,27 +1,17 @@
 <?php
-
-class User
-{
-    private $db;
-
-    public function __construct($db)
-    {
-        $this->db = $db;
+class User extends Model {
+    // Lấy thông tin hiển thị (LMS-31)
+    public function getUserProfile($id) {
+        $sql = "SELECT * FROM users WHERE id = :id";
+        return $this->db->query($sql, [':id' => $id])->fetch();
     }
 
-    // Lấy user theo email
-    public function findByEmail($email)
-    {
-        $sql = "SELECT * FROM users WHERE email = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$email]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-    // Đếm số lượng user
-    public function countUsers()
-    {
-        $stmt = $this->db->query("SELECT COUNT(*) FROM users WHERE role = 'user'");
-        return $stmt->fetchColumn();
+    // Lấy thống kê cho 3 ô Dashboard
+    public function getBorrowStatistics($id) {
+        $sql = "SELECT 
+            (SELECT COUNT(*) FROM transactions WHERE user_id = :id AND status = 'borrowing') as currently_borrowed,
+            (SELECT COUNT(*) FROM transactions WHERE user_id = :id AND status = 'returned') as returned_books,
+            (SELECT COUNT(*) FROM transactions WHERE user_id = :id AND status = 'on_time') as on_time_books";
+        return $this->db->query($sql, [':id' => $id])->fetch();
     }
 }
-?>

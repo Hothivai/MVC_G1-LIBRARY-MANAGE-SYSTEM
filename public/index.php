@@ -1,12 +1,13 @@
 <?php
-require_once __DIR__ . '/../config/config.php';
+session_start();
+// ... các dòng error reporting ...
+
+// Nạp các core class trước để Controller có thể kế thừa
 require_once __DIR__ . '/../app/core/Database.php';
 require_once __DIR__ . '/../app/core/Controller.php';
 require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/core/Auth.php';
 
-// load routes
-require_once __DIR__ . '/../config/routes.php';
+// Nạp file routes và PHẢI gán vào biến $router
+$router = require_once __DIR__ . '/../config/routes.php';
 
-// chạy router
 $router->dispatch();
