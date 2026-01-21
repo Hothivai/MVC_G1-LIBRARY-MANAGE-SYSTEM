@@ -11,15 +11,13 @@ class Controller
         $this->db = $database->getConnection();
     }
 
-    public function view($view, $data = [])
-    {
-        extract($data);
-        require_once __DIR__ . "/../views/$view.php";
+    public function view($view, $data = []) {
+    if (file_exists('../app/views/' . $view . '.php')) {
+        // Lệnh này cực kỳ quan trọng, nó chuyển ['user' => '...'] thành $user
+        extract($data); 
+        require_once '../app/views/' . $view . '.php';
+    } else {
+        die("View does not exist");
     }
-
-    public function model($model)
-    {
-        require_once __DIR__ . "/../models/$model.php";
-        return new $model($this->db);
-    }
+}
 }

@@ -1,0 +1,72 @@
+ /* CSS cho trang profile người dùng */
+:root {
+    --main-green: #28a745;
+    --light-gray: #f8f9fa;
+    --border-color: #dee2e6;
+}
+
+body {
+    background-color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Avatar hình tròn xám */
+.avatar-circle {
+    width: 120px;
+    height: 120px;
+    background-color: #ced4da;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #6c757d;
+    border: 5px solid #e9ecef;
+}
+
+/* Badge Active */
+.bg-success-light {
+    background-color: #e8f5e9;
+}
+
+/* Các ô thống kê */
+.stat-card {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    height: 100%;
+}
+
+/* Header của bảng */
+.table-success-custom {
+    background-color: var(--main-green) !important;
+    color: white;
+}
+
+.table thead th {
+    border: none;
+    font-weight: 500;
+}
+
+/* Thông tin cá nhân */
+.info-section p {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.info-section hr {
+    margin: 0.5rem 0;
+    opacity: 0.1;
+}
+
+/* Box quy định */
+.regulation-box {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    color: #495057;
+}
+
+/* Hiệu ứng nút khi di chuột */
+.btn-outline-dark:hover {
+    background-color: #343a40;
+    color: white;
+}

@@ -1,24 +1,12 @@
 <?php
-
+// Đảm bảo đã nạp file Router class
 require_once __DIR__ . '/../app/core/Router.php';
 
+// Khởi tạo đối tượng Router
 $router = new Router();
 
-// AUTH
-$router->get('/auth/login', 'AuthController', 'login');
-$router->post('/auth/login', 'AuthController', 'loginPost');
+// config/routes.php// Tìm trong controllers/user/
+$router->get('/profile/edit', 'user/ProfileController', 'edit');
+$router->post('/profile/change-password', 'user/ProfileController', 'changePassword'); // LMS-33
 
-$router->get('/auth/logout', 'AuthController', 'logout');
-
-// DEFAULT
-$router->get('/', 'AuthController', 'login');
-
-// ADMIN
-$router->get('/admin/dashboard/index','admin/DashboardController','index');
-
-// HOME (USER)
-$router->get('/home/index', 'HomeController', 'index');
-
-// DEFAULT
-
-$router->get('/', 'HomeController', 'index');
+return $router; 

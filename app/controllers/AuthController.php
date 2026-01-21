@@ -18,9 +18,8 @@ class AuthController extends Controller
     {
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
-
-        $userModel = $this->model('User');
-        $user = $userModel->findByEmail($email);
+        
+        
 
         if ($user && password_verify($password, $user['password'])) {
             Auth::login($user);

@@ -23,48 +23,49 @@ class Router
         ];
     }
 
-    public function dispatch()
-    {
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $method = $_SERVER['REQUEST_METHOD'];
+   public function dispatch()
+{
+    // 1. Lấy URI hiện tại
+    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $method = $_SERVER['REQUEST_METHOD'];
 
-        // Bỏ base path
-        $basePath = '/MVC_G1-LIBRARY-MANAGE-SYSTEM/public';
-        if (strpos($uri, $basePath) === 0) {
-            $uri = substr($uri, strlen($basePath));
-        }
+    // 2. Xử lý loại bỏ "/public/index.php" khỏi URI nếu có
+    $scriptName = $_SERVER['SCRIPT_NAME']; // Sẽ là /public/index.php
+    if (strpos($uri, $scriptName) === 0) {
+        $uri = substr($uri, strlen($scriptName));
+    } elseif (strpos($uri, dirname($scriptName)) === 0) {
+        $uri = substr($uri, strlen(dirname($scriptName)));
+    }
 
-        if ($uri === '') {
-            $uri = '/';
-        }
+    // 3. Chuẩn hóa URI (luôn bắt đầu bằng / và không có / ở cuối)
+    $uri = '/' . trim($uri, '/');
 
-        foreach ($this->routes as $route) {
-            if ($route['method'] === $method && $route['path'] === $uri) {
+    foreach ($this->routes as $route) {
+        if ($route['method'] === $method && $route['path'] === $uri) {
+            // Đường dẫn tới file controller
+            $controllerPath = __DIR__ . '/../controllers/' . $route['controller'] . '.php';
+            if (!file_exists($controllerPath)) {
+                die('Controller file not found: ' . $controllerPath);
+            }
 
-                // HỖ TRỢ CONTROLLER TRONG THƯ MỤC CON (admin/...)
-                $controllerPath = __DIR__ . '/../controllers/' . $route['controller'] . '.php';
+            require_once $controllerPath;
 
-                if (!file_exists($controllerPath)) {
-                    die('Controller not found: ' . $controllerPath);
-                }
+            // Lấy tên Class cuối cùng (ví dụ: 'user/ProfileController' -> 'ProfileController')
+            $parts = explode('/', $route['controller']);
+            $className = end($parts);
 
-                require_once $controllerPath;
-
-                // Lấy tên class (admin/DashboardController → DashboardController)
-                $className = basename($route['controller']);
-
+            if (class_exists($className)) {
                 $controller = new $className();
-
-                if (!method_exists($controller, $route['action'])) {
-                    die("Method {$route['action']} not found in {$className}");
+                $action = $route['action'];
+                if (method_exists($controller, $action)) {
+                    $controller->$action();
+                    return;
                 }
-
-                $controller->{$route['action']}();
-                return;
             }
         }
-
-        http_response_code(404);
-        echo "Route not found: " . htmlspecialchars($uri);
     }
+
+    http_response_code(404);
+    echo "Route not found: " . htmlspecialchars($uri);
+}
 }
