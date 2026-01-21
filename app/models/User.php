@@ -1,5 +1,4 @@
-<?php
-
+<?php   
 class User
 {
     private $db;
@@ -9,7 +8,6 @@ class User
         $this->db = $db;
     }
 
-    // Lấy user theo email
     public function findByEmail($email)
     {
         $sql = "SELECT * FROM users WHERE email = ?";
@@ -17,11 +15,29 @@ class User
         $stmt->execute([$email]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    // Đếm số lượng user
+
     public function countUsers()
     {
         $stmt = $this->db->query("SELECT COUNT(*) FROM users WHERE role = 'user'");
         return $stmt->fetchColumn();
+    }
+
+    // ⭐ LMS-32
+    public function findById($id)
+    {
+        $sql = "SELECT id, full_name, phone FROM users WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function updateContact($id, $full_name, $phone)
+    {
+        $sql = "UPDATE users 
+                SET full_name = ?, phone = ?
+                WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$full_name, $phone, $id]);
     }
 }
 ?>

@@ -1,27 +1,40 @@
-<?php ?>
-<?php include '../app/views/layouts/header.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Edit Contact</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<section class="profile-edit">
-    <h1>Chỉnh Sửa Thông Tin Cá Nhân</h1>
-    <form method="POST" action="/profile">
-        <div class="form-group">
-            <label for="name">Tên:</label>
-            <input type="text" id="name" name="name" required>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/css/login.css">
+</head>
+
+<body>
+<div class="container">
+    <div class="text-center mb-4">
+        <img src="/public/images/logo.jpg" class="logo">
+        <h5 class="fw-bold">LIBRARY MANAGEMENT SYSTEM</h5>
+    </div>
+
+   <form action="/public/user/profile/edit" method="post">
+
+
+        <div class="mb-3">
+            <label>Full Name</label>
+            <input type="text" class="form-control" name="full_name"  placeholder="Full name" required>             
+                   
         </div>
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+
+        <div class="mb-3">
+            <label>Phone</label>
+            <input type="text" class="form-control" name="phone"  placeholder="Enter phone number" required> 
+                
         </div>
-        <div class="form-group">
-            <label for="phone">Điện Thoại:</label>
-            <input type="tel" id="phone" name="phone">
-        </div>
-        <div class="form-group">
-            <label for="address">Địa Chỉ:</label>
-            <input type="text" id="address" name="address">
-        </div>
-        <button type="submit" class="btn btn-primary">Lưu Thay Đổi</button>
+
+        <button class="btn btn-primary w-100">
+            UPDATE
+        </button>
     </form>
-</section>
-
-<?php include '../app/views/layouts/footer.php'; ?>
+</div>
+</body>
+</html>

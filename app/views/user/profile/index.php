@@ -6,7 +6,7 @@
     <div class="profile-info">
         <!-- User profile information will be displayed here -->
     </div>
-    <a href="/profile/edit" class="btn btn-primary">Chỉnh Sửa Thông Tin</a>
+    <a href="<?= URLROOT ?>/public/user/profile/edit" class="btn btn-primary">Chỉnh Sửa Thông Tin</a>
 </section>
 
 <?php include '../app/views/layouts/footer.php'; ?>
