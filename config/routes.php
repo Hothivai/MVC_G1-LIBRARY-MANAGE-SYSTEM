@@ -19,6 +19,10 @@ $router->get('/admin/dashboard/index','admin/DashboardController','index');
 // HOME (USER)
 $router->get('/home/index', 'HomeController', 'index');
 
-// DEFAULT
+// USER PROFILE (LMS-34)
+$router->get('/user/profile/index', 'UserController', 'index');
+$router->get('/user/profile/edit', 'UserController', 'edit');
+$router->post('/user/profile/edit', 'UserController', 'update');
 
+// DEFAULT
 $router->get('/', 'HomeController', 'index');
