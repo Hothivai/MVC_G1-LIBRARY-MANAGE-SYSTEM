@@ -1,6 +1,6 @@
 <?php
 
-/*// Start session first
+// Start session first
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -92,4 +92,3 @@ $router->add('GET', 'admin/users/show/{id}', 'Admin\UserController', 'show', 'Ad
 $router->add('GET', 'admin/transactions', 'Admin\TransactionController', 'index', 'AdminMiddleware');
 $router->add('POST', 'admin/transactions/approve/{id}', 'Admin\TransactionController', 'approve', 'AdminMiddleware');
 $router->add('POST', 'admin/transactions/return/{id}', 'Admin\TransactionController', 'returnBook', 'AdminMiddleware');
-*/

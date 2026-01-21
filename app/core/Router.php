@@ -1,5 +1,5 @@
 <?php
-/*
+
 namespace App\Core;
 class Router
 {
@@ -170,4 +170,3 @@ class Router
         }
     }
 }
-*/

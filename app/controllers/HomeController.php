@@ -5,7 +5,10 @@ use App\Models\Book;
 use App\Models\Category;
 
 class HomeController extends Controller
+
+
 {
+    
     // public function index()
     // {
     //     $user = $_SESSION['user'] ?? null;
