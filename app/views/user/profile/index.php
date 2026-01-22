@@ -53,8 +53,16 @@
 
                 <div class="card-footer bg-light border-0 p-3">
                     <div class="d-grid gap-2">
-                        <a href="/profile/edit" class="btn btn-outline-dark btn-sm py-2 shadow-sm"><i class="fas fa-user-edit me-2"></i>Edit Profile</a>
-                        <a href="/profile/change-password" class="btn btn-dark btn-sm py-2 shadow-sm"><i class="fas fa-key me-2"></i>Change Password</a>
+                        <button class="btn btn-outline-success btn-sm py-2 shadow-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editProfileModal">
+                            <i class="fas fa-user-edit me-2"></i>Edit Profile
+                        </button>
+                        <button class="btn btn-success btn-sm py-2 shadow-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#changePasswordModal">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </button>
                     </div>
                 </div>
             </div>
@@ -135,6 +143,103 @@
         </div>
     </div>
 </div>
+
+<!-- ===================== MODALS ===================== -->
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <form method="POST" action="/user/updateProfile" class="modal-content">
+
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-user-edit me-2"></i>Edit Profile
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Full name</label>
+          <input type="text" name="full_name" class="form-control"
+                 value="<?= htmlspecialchars($user['full_name']) ?>" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Phone number</label>
+          <input type="text" name="phone" class="form-control"
+                 value="<?= htmlspecialchars($user['phone'] ?? '') ?>">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Address</label>
+          <input type="text" name="address" class="form-control"
+                 value="<?= htmlspecialchars($user['address'] ?? '') ?>">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-success">Save changes</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <form method="POST" action="/user/changePassword" class="modal-content">
+
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-key me-2"></i>Change Password
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Current password</label>
+          <input type="password" name="current_password" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">New password</label>
+          <input type="password" name="new_password" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Confirm new password</label>
+          <input type="password" name="confirm_password" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-success">Update password</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- ===================== JS ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.getElementById('passwordForm').addEventListener('submit', function(e) {
+    const pass = document.getElementById('newPass').value;
+    const confirm = document.getElementById('confirmPass').value;
+    const error = document.getElementById('passError');
+
+    if (pass !== confirm) {
+        e.preventDefault();
+        error.classList.remove('d-none');
+    }
+});
+</script>
 
 </body>
 </html>

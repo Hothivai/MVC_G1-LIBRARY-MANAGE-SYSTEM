@@ -7,7 +7,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= URLROOT ?>/public/css/admin.css">
+    <link rel="stylesheet" href="/public/css/admin.css">
 </head>
 
 <body>
@@ -177,7 +177,7 @@
                     <tbody>
                         <?php foreach ($overdueList as $row): ?>
                             <tr>
-                                <td>#<?= $row['transaction_id'] ?></td>
+                                <td><?= $row['transaction_id'] ?></td>
                                 <td><?= htmlspecialchars($row['member_name']) ?></td>
                                 <td><?= htmlspecialchars($row['book_title']) ?></td>
                                 <td><?= $row['due_date'] ?></td>
