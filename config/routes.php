@@ -24,5 +24,7 @@ $router->get('/home/index', 'HomeController', 'index');
 $router->get('/', 'HomeController', 'index');
 
 // USER PROFILE - LMS-32
-$router->get('/user/profile/edit', 'ProfileController', 'edit');
 $router->post('/user/profile/update', 'ProfileController', 'update');
+$router->get('/user/profile', 'ProfileController', 'index');
+
+

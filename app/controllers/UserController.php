@@ -18,24 +18,21 @@ class ProfileController extends Controller
 
     // Trang profile
     public function index()
-    {
-        return $this->view('user/profile/index');
-    }
+{
+    session_start();
+
+
+    $user_id = $_SESSION['user_id'];
+    $user = $this->userModel->findById($user_id);
+
+    return $this->view('user/profile/index', [
+        'user' => $user
+    ]);
+}
+
 
     // ⭐ LMS-32: hiển thị form chỉnh sửa contact
-    public function edit()
-    {
-        session_start();
 
-        $user_id = $_SESSION['user_id'];
-
-        // ✅ ĐÚNG TÊN HÀM
-        $user = $this->userModel->findById($user_id);
-
-        return $this->view('user/profile/edit', [
-            'user' => $user
-        ]);
-    }
 
     // ⭐ LMS-32: xử lý update contact
     public function update()
@@ -45,8 +42,9 @@ class ProfileController extends Controller
         $user_id   = $_SESSION['user_id'];
         $full_name = $_POST['full_name'];
         $phone     = $_POST['phone'];
+        $address   = $_POST['address'];
 
-        $this->userModel->updateContact($user_id, $full_name, $phone);
+        $this->userModel->updateContact($user_id, $full_name, $phone, $address);
 
         header("Location: " . URLROOT . "/public/user/profile");
         exit;
