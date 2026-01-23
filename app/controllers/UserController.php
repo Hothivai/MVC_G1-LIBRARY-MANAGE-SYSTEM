@@ -1,22 +1,97 @@
 <?php
+namespace App\Controllers;
 
-class Admin_UserController extends Controller
+use App\Models\User;
+use App\Controllers\Controller;
+
+require_once __DIR__ . '/../models/User.php';
+
+class UserController extends Controller
 {
-    public function index()
+    private $userModel;
+
+    public function __construct()
     {
-        // Danh sách người dùng
-        return $this->view('admin/users/index');
+        parent::__construct();
+        $this->userModel = new User($this->db);
     }
 
-    public function show($id)
+    // VIEW PROFILE
+    public function profile()
     {
-        // Chi tiết người dùng
-        return $this->view('admin/users/show');
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /auth/login');
+            exit;
+        }
+
+        $userId = $_SESSION['user_id'];
+
+        $data = [
+            'user' => $this->userModel->getUserProfile($userId),
+            'stats' => $this->userModel->getBorrowStatistics($userId),
+            'borrowedBooks' => $this->userModel->getActiveTransactions($userId)
+        ];
+
+        $this->view('user/profile/index', $data);
     }
 
-    public function edit($id)
+    // UPDATE PROFILE (MODAL)
+    public function updateProfile()
     {
-        // Chỉnh sửa người dùng
-        return $this->view('admin/users/edit');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /profile');
+            exit;
+        }
+
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /auth/login');
+            exit;
+        }
+
+        $userId = $_SESSION['user_id'];
+
+        $data = [
+            'full_name' => trim($_POST['full_name'] ?? ''),
+            'phone'     => trim($_POST['phone'] ?? ''),
+            'address'   => trim($_POST['address'] ?? '')
+        ];
+
+        $this->userModel->updateProfile($userId, $data);
+
+        header('Location: /profile');
+        exit;
+    }
+
+    // CHANGE PASSWORD (MODAL)
+    public function changePassword()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /profile');
+            exit;
+        }
+
+        $userId = $_SESSION['user_id'];
+
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword     = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if ($newPassword !== $confirmPassword) {
+            $_SESSION['error'] = 'Passwords do not match';
+            header('Location: /profile');
+            exit;
+        }
+
+        if (!$this->userModel->checkCurrentPassword($userId, $currentPassword)) {
+            $_SESSION['error'] = 'Current password is incorrect';
+            header('Location: /profile');
+            exit;
+        }
+
+        $this->userModel->updatePassword($userId, $newPassword);
+
+        $_SESSION['success'] = 'Password updated successfully';
+        header('Location: /profile');
+        exit;
     }
 }

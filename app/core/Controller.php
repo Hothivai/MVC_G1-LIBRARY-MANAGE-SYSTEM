@@ -1,80 +1,62 @@
 <?php
-    namespace App\Controllers;  // ← Namespace đúng cho base Controller
-    require_once __DIR__ . '/../../config/config.php';
-    require_once __DIR__ . '/../core/Database.php';
-    use App\Core\Database;
-    class Controller {
+namespace App\Controllers;
+
+use App\Core\Database;
+use App\Core\Auth;
+
+require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/../core/Auth.php';
+
+class Controller
+{
     protected $db;
 
     public function __construct()
     {
+        // PDO dùng chung cho toàn hệ thống
         $this->db = Database::getInstance()->getConnection();
     }
 
-    // protected function view($viewPath, $data = [])
-    // {
-    //     extract($data);
-    //     $viewFile = APPROOT . '/views/' . $viewPath . '.php';
-        
-    //     if (file_exists($viewFile)) {
-    //         require_once $viewFile;
-    //     } else {
-    //         die("View file not found: $viewPath (looking for: $viewFile)");
-    //     }
-    // }
-
-    protected function view($viewPath, $data = [])
-{
-    extract($data);
-
-    $viewFile = APP_PATH . '/views/' . $viewPath . '.php';
-
-    if (file_exists($viewFile)) {
-        require_once $viewFile;
-    } else {
-        die("View file not found: $viewPath (looking for: $viewFile)");
-    }
-}
-    // public function model($model)
-    // {
-    //     require_once __DIR__ . "/../models/$model.php";
-    //     return new $model($this->db);
-    // }
-    public function model($model)
+    // ================= VIEW =================
+    protected function view(string $view, array $data = [])
     {
-        $modelClass = "App\\Models\\$model";
+        $viewFile = __DIR__ . '/../views/' . $view . '.php';
 
-        $modelFile = __DIR__ . "/../models/$model.php";
-        if (file_exists($modelFile)) {
-            require_once $modelFile;
-        } else {
-            die("Model file not found: $modelFile");
+        if (!file_exists($viewFile)) {
+            die("View not found: $view");
         }
 
-        return new $modelClass($this->db);
+        extract($data);
+        require $viewFile;
     }
 
-    
-    protected function redirect($url) {
-        header("Location: $url");
-        exit();
+    // ================= MODEL =================
+    protected function model(string $model)
+    {
+        $class = "App\\Models\\$model";
+        return new $class(); // Model tự lấy DB từ Database singleton
     }
-    
-    protected function json($data) {
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit();
+
+    // ================= REDIRECT =================
+    protected function redirect(string $path)
+    {
+        header("Location: $path");
+        exit;
     }
-    
-    protected function requireAuth() {
-        if (!isset($_SESSION['user_id'])) {
-            $this->redirect('/login');
+
+    // ================= AUTH =================
+    protected function requireAuth()
+    {
+        if (!Auth::check()) {
+            $this->redirect('/auth/login');
         }
     }
-    
-    protected function requireAdmin() {
+
+    protected function requireAdmin()
+    {
         $this->requireAuth();
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+
+        if (!Auth::isAdmin()) {
             $this->redirect('/');
         }
     }

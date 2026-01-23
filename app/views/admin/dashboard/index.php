@@ -177,7 +177,7 @@
                     <tbody>
                         <?php foreach ($overdueList as $row): ?>
                             <tr>
-                                <td>#<?= $row['transaction_id'] ?></td>
+                                <td><?= $row['transaction_id'] ?></td>
                                 <td><?= htmlspecialchars($row['member_name']) ?></td>
                                 <td><?= htmlspecialchars($row['book_title']) ?></td>
                                 <td><?= $row['due_date'] ?></td>

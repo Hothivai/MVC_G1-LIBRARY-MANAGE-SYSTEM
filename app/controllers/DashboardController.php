@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../../core/Controller.php';
-require_once __DIR__ . '/../../core/Middleware.php';
-
+namespace App\Controllers\Admin;
+use App\Controllers\Controller;
+use App\Core\Middleware;
 class DashboardController extends Controller
 {
     public function index()

@@ -1,105 +1,110 @@
 <?php
+
 namespace App\Controllers;
 
-require_once __DIR__ . '/../core/Controller.php';
-require_once __DIR__ . '/../core/Auth.php';
-
 use App\Core\Auth;
+use App\Models\User;
 
-class AuthController extends Controller {
-    
-         public function register() {
+class AuthController extends Controller
+{
+    /* ================= REGISTER ================= */
+
+    // GET /register
+    public function register()
+    {
         $this->view('auth/register');
     }
 
-    public function postRegister() {
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        if (session_status() == PHP_SESSION_NONE) session_start();
-
+    // POST /register
+    public function handleRegister()
+    {
         $data = [
-            'fullname' => trim($_POST['fullname']),
-            'phone' => trim($_POST['phone']),
-            'email' => trim($_POST['email']),
-            'password' => $_POST['password'],
-            'confirm_password' => $_POST['confirm_password']
+            'fullname' => trim($_POST['fullname'] ?? ''),
+            'phone'    => trim($_POST['phone'] ?? ''),
+            'email'    => trim($_POST['email'] ?? ''),
+            'password' => $_POST['password'] ?? '',
+            'confirm_password' => $_POST['confirm_password'] ?? ''
         ];
 
         $errors = [];
 
-        // Kiểm tra 10 số điện thoại
+        // Phone: 10 digits
         if (!preg_match('/^[0-9]{10}$/', $data['phone'])) {
-            $errors[] = "Invalid phone number. Please enter exactly 10 digits.";
+            $errors[] = "Phone number must be exactly 10 digits.";
         }
 
-        // Kiểm tra mật khẩu (8 ký tự, chữ, số, ký tự đặc biệt)
-        $passwordPattern = '/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/';
-        if (!preg_match($passwordPattern, $data['password'])) {
-            $errors[] = "Password must be at least 8 characters long, including letters, numbers and special characters.";
+        // Password rule
+        if (!preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/', $data['password'])) {
+            $errors[] = "Password must be at least 8 characters, include letters, numbers and special characters.";
         }
 
         if ($data['password'] !== $data['confirm_password']) {
             $errors[] = "Confirm password does not match.";
         }
 
-        // --- BƯỚC QUAN TRỌNG: Nếu có lỗi thì dừng lại luôn ---
         if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
+            $_SESSION['errors']   = $errors;
             $_SESSION['old_data'] = $data;
-            header("Location: /MVC_G1-LIBRARY-MANAGE-SYSTEM/auth/register");
-            exit(); // Bắt buộc phải có exit để không chạy code bên dưới
-        }
-
-        $userModel = $this->model('User');
-        
-        if ($userModel->findByEmail($data['email'])) {
-            $_SESSION['errors'] = ["This email already exists in the system. Please use a different email."];
-            $_SESSION['old_data'] = $data;
-            header("Location: /MVC_G1-LIBRARY-MANAGE-SYSTEM/auth/register");
-            exit();
-        }
-
-        if ($userModel->register($data)) {
-            header("Location: /MVC_G1-LIBRARY-MANAGE-SYSTEM/auth/login?success=1");
-            exit();
-        }
-    }
-}
-
-    public function login() {
-        $this->view('auth/login', [
-            'error' => null
-        ]);
-    }
-
-    public function loginPost() {
-        $email = $_POST['email'] ?? '';
-        $password = $_POST['password'] ?? '';
-
-        $userModel = $this->model('User');
-        $user = $userModel->findByEmail($email);
-
-        if ($user && password_verify($password, $user['password'])) {
-            Auth::login($user);
-
-            if ($user['role'] === 'admin') {
-                header('Location: /admin/dashboard');
-            } else {
-                header('Location: /');
-            }
+            header('Location: /register');
             exit;
         }
 
-        $this->view('auth/login', [
-            'error' => 'Wrong email or password'
-        ]);
+        $userModel = new User();
+
+        if ($userModel->findByEmail($data['email'])) {
+            $_SESSION['errors']   = ['Email already exists.'];
+            $_SESSION['old_data'] = $data;
+            header('Location: /register');
+            exit;
+        }
+
+        $userModel->register($data);
+        header('Location: /login');
+        exit;
     }
 
-    public function logout() {
+    /* ================= LOGIN ================= */
+
+    // GET /login
+    public function login()
+    {
+        $this->view('auth/login', ['error' => null]);
+    }
+
+    // POST /login
+    public function handleLogin()
+    {
+        $email    = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+
+        $userModel = new User();
+        $user = $userModel->findByEmail($email);
+
+        if (!$user || !password_verify($password, $user['password'])) {
+            $this->view('auth/login', [
+                'error' => 'Invalid email or password'
+            ]);
+            return;
+        }
+
+        Auth::login($user);
+
+        // Redirect theo role
+        if ($user['role'] === 'admin') {
+            header('Location: /admin/dashboard');
+        } else {
+            header('Location: /');
+        }
+        exit;
+    }
+
+    /* ================= LOGOUT ================= */
+
+    // GET /logout
+    public function logout()
+    {
         Auth::logout();
         header('Location: /');
         exit;
     }
-
 }
-
-?>
