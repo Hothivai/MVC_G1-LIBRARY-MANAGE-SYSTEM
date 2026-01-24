@@ -7,7 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/public/css/login.css">
+<<<<<<< HEAD
 
+=======
+>>>>>>> feature/LMS-8
 </head>
 
 <body>
@@ -17,7 +20,11 @@
         <h5 class="fw-bold">LIBRARY MANAGEMENT SYSTEM</h5>
     </div>
 
+<<<<<<< HEAD
     <form action="/auth/login" method="post">
+=======
+    <form action="/public/auth/login" method="post">
+>>>>>>> feature/LMS-8
         <div class="mb-3">
             <label>Email</label>
             <input type="email" class="form-control"
@@ -40,7 +47,11 @@
 
         <div class="text-center mt-3">
             Don't have an account?
+<<<<<<< HEAD
             <a href="/register">Register now</a>
+=======
+            <a href="/auth/register">Register now</a>
+>>>>>>> feature/LMS-8
         </div>
     </form>
 </div>

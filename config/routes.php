@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 
 // Start session first
 if (session_status() === PHP_SESSION_NONE) {
@@ -6,6 +7,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 use App\Core\Router;
+=======
+>>>>>>> feature/LMS-8
 require_once __DIR__ . '/../app/core/Router.php';
 
 $router = new Router();
@@ -17,21 +20,19 @@ $router->post('/register', 'AuthController', 'handleRegister');
 
 // AUTH
 $router->get('/auth/login', 'AuthController', 'login');
-$router->post('/auth/login', 'AuthController', 'loginPost');
-
+$router->post('/auth/login', 'AuthController', 'handleLogin');
 $router->get('/auth/logout', 'AuthController', 'logout');
 
-// DEFAULT
-$router->get('/', 'AuthController', 'login');
-
-// ADMIN
-$router->get('/admin/dashboard/index','admin/DashboardController','index');
-
-// HOME (USER)
+// HOME
+$router->get('/', 'HomeController', 'index');
 $router->get('/home/index', 'HomeController', 'index');
 
-// DEFAULT
+// USER PROFILE (MODAL BASED)
+$router->get('/profile', 'UserController', 'profile');                 // View profile
+$router->post('/profile/update', 'UserController', 'updateProfile');   // Edit info
+$router->post('/profile/change-password', 'UserController', 'changePassword'); // LMS-33
 
+<<<<<<< HEAD
 $router->get('/', 'HomeController', 'index');
 
 // ==================== PUBLIC ROUTES ====================
@@ -92,3 +93,10 @@ $router->add('GET', 'admin/users/show/{id}', 'Admin\UserController', 'show', 'Ad
 $router->add('GET', 'admin/transactions', 'Admin\TransactionController', 'index', 'AdminMiddleware');
 $router->add('POST', 'admin/transactions/approve/{id}', 'Admin\TransactionController', 'approve', 'AdminMiddleware');
 $router->add('POST', 'admin/transactions/return/{id}', 'Admin\TransactionController', 'returnBook', 'AdminMiddleware');
+=======
+// ADMIN
+$router->get('/admin/dashboard/index', 'admin/DashboardController', 'index');
+
+// DEFAULT FALLBACK
+return $router;
+>>>>>>> feature/LMS-8

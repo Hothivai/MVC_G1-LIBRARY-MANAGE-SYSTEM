@@ -10,120 +10,53 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Load configuration
-require_once '../config/database.php';
 require_once '../config/config.php';
-require_once __DIR__ . '/../config/routes.php';
 
 // Load CORE classes
 require_once '../app/core/Database.php';
 require_once '../app/core/Controller.php';
 require_once '../app/core/Model.php';
-require_once __DIR__ . '/../app/core/Auth.php';
-
-// load routes
-require_once __DIR__ . '/../config/routes.php';
-require_once '../app/core/Router.php';
+require_once '../app/core/Auth.php';
+require_once '../app/core/Middleware.php';
 
 
-// Load Middleware (optional)
-if (file_exists('../app/core/Middleware.php')) {
-    require_once '../app/core/Middleware.php';
-}
-if (file_exists('../app/core/AdminMiddleware.php')) {
-    require_once '../app/core/AdminMiddleware.php';
-}
+// --- SIMPLIFIED ROUTING ---
 
-// Load MODELS
-require_once '../app/models/Category.php';
-require_once '../app/models/Book.php';
-require_once '../app/models/User.php';
-require_once '../app/models/Transaction.php';
+// 1. Determine Controller and Action
+$controllerName = isset($_GET['controller']) ? $_GET['controller'] : 'home';
+$actionName = isset($_GET['action']) ? $_GET['action'] : 'index';
 
-// Load CONTROLLERS - Base first
-require_once '../app/controllers/HomeController.php';
+// 2. Sanitize and Format Names
+// Whitelist of allowed characters for security
+$controllerName = preg_replace('/[^a-zA-Z0-9_]/', '', $controllerName);
+$actionName = preg_replace('/[^a-zA-Z0-9_]/', '', $actionName);
 
+$controllerClass = ucfirst($controllerName) . 'Controller';
 
-// Load User Controllers
-if (file_exists('../app/controllers/user/BookController.php')) {
-    require_once '../app/controllers/user/BookController.php';
-}
+// 3. Construct File Path and Fully Qualified Class Name
+$controllerFile = '../app/controllers/' . $controllerClass . '.php';
+$fullyQualifiedControllerClass = 'App\Controllers\' . $controllerClass;
 
-// Debug: Log the request
-error_log("=== New Request ===");
-error_log("REQUEST_URI: " . $_SERVER['REQUEST_URI']);
+// 4. Check and Load Controller
+if (file_exists($controllerFile)) {
+    require_once $controllerFile;
 
-// Get request URI
-$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$base_path = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+    // 5. Instantiate Controller and Call Action
+    if (class_exists($fullyQualifiedControllerClass)) {
+        $controller = new $fullyQualifiedControllerClass();
 
-if ($base_path !== '/') {
-    $request_uri = str_replace($base_path, '', $request_uri);
-}
-
-$_GET['url'] = trim($request_uri, '/');
-
-error_log("Processed URL: '" . $_GET['url'] . "'");
-
-$request_method = $_SERVER['REQUEST_METHOD'];
-
-// Giả sử Router đơn giản theo URL: domain/controller/method
-// → Quy ước URL có dạng: controller/method
-
-$url = isset($_GET['url'])
-    ? explode('/', filter_var(rtrim($_GET['url'], '/'), FILTER_SANITIZE_URL))
-    : ['auth', 'register'];
-// Nếu URL tồn tại:
-//    - Xóa dấu / dư ở cuối
-//    - Làm sạch URL
-//    - Tách chuỗi thành mảng ['controller', 'method']
-// Nếu không có URL → mặc định vào auth/register
-
-$controllerName = ucfirst($url[0]) . 'Controller';
-// → Lấy phần controller trong URL
-// → Viết hoa chữ cái đầu và gắn 'Controller'
-// → Ví dụ: auth → AuthController
-
-if (file_exists('../app/controllers/' . $controllerName . '.php')) {
-// → Kiểm tra file controller có tồn tại không
-
-    require_once '../app/controllers/' . $controllerName . '.php';
-    // → Nạp file controller vào chương trình
-
-    $controller = new $controllerName;
-    // → Khởi tạo object controller
-
-    $method = isset($url[1]) ? $url[1] : 'register';
-    // → Lấy method từ URL
-    // → Nếu không có → mặc định gọi register()
-
-    // Nếu là POST register thì gọi postRegister
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && $method == 'register') {
-        $method = 'postRegister';
+        if (method_exists($controller, $actionName)) {
+            // Call the action
+            $controller->$actionName();
+        } else {
+            // Action not found
+            echo "Error: Action '{$actionName}' not found in controller '{$fullyQualifiedControllerClass}'.";
+        }
+    } else {
+        // Class not found in file
+        echo "Error: Controller class '{$fullyQualifiedControllerClass}' not found in file '{$controllerFile}'.";
     }
-    // → Phân biệt GET và POST
-    // → GET  /register  → register()
-    // → POST /register  → postRegister()
-
-    if (method_exists($controller, $method)) {
-    // → Kiểm tra method có tồn tại trong controller không
-
-        $controller->$method();
-        // → Gọi method tương ứng trong controller
-    }
+} else {
+    // Controller file not found
+    echo "Error: Controller file not found for '{$controllerName}'. Path: {$controllerFile}";
 }
-
-
-// chạy router
-$router->dispatch();
-// Dispatch router
-try {
-    $router->dispatch();
-} catch (Exception $e) {
-    error_log("Router Error: " . $e->getMessage());
-    echo "<h1>Router Error</h1>";
-    echo "<p>" . $e->getMessage() . "</p>";
-    echo "<pre>" . $e->getTraceAsString() . "</pre>";
-}
-
-
-require_once __DIR__ . '/../app/core/Router.php';
