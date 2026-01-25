@@ -1,57 +1,45 @@
 <?php
-namespace App\Controllers;
-use App\Models\User;
-use App\Core\Auth;
 
 class AuthController extends Controller
 {
-    // khi vào /
-    public function redirectToLogin()
-    {
-        header('Location: /auth/login');
-        exit;
-    }
-    
-    // hiển thị form login
+    // Hiển thị form login
     public function login()
     {
         $this->view('auth/login');
     }
 
-    // xử lý submit login
-    public function loginPost()
+    // Xử lý submit login
+    public function login_handle()
     {
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
-        
-        $user = new User();
-        $user = $user->findByEmail($email);  // Add this line
+
+        $userModel = new User();
+        $user = $userModel->findByEmail($email);
 
         if (!$user || !password_verify($password, $user['password'])) {
             $this->view('auth/login', [
-                'error' => 'Invalid email or password'
+                'error' => 'Email hoặc mật khẩu không đúng'
             ]);
             return;
         }
 
         Auth::login($user);
 
-        // redirect theo role
+        // Redirect theo role → ACTION
         if ($user['role'] === 'admin') {
-            header('Location: /admin/dashboard/index');
+            header('Location: /?action=admin_dashboard');
         } else {
-            header('Location: /home/index');
+            header('Location: /?action=home');
         }
         exit;
     }
 
-    public function logout() {
+    // Logout
+    public function logout()
+    {
         Auth::logout();
-        header('Location: /');
-        header('Location: /auth/login');
+        header('Location: /?action=login');
         exit;
     }
-
 }
-
-?>

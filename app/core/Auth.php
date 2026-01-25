@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Core;
-
 class Auth
 {
     protected static function startSession()
@@ -15,11 +13,13 @@ class Auth
     {
         self::startSession();
         $_SESSION['user'] = $user;
+        $_SESSION['user_id'] = $user['id']; // thêm để đồng bộ
     }
 
     public static function logout()
     {
         self::startSession();
+        session_unset();
         session_destroy();
     }
 
@@ -33,5 +33,11 @@ class Auth
     {
         self::startSession();
         return isset($_SESSION['user']);
+    }
+
+    public static function isAdmin()
+    {
+        self::startSession();
+        return isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin';
     }
 }

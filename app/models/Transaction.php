@@ -1,6 +1,5 @@
 <?php
-namespace App\Models;
-use PDO;
+require_once __DIR__ . '/../core/Model.php';
 class Transaction extends Model
 {
 

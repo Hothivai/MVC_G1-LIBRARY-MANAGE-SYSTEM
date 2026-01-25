@@ -1,7 +1,5 @@
 <?php
-namespace App\Models;
-
-use PDO;
+require_once __DIR__ . '/../core/Model.php';
 
 class Book extends Model
 {

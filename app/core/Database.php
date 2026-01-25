@@ -1,18 +1,19 @@
 <?php
-namespace App\Core;
 
 use PDO;
 use PDOException;
 
 class Database
 {
-    private static ?Database $instance = null;
-    private PDO $conn;
+    private static $instance = null;
+    private $conn;
 
     private function __construct()
     {
         try {
-            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
+            $dsn = "mysql:host=" . DB_HOST .
+                   ";dbname=" . DB_NAME .
+                   ";charset=" . DB_CHARSET;
 
             $this->conn = new PDO(
                 $dsn,
@@ -28,7 +29,7 @@ class Database
         }
     }
 
-    public static function getInstance(): Database
+    public static function getInstance()
     {
         if (self::$instance === null) {
             self::$instance = new Database();
@@ -36,7 +37,7 @@ class Database
         return self::$instance;
     }
 
-    public function getConnection(): PDO
+    public function getConnection()
     {
         return $this->conn;
     }

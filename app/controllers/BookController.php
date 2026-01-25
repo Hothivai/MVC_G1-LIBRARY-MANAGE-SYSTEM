@@ -1,28 +1,26 @@
 <?php
-use App\Controllers\Controller;
+require_once __DIR__ . '/../../core/Controller.php';
+require_once __DIR__ . '/../../core/Middleware.php';
+
 class Admin_BookController extends Controller
 {
     public function index()
     {
-        // Danh sách sách
-        return $this->view('admin/books/index');
+        $this->view('admin/books/index');
     }
 
     public function create()
     {
-        // Thêm sách mới
-        return $this->view('admin/books/create');
+        $this->view('admin/books/create');
     }
 
     public function edit($id)
     {
-        // Sửa thông tin sách
-        return $this->view('admin/books/edit');
+        $this->view('admin/books/edit', ['id' => $id]);
     }
 
     public function show($id)
     {
-        // Chi tiết sách
-        return $this->view('admin/books/show');
+        $this->view('admin/books/show', ['id' => $id]);
     }
 }
