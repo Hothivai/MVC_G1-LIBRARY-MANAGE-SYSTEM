@@ -72,46 +72,65 @@ class BookController extends Controller
         $this->view('user/books/show', $data);
     }
 
-    // action: user_books_search
-    public function userSearch()
+// action: user_books_search
+public function userSearch()
+{
+    $this->requireAuth();
+
+    $bookModel     = $this->model('Book');
+    $categoryModel = $this->model('Category');
+
+    // ---- GET PARAMS ----
+    $keyword = trim($_GET['search'] ?? '');
+    $categoryId = isset($_GET['category']) && $_GET['category'] !== ''
+        ? (int)$_GET['category']
+        : null;
+
+    $page    = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+    $perPage = 12;
+
+    // ---- SEARCH DATA ----
+    $allBooks = $bookModel->search($keyword, $categoryId);
+
+    // ---- PAGINATION ----
+    $totalBooks = count($allBooks);
+    $totalPages = max(1, ceil($totalBooks / $perPage));
+    $page       = min($page, $totalPages);
+    $offset     = ($page - 1) * $perPage;
+
+    $books = array_slice($allBooks, $offset, $perPage);
+
+    // ---- CATEGORIES (FILTER) ----
+    $categories = $categoryModel->all();
+
+    // ---- VIEW DATA ----
+    $this->view('user/books/index', [
+        'books'            => $books,
+        'categories'       => $categories,
+        'searchQuery'      => $keyword,
+        'selectedCategory' => $categoryId,
+        'currentPage'      => $page,
+        'totalPages'       => $totalPages,
+        'totalBooks'       => $totalBooks
+    ]);
+}
+
+
+    // action: user_books_borrow_request
+    public function userBorrowRequest(int $id)
     {
         $this->requireAuth();
 
-        $keyword    = $_GET['q'] ?? $_GET['search'] ?? '';
-        $selectedCategory = isset($_GET['category']) ? (string)$_GET['category'] : '';
-        $categoryId = $selectedCategory ? (int)$selectedCategory : null;
-
         $bookModel = $this->model('Book');
-        $categoryModel = $this->model('Category');
+        $book = $bookModel->findWithCategory($id);
 
-        // Get pagination and filter parameters
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $perPage = 12;
+        if (!$book) {
+            $this->redirect('user_books_index');
+        }
 
-        // Get books with search
-        $allBooks = $bookModel->search($keyword, $categoryId);
-
-        // Calculate pagination
-        $totalBooks = count($allBooks);
-        $totalPages = ceil($totalBooks / $perPage);
-        $page = min($page, $totalPages ?: 1);
-        $offset = ($page - 1) * $perPage;
-        $books = array_slice($allBooks, $offset, $perPage);
-
-        // Get categories for filter
-        $categories = $categoryModel->all();
-
-        $data = [
-            'books'            => $books,
-            'categories'       => $categories,
-            'searchQuery'      => $keyword,
-            'selectedCategory' => $selectedCategory,
-            'currentPage'      => $page,
-            'totalPages'       => $totalPages,
-            'totalBooks'       => $totalBooks
-        ];
-
-        $this->view('user/books/index', $data);
+        $this->view('user/borrow/request', [
+            'book' => $book
+        ]);
     }
 
     // ---------- ADMIN METHODS ----------

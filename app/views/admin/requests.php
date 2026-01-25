@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/public/css/admin.css">
 </head>
 <body>
+    <form action="index.php?action=admin_requests" method="GET">
     <div class="d-flex">
         <aside class="sidebar p-3 border-end">
             <div class="text-center mb-4">
@@ -33,7 +34,6 @@
                     <i class="bi bi-person-circle fs-4"></i>
                 </div>
             </nav>
-
             <main class="p-4">
                 <div class="d-flex justify-content-between align-items-end mb-4">
                     <div>
@@ -146,5 +146,6 @@
             </main>
         </div>
     </div>
+</form>
 </body>
 </html>

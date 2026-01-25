@@ -1,4 +1,5 @@
 <?php
+use App\Core\Database;
 
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/Database.php';

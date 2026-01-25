@@ -1,6 +1,6 @@
 <?php
-require_once APP_PATH . '/views/layouts/header.php';
-require_once APP_PATH . '/views/layouts/navbar.php';
+    require_once __DIR__ . '/../../layouts/header.php';
+    require_once __DIR__ . '/../../layouts/navbar.php';
 ?>
 
 <div class="container" style="margin-top: 30px; margin-bottom: 50px;">
@@ -10,16 +10,29 @@ require_once APP_PATH . '/views/layouts/navbar.php';
                 <h4 class="fw-bold mb-4 text-success"><i class="fa fa-filter me-2"></i>Filter</h4>
                 
                 <form action="index.php" method="GET">
-                    <input type="hidden" name="action" value="home"> <div class="mb-4">
+                    <input type="hidden" name="action" value="user_books_index">
+                    <div class="mb-4">
                         <label class="fw-bold mb-2">Categories</label>
-                        <?php 
-                        $cats = ['Công nghệ', 'Khoa học', 'Văn học', 'Kinh tế', 'Tự phát triển', 'Tâm lý học'];
-                        foreach($cats as $cat): ?>
-                            <div class="form-check mb-1">
-                                <input class="form-check-input accent-success" type="checkbox" name="cat[]" value="<?= $cat ?>">
-                                <label class="form-check-label small"><?= $cat ?></label>
-                            </div>
-                        <?php endforeach; ?>
+
+                        <?php if (!empty($categories)): ?>
+                            <?php foreach ($categories as $cat): ?>
+                                <div class="form-check mb-1">
+                                    <input
+                                        class="form-check-input accent-success"
+                                        type="radio"
+                                        name="category"
+                                        value="<?= $cat['category_id'] ?>"
+                                        <?= ($selectedCategory == $cat['category_id']) ? 'checked' : '' ?>
+                                    >
+                                    <label class="form-check-label small">
+                                        <?= htmlspecialchars($cat['category_name']) ?>
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="text-muted small">No categories found.</p>
+                        <?php endif; ?>
+
                     </div>
 
                     <div class="mb-4">
@@ -44,10 +57,10 @@ require_once APP_PATH . '/views/layouts/navbar.php';
 
         <main class="col-md-9">
             <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 shadow-sm rounded">
-                <div class="input-group w-50">
-                    <input type="text" class="form-control border-success" placeholder="Search books...">
+                <form action="index.php?action=user_books_search" method="GET" class="input-group w-50">
+                    <input type="text" name="search" class="form-control border-success" placeholder="Search books...">
                     <button class="btn btn-success" type="button" style="background-color: #16A34A;"><i class="fa fa-search"></i></button>
-                </div>
+                </form>
                 <div class="d-flex align-items-center">
                     <label class="me-2 small text-muted">Sort by:</label>
                     <select class="form-select form-select-sm border-success">
@@ -58,13 +71,17 @@ require_once APP_PATH . '/views/layouts/navbar.php';
             </div>
 
             <div class="row g-4">
-                <?php if(!empty($latestBooks)): ?>
-                    <?php foreach($latestBooks as $book): ?>
+                <?php if (!empty($books)): ?>
+                    <?php foreach ($books as $book): ?>
                     <div class="col-md-4">
                         <div class="card h-100 border-0 shadow-sm book-card-hover">
                             <div class="position-relative overflow-hidden" style="height: 280px;">
-                                <img src="<?= !empty($book['image_url']) ? $book['image_url'] : '/public/images/books/1984.jpg' ?>" 
-                                     class="card-img-top h-100 w-100 object-fit-cover" alt="Book Cover">
+                                <a href="index.php?action=user_books_show&id=<?= $book['book_id'] ?>">
+                                    <img src="../../../public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
+                                        class="book-img"
+                                        alt="<?= htmlspecialchars($book['title']) ?>"
+                                        onerror="this.src='../../../public/images/books/1984.jpg'">
+                                </a>
                                 
                                 <?php if(($book['available_copies'] ?? 0) > 0): ?>
                                     <span class="badge bg-success position-absolute top-0 start-0 m-2 px-3 py-2 shadow-sm">Book available</span>
@@ -79,9 +96,9 @@ require_once APP_PATH . '/views/layouts/navbar.php';
                                 <p class="card-text small text-secondary mb-3">by <?= htmlspecialchars($book['author']) ?></p>
                                 
                                 <div class="d-flex gap-2">
-                                    <a href="index.php?action=book_detail&id=<?= $book['book_id'] ?>" class="btn btn-outline-success btn-sm flex-grow-1 border-2 fw-bold">Detail</a>
+                                    <a href="index.php?action=user_books_show&id=<?= $book['book_id'] ?>" class="btn btn-outline-success btn-sm flex-grow-1 border-2 fw-bold">Detail</a>
                                     <?php if(($book['available_copies'] ?? 0) > 0): ?>
-                                        <a href="index.php?action=borrow_request&id=<?= $book['book_id'] ?>" class="btn btn-success btn-sm flex-grow-1 fw-bold" style="background-color: #16A34A;">Borrow</a>
+                                        <a href="index.php?action=user_books_borrow_request&id=<?= $book['book_id'] ?>" class="btn btn-success btn-sm flex-grow-1 fw-bold" style="background-color: #16A34A;">Borrow</a>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -157,4 +174,4 @@ require_once APP_PATH . '/views/layouts/navbar.php';
 }
 </style>
 
-<?php require_once APP_PATH . '/views/layouts/footer.php'; ?>
+<?php require_once __DIR__ . '/../../layouts/footer.php';?>

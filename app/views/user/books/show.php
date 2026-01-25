@@ -6,8 +6,8 @@ require_once dirname(__DIR__,2) . '/layouts/navbar.php';
 <div class="container mt-4 mb-5">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb py-3 px-4 shadow-sm" style="background-color: #16A34A;">
-            <li class="breadcrumb-item"><a href="index.php?action=home" class="text-white text-decoration-none">Home</a></li>
-            <li class="breadcrumb-item"><a href="index.php?action=home" class="text-white text-decoration-none">Book</a></li>
+            <li class="breadcrumb-item"><a href="index.php?action=home_index" class="text-white text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="index.php?action=user_books_index" class="text-white text-decoration-none">Book</a></li>
             <li class="breadcrumb-item active text-white-50" aria-current="page"><?= htmlspecialchars($book['title']) ?></li>
         </ol>
     </nav>
@@ -15,11 +15,15 @@ require_once dirname(__DIR__,2) . '/layouts/navbar.php';
     <div class="row g-5">
         <div class="col-md-4 text-center">
             <div class="book-cover-container p-4 bg-white shadow-sm rounded border">
-                <img src="<?= !empty($book['image_url']) ? $book['image_url'] : '/public/images/books/1984.jpg' ?>" 
-                     class="img-fluid rounded shadow" alt="Book Cover" style="max-height: 400px;">
-                
-                <div class="mt-4 d-grid gap-3">``
-                    <a href="index.php?action=user_borrow_request&id=<?= $book['book_id'] ?>" 
+                                <a href="index.php?action=user_books_show&id=<?= $book['book_id'] ?>">
+                                    <img src="../../../public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
+                                        class="book-img"
+                                        alt="<?= htmlspecialchars($book['title']) ?>"
+                                        onerror="this.src='../../../public/images/books/1984.jpg'">
+                                </a>
+
+                <div class="mt-4 d-grid gap-3">
+                    <a href="index.php?action=user_books_borrow_request&id=<?= $book['book_id'] ?>" 
                        class="btn btn-success py-3 fw-bold shadow-sm" style="background-color: #16A34A; border: none;">
                        <i class="fa fa-book-reader me-2"></i>Borrow books
                     </a>

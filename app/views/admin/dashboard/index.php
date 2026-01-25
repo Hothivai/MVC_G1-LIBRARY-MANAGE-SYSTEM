@@ -39,7 +39,7 @@
                 </li>
 
                 <li class="nav-item <?= $active === 'borrow_requests' ? 'active' : '' ?>">
-                    <a href="/admin/borrow_requests/index">
+                    <a href="index.php?action=admin_requests">
                         <i class="bi bi-people me-2"></i> Borrow Requests
                     </a>
                 </li>
@@ -57,7 +57,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="auth_logout">
+                    <a href="index.php?action=auth_login">
                         <i class="bi bi-box-arrow-right me-2"></i> Logout
                     </a>
                 </li>

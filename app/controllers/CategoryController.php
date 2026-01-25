@@ -1,7 +1,5 @@
 <?php
 require_once __DIR__ . '/../core/Controller.php';
-require_once __DIR__ . '/../models/Category.php';
-
 class CategoryController extends Controller
 {
     // action: admin_categories_index
@@ -9,7 +7,7 @@ class CategoryController extends Controller
     {
         $this->requireAdmin();
 
-        $categoryModel = new Category();
+        $categoryModel = $this->model('Category');
         $categories = $categoryModel->all();
 
         $this->view('admin/categories/index', [
@@ -29,11 +27,16 @@ class CategoryController extends Controller
     {
         $this->requireAdmin();
 
-        $categoryModel = new Category();
+        $categoryModel = $this->model('Category');
         $category = $categoryModel->find($id);
+
+        if (!$category) {
+            $this->redirect('admin_categories_index');
+        }
 
         $this->view('admin/categories/edit', [
             'category' => $category
         ]);
     }
 }
+?>

@@ -149,7 +149,7 @@
 <!-- EDIT PROFILE MODAL -->
 <div class="modal fade" id="editProfileModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <form method="POST" action="user_profile_update" class="modal-content">
+    <form method="POST" action="index.php?action=user_profile_update" class="modal-content">
 
       <div class="modal-header bg-success text-white">
         <h5 class="modal-title">
@@ -190,7 +190,7 @@
 <!-- CHANGE PASSWORD MODAL -->
 <div class="modal fade" id="changePasswordModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <form method="POST" action="user_change_password" class="modal-content">
+    <form method="POST" action="index.php?action=user_change_password" class="modal-content">
 
       <div class="modal-header bg-success text-white">
         <h5 class="modal-title">

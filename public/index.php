@@ -31,6 +31,7 @@ require_once '../app/models/Category.php';
 require_once '../app/models/Notification.php';
 require_once '../app/models/Transaction.php';
 require_once '../app/models/User.php';
+require_once '../app/models/BorrowRequest.php';
 
 // ============================
 // 5. LOAD CONTROLLERS
@@ -43,7 +44,7 @@ require_once '../app/controllers/DashboardController.php';
 require_once '../app/controllers/NotificationController.php';
 require_once '../app/controllers/TransactionController.php';
 require_once '../app/controllers/UserController.php';
-
+require_once '../app/controllers/BorrowRequestController.php';
 // ============================
 // 6. LẤY ACTION
 // ============================
@@ -103,8 +104,9 @@ switch ($action) {
         (new UserController())->borrowIndex();  // Giả định thêm method này
         break;
 
-    case 'user_borrow_request':
-        (new UserController())->borrowRequest();  // Giả định thêm method này
+    case 'user_books_borrow_request':
+        $controller = new BookController();
+        $controller->userBorrowRequest((int)$_GET['id']);
         break;
 
     // ---------- USER NOTIFICATIONS ----------
@@ -221,6 +223,16 @@ switch ($action) {
         $id = $_GET['id'] ?? 0;
         (new UserController())->adminEdit($id);  // Giả định thêm method này
         break;
+
+case 'admin_requests':
+    Middleware::requireAdmin();
+    (new BorrowRequestController())->index();
+    break;
+
+case 'admin_requests_approve':
+    Middleware::requireAdmin();
+    (new BorrowRequestController())->approve_request();
+    break;
 
     // ---------- DEFAULT ----------
     default:

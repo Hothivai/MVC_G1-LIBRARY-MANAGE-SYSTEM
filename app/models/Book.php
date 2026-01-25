@@ -86,45 +86,50 @@ class Book extends Model
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Search books by keyword and/or category
-     */
-    public function search(string $keyword = '', ?int $categoryId = null): array
-    {
-        $sql = "
-            SELECT 
-                b.*,
-                c.category_name,
-                COUNT(bc.copy_id) AS total_copies,
-                SUM(bc.status = 'available') AS available_copies
-            FROM books b
-            JOIN categories c ON b.category_id = c.category_id
-            LEFT JOIN book_copies bc ON b.book_id = bc.book_id
-        ";
+/**
+ * Search books by keyword and/or category
+ */
+public function search(string $keyword = '', ?int $categoryId = null): array
+{
+    $sql = "
+        SELECT 
+            b.*,
+            c.category_name,
+            COUNT(bc.copy_id) AS total_copies,
+            COALESCE(
+                SUM(CASE WHEN bc.status = 'available' THEN 1 ELSE 0 END),
+                0
+            ) AS available_copies
+        FROM books b
+        LEFT JOIN categories c ON b.category_id = c.category_id
+        LEFT JOIN book_copies bc ON b.book_id = bc.book_id
+    ";
 
-        $conditions = [];
-        $params = [];
+    $conditions = [];
+    $params     = [];
 
-        if ($keyword) {
-            $conditions[] = "(b.title LIKE :kw OR b.author LIKE :kw OR b.isbn LIKE :kw)";
-            $params[':kw'] = "%$keyword%";
-        }
-
-        if ($categoryId) {
-            $conditions[] = "b.category_id = :cat";
-            $params[':cat'] = $categoryId;
-        }
-
-        if (!empty($conditions)) {
-            $sql .= " WHERE " . implode(' AND ', $conditions);
-        }
-
-        $sql .= " GROUP BY b.book_id ORDER BY b.created_at DESC";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($keyword !== '') {
+        $conditions[] = "(b.title LIKE :kw OR b.author LIKE :kw OR b.isbn LIKE :kw)";
+        $params[':kw'] = '%' . $keyword . '%';
     }
+
+    if ($categoryId !== null) {
+        $conditions[] = "b.category_id = :cat";
+        $params[':cat'] = $categoryId;
+    }
+
+    if (!empty($conditions)) {
+        $sql .= " WHERE " . implode(' AND ', $conditions);
+    }
+
+    $sql .= " GROUP BY b.book_id ORDER BY b.created_at DESC";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute($params);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
     /**
      * Find book with category information
@@ -167,5 +172,31 @@ class Book extends Model
         $sql = "SELECT COUNT(*) AS total FROM {$this->table}";
         $stmt = $this->db->query($sql);
         return (int) $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    }
+    
+    // Lấy 1 bản copy còn available của sách
+public function getAvailableCopy(int $bookId): ?int
+{
+    $stmt = $this->db->prepare("
+        SELECT copy_id 
+        FROM book_copies
+        WHERE book_id = ? AND status = 'available'
+        LIMIT 1
+    ");
+    $stmt->execute([$bookId]);
+    $copy = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $copy ? $copy['copy_id'] : null;
+}
+
+// Giảm số lượng available_copies (nếu bạn CÓ cột này)
+    public function decreaseAvailable(int $bookId): bool
+    {
+        $stmt = $this->db->prepare("
+            UPDATE books 
+            SET available_copies = available_copies - 1
+            WHERE book_id = ?
+        ");
+        return $stmt->execute([$bookId]);
     }
 }

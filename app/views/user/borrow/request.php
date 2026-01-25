@@ -6,8 +6,8 @@ require_once dirname(__DIR__, 2) . '/layouts/navbar.php';
 <div class="container mt-4 mb-5">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb py-3 px-4 shadow-sm" style="background-color: #16A34A;">
-            <li class="breadcrumb-item"><a href="index.php?action=home" class="text-white text-decoration-none">Home</a></li>
-            <li class="breadcrumb-item"><a href="index.php?action=book_detail&id=<?= $book['book_id'] ?>" class="text-white text-decoration-none">Book Detail</a></li>
+            <li class="breadcrumb-item"><a href="index.php?action=home_index" class="text-white text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="index.php?action=user_books_show&id=<?= $book['book_id'] ?>" class="text-white text-decoration-none">Book Detail</a></li>
             <li class="breadcrumb-item active text-white-50" aria-current="page">Borrow Request</li>
         </ol>
     </nav>
@@ -18,8 +18,12 @@ require_once dirname(__DIR__, 2) . '/layouts/navbar.php';
                 <div class="row g-0">
                     <div class="col-md-4 bg-light p-4 text-center border-end">
                         <h5 class="text-success fw-bold mb-4">BOOK INFORMATION</h5>
-                        <img src="<?= !empty($book['image_url']) ? $book['image_url'] : '/public/images/books/1984.jpg' ?>" 
-                             class="img-fluid rounded shadow-sm mb-3" style="max-height: 250px;">
+                                <a href="index.php?action=user_books_show&id=<?= $book['book_id'] ?>">
+                                    <img src="../../../public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
+                                        class="book-img"
+                                        alt="<?= htmlspecialchars($book['title']) ?>"
+                                        onerror="this.src='../../../public/images/books/1984.jpg'">
+                                </a>
                         <h6 class="fw-bold mb-1"><?= htmlspecialchars($book['title']) ?></h6>
                         <p class="text-muted small">Author: <?= htmlspecialchars($book['author']) ?></p>
                         <div class="badge bg-success-light text-success border border-success px-3 py-2 mt-2">

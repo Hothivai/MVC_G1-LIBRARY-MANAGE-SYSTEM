@@ -1,5 +1,6 @@
 <?php
-
+// use PDO;
+use App\Core\Database;
 require_once __DIR__ . '/../core/Database.php';
 
 abstract class Model
