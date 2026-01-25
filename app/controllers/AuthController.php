@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
-
-require_once __DIR__ . '/../core/Auth.php';
+use App\Models\User;
+use App\Core\Auth;
 
 class AuthController extends Controller
 {

@@ -1,5 +1,5 @@
 <?php
-
+use App\Controllers\Controller;
 class Admin_CategoryController extends Controller
 {
     public function index()

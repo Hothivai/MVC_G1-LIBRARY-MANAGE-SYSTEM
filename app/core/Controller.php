@@ -11,7 +11,6 @@
         $this->db = Database::getInstance()->getConnection();
     }
 
-<<<<<<< HEAD
     // protected function view($viewPath, $data = [])
     // {
     //     extract($data);
@@ -80,15 +79,5 @@
         }
     }
 }
-=======
-    public function view($view, $data = []) {
-    if (file_exists('../app/views/' . $view . '.php')) {
-        // Lệnh này cực kỳ quan trọng, nó chuyển ['user' => '...'] thành $user
-        extract($data); 
-        require_once '../app/views/' . $view . '.php';
-    } else {
-        die("View does not exist");
-    }
-}
-}
->>>>>>> feature/LMS-8
+    
+

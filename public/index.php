@@ -1,62 +1,77 @@
 <?php
-
-// Enable error reporting for debugging
+// 1. Cấu hình & Session
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Start session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Load configuration
+// 2. Load Config & Core Classes
 require_once '../config/config.php';
-
-// Load CORE classes
 require_once '../app/core/Database.php';
 require_once '../app/core/Controller.php';
 require_once '../app/core/Model.php';
 require_once '../app/core/Auth.php';
 require_once '../app/core/Middleware.php';
 
+// 3. Lấy Controller và Action từ URL
+// Mặc định là 'home' và 'index'
+$controllerInput = isset($_GET['controller']) ? $_GET['controller'] : 'home';
+$actionInput = isset($_GET['action']) ? $_GET['action'] : 'index';
 
-// --- SIMPLIFIED ROUTING ---
+// 4. Chuẩn hóa tên (Ví dụ: 'auth' -> 'AuthController')
+$controllerName = ucfirst($controllerInput) . 'Controller';
+$actionName = $actionInput;
 
-// 1. Determine Controller and Action
-$controllerName = isset($_GET['controller']) ? $_GET['controller'] : 'home';
-$actionName = isset($_GET['action']) ? $_GET['action'] : 'index';
+// 5. Tìm file Controller (Quét cả thư mục gốc, admin và user)
+$pathsToCheck = [
+    '../app/controllers/' . $controllerName . '.php',
+    '../app/controllers/admin/' . $controllerName . '.php',
+    '../app/controllers/user/' . $controllerName . '.php'
+];
 
-// 2. Sanitize and Format Names
-// Whitelist of allowed characters for security
-$controllerName = preg_replace('/[^a-zA-Z0-9_]/', '', $controllerName);
-$actionName = preg_replace('/[^a-zA-Z0-9_]/', '', $actionName);
+$controllerPath = null;
+foreach ($pathsToCheck as $path) {
+    if (file_exists($path)) {
+        $controllerPath = $path;
+        require_once $path;
+        break;
+    }
+}
 
-$controllerClass = ucfirst($controllerName) . 'Controller';
+// 6. Khởi tạo và chạy
+if ($controllerPath) {
+    // Xử lý Namespace/Class Name
+    // Code cũ của bạn có class tên là Admin_BookController, User_BookController
+    // Để code gọn, ta sẽ kiểm tra class tồn tại.
+    
+    $className = $controllerName; // Mặc định: BookController
 
-// 3. Construct File Path and Fully Qualified Class Name
-$controllerFile = '../app/controllers/' . $controllerClass . '.php';
-$fullyQualifiedControllerClass = 'App\Controllers\' . $controllerClass;
+    // Logic fallback để hỗ trợ cách đặt tên class cũ của bạn
+    if (!class_exists($className)) {
+        if (class_exists('Admin_' . $controllerName)) {
+            $className = 'Admin_' . $controllerName;
+        } elseif (class_exists('User_' . $controllerName)) {
+            $className = 'User_' . $controllerName;
+        } elseif (class_exists("App\\Controllers\\" . $controllerName)) {
+            $className = "App\\Controllers\\" . $controllerName;
+        }
+    }
 
-// 4. Check and Load Controller
-if (file_exists($controllerFile)) {
-    require_once $controllerFile;
-
-    // 5. Instantiate Controller and Call Action
-    if (class_exists($fullyQualifiedControllerClass)) {
-        $controller = new $fullyQualifiedControllerClass();
-
+    if (class_exists($className)) {
+        $controller = new $className();
+        
         if (method_exists($controller, $actionName)) {
-            // Call the action
             $controller->$actionName();
         } else {
-            // Action not found
-            echo "Error: Action '{$actionName}' not found in controller '{$fullyQualifiedControllerClass}'.";
+            // Action không tồn tại -> Về trang chủ
+            header("Location: index.php?controller=home&action=index");
         }
     } else {
-        // Class not found in file
-        echo "Error: Controller class '{$fullyQualifiedControllerClass}' not found in file '{$controllerFile}'.";
+        die("Lỗi: Class '$className' không tìm thấy trong file.");
     }
 } else {
-    // Controller file not found
-    echo "Error: Controller file not found for '{$controllerName}'. Path: {$controllerFile}";
+    die("Lỗi: Không tìm thấy file cho controller '$controllerInput'.");
 }
+?>

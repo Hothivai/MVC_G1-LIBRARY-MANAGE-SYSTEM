@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Core;
+
 class Router
 {
     protected array $routes = [];
@@ -25,73 +26,84 @@ class Router
         ];
     }
 
-   public function dispatch()
-{
-    // 1. Lấy URI hiện tại
-    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $method = $_SERVER['REQUEST_METHOD'];
+    public function dispatch()
+    {
+        // 1. Lấy URI hiện tại
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $method = $_SERVER['REQUEST_METHOD'];
 
-    // 2. Xử lý loại bỏ "/public/index.php" khỏi URI nếu có
-    $scriptName = $_SERVER['SCRIPT_NAME']; // Sẽ là /public/index.php
-    if (strpos($uri, $scriptName) === 0) {
-        $uri = substr($uri, strlen($scriptName));
-    } elseif (strpos($uri, dirname($scriptName)) === 0) {
-        $uri = substr($uri, strlen(dirname($scriptName)));
-    }
+        // 2. Xử lý loại bỏ "/public" hoặc "/MVC_G1-LIBRARY-MANAGE-SYSTEM/public" khỏi URI nếu có
+        $basePath = '/MVC_G1-LIBRARY-MANAGE-SYSTEM/public';
+        if (strpos($uri, $basePath) === 0) {
+            $uri = substr($uri, strlen($basePath));
+        }
+        
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        if (strpos($uri, $scriptName) === 0) {
+            $uri = substr($uri, strlen($scriptName));
+        } elseif (strpos($uri, dirname($scriptName)) === 0) {
+            $uri = substr($uri, strlen(dirname($scriptName)));
+        }
 
-    // 3. Chuẩn hóa URI (luôn bắt đầu bằng / và không có / ở cuối)
-    $uri = '/' . trim($uri, '/');
+        // 3. Chuẩn hóa URI (luôn bắt đầu bằng / và không có / ở cuối trừ khi là root)
+        if ($uri !== '/') {
+            $uri = '/' . trim($uri, '/');
+        }
 
-    foreach ($this->routes as $route) {
-        if ($route['method'] === $method && $route['path'] === $uri) {
-            // Đường dẫn tới file controller
-            $controllerPath = __DIR__ . '/../controllers/' . $route['controller'] . '.php';
-            if (!file_exists($controllerPath)) {
-                die('Controller file not found: ' . $controllerPath);
-            }
+        // 4. Tìm route khớp
+        foreach ($this->routes as $route) {
+            if ($route['method'] === $method && $route['path'] === $uri) {
+                // Xử lý controller path
+                $controllerPath = $route['controller'];
+                $controllerFile = __DIR__ . '/../controllers/' . $controllerPath . '.php';
+                
+                // Hỗ trợ controller trong thư mục con (admin/..., user/...)
+                if (strpos($controllerPath, '/') !== false) {
+                    $controllerFile = __DIR__ . '/../controllers/' . $controllerPath . '.php';
+                }
+                
+                if (!file_exists($controllerFile)) {
+                    http_response_code(404);
+                    die('Controller file not found: ' . $controllerFile);
+                }
 
-                require_once "../app/controllers/{$route['controller']}.php";
+                require_once $controllerFile;
 
-                $controller = new $route['controller']();
-                // HỖ TRỢ CONTROLLER TRONG THƯ MỤC CON (admin/...)
-                $controllerPath = __DIR__ . '/../controllers/' . $route['controller'] . '.php';
-            require_once $controllerPath;
+                // Lấy tên Class cuối cùng (ví dụ: 'admin/DashboardController' -> 'DashboardController')
+                $parts = explode('/', $route['controller']);
+                $className = end($parts);
 
-            // Lấy tên Class cuối cùng (ví dụ: 'user/ProfileController' -> 'ProfileController')
-            $parts = explode('/', $route['controller']);
-            $className = end($parts);
+                // Kiểm tra các prefix có thể có
+                if (!class_exists($className)) {
+                    if (class_exists('Admin_' . $className)) {
+                        $className = 'Admin_' . $className;
+                    } elseif (class_exists('User_' . $className)) {
+                        $className = 'User_' . $className;
+                    } elseif (class_exists("App\\Controllers\\" . $className)) {
+                        $className = "App\\Controllers\\" . $className;
+                    }
+                }
 
-            if (class_exists($className)) {
-                $controller = new $className();
-                $action = $route['action'];
-                if (method_exists($controller, $action)) {
-                    $controller->$action();
-                    return;
+                if (class_exists($className)) {
+                    $controller = new $className();
+                    $action = $route['action'];
+                    
+                    if (method_exists($controller, $action)) {
+                        $controller->$action();
+                        return;
+                    } else {
+                        http_response_code(404);
+                        die("Action '$action' not found in controller '$className'");
+                    }
+                } else {
+                    http_response_code(404);
+                    die("Class '$className' not found");
                 }
             }
         }
 
+        // Không tìm thấy route
         http_response_code(404);
         echo "Route not found: " . htmlspecialchars($uri);
-        $pattern = preg_replace('/\{[^\/]+\}/', '([^/]+)', $pattern);
-        preg_match('#^' . $pattern . '$#', $url, $matches);
-        array_shift($matches);
-        return $matches;
     }
-
-    private function show404(): void
-    {
-        $file404 = __DIR__ . '/../views/errors/404.php';
-        if (file_exists($file404)) {
-            require $file404;
-        } else {
-            echo "<h1>404 - Page Not Found</h1>";
-            echo "<p>The page you are looking for does not exist.</p>";
-            echo "<p>URL requested: " . htmlspecialchars($_GET['url'] ?? '') . "</p>";
-        }
-    }
-
-    http_response_code(404);
-    echo "Route not found: " . htmlspecialchars($uri);
-}
 }

@@ -4,7 +4,7 @@ $current_uri = $_SERVER['REQUEST_URI'] ?? '/';
 
 // Hàm kiểm tra active đơn giản
 function isActive($uri, $keyword) {
-    if ($keyword == '/' && ($uri == '/' || $uri == '/index.php')) return 'active';
+    if ($keyword == '/' && ($uri == '/' || $uri == '/index.php' || strpos($uri, '/home') !== false)) return 'active';
     if ($keyword != '/' && strpos((string)$uri, $keyword) !== false) return 'active';
     return '';
 }
@@ -29,22 +29,22 @@ function isActive($uri, $keyword) {
             <div class="collapse navbar-collapse" id="main-navbar">
                 <ul class="nav navbar-nav" style="float: none; display: inline-block; left: 50%; transform: translateX(-50%); position: absolute;">
                     <li class="<?= isActive($current_uri, '/') ?>">
-                        <a href="<?= $current_uri == '/' ? '/' : '/app/views/home/index.php' ?>">Home</a>
+                        <a href="/">Home</a>
                     </li>
                     
                     <li class="<?= isActive($current_uri, '/books') ?>">
-                        <a href="<?=  $current_uri == "/user/books" ? "/user/books" : "/app/views/user/books/index.php" ?>">Books</a>
+                        <a href="/user/books">Books</a>
                     </li>
 
                     <li class="<?= isActive($current_uri, '/about') ?>">
-                        <a href="/app/views/home/about.php">About</a>
+                        <a href="/home/about">About</a>
                     </li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <li>
-                            <a href="/app/views/notifications/index.php" style="border:none; font-size: 20px;">
+                            <a href="/user/notifications" style="border:none; font-size: 20px;">
                                 <i class="fa fa-bell"></i>
                             </a>
                         </li>
@@ -56,13 +56,13 @@ function isActive($uri, $keyword) {
                                 <span><?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="/app/views/user/profile/index.php">Hồ sơ</a></li>
-                                <li><a href="/app/views/auth/login.php">Đăng xuất</a></li>
+                                <li><a href="/profile">Hồ sơ</a></li>
+                                <li><a href="/auth/logout">Đăng xuất</a></li>
                             </ul>
                         </li>
                     <?php else: ?>
-                        <li><a href="/app/views/auth/register.php" class="btn-nav-action">Register</a></li>
-                        <li><a href="/app/views/auth/login.php" class="btn-nav-action">Login</a></li>
+                        <li><a href="/auth/register" class="btn-nav-action">Register</a></li>
+                        <li><a href="/auth/login" class="btn-nav-action">Login</a></li>
                     <?php endif; ?>
                 </ul>
             </div>

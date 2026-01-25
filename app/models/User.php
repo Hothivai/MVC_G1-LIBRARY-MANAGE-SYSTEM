@@ -2,39 +2,12 @@
 namespace App\Models;
 use PDO;
 
-<<<<<<< HEAD
-class User extends Model {
-
-    public function register($data) {
-        // Tự tạo username từ email (vì form không có ô username)
-        $username = explode('@', $data['email'])[0] . rand(100, 999);
-        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-
-        $sql = "INSERT INTO users (username, email, password, full_name, phone, role, status) 
-                VALUES (?, ?, ?, ?, ?, 'member', 'active')";
-        
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            $username,
-            $data['email'],
-            $hashedPassword,
-            $data['fullname'],
-            $data['phone']
-        ]);
-    }
-
-    public function __construct($db)
-    {
-        $this->db = $db;
-    }
 
     // Lấy user theo email
-=======
 class User extends Model
 {
     // AUTH / ACCOUNT
     // Tìm user theo email (login, register)
->>>>>>> feature/LMS-8
     public function findByEmail($email)
     {
         $sql = "SELECT * FROM users WHERE email = ?";
