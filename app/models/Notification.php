@@ -6,7 +6,7 @@ class Notification extends Model
     protected string $table = 'notifications';
     protected string $primaryKey = 'notification_id';
 
-    public function getByUserId($userId, $limit = 10) {
+    public function getByUser($userId, $limit = 10) {
         $sql = "SELECT * FROM notifications 
                 WHERE user_id = ? 
                 ORDER BY created_at DESC 

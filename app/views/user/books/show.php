@@ -1,6 +1,6 @@
-<?php 
-require_once dirname(__DIR__, 2) . '/layouts/header.php';
-require_once dirname(__DIR__, 2) . '/layouts/navbar.php';
+<?php
+require_once dirname(__DIR__,2) . '/layouts/header.php';
+require_once dirname(__DIR__,2) . '/layouts/navbar.php';
 ?>
 
 <div class="container mt-4 mb-5">
@@ -19,7 +19,7 @@ require_once dirname(__DIR__, 2) . '/layouts/navbar.php';
                      class="img-fluid rounded shadow" alt="Book Cover" style="max-height: 400px;">
                 
                 <div class="mt-4 d-grid gap-3">``
-                    <a href="index.php?action=borrow_request&id=<?= $book['book_id'] ?>" 
+                    <a href="index.php?action=user_borrow_request&id=<?= $book['book_id'] ?>" 
                        class="btn btn-success py-3 fw-bold shadow-sm" style="background-color: #16A34A; border: none;">
                        <i class="fa fa-book-reader me-2"></i>Borrow books
                     </a>

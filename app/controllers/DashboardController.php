@@ -1,14 +1,13 @@
 <?php
-require_once __DIR__ . '/../../core/Controller.php';
-require_once __DIR__ . '/../../core/Middleware.php';
+require_once __DIR__ . '/../core/Controller.php';
 
 class DashboardController extends Controller
 {
-    // action: index
+    // action: admin_dashboard_index
     public function index()
     {
-        // kiểm tra quyền admin
-        Middleware::requireAdmin();
+        // kiểm tra quyền admin (giữ hoặc xóa nếu đã có trong index.php)
+        $this->requireAdmin();
 
         // load model
         $bookModel = $this->model('Book');

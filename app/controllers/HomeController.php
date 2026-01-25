@@ -3,7 +3,7 @@ require_once __DIR__ . '/../core/Controller.php';
 
 class HomeController extends Controller
 {
-    // action: index
+    // action: home_index
     public function index()
     {
         $user = $_SESSION['user'] ?? null;
@@ -22,5 +22,11 @@ class HomeController extends Controller
 
         // render view 1 lần duy nhất
         $this->view('home/index', $data);
+    }
+
+    // action: home_about
+    public function about()
+    {
+        $this->view('home/about');
     }
 }

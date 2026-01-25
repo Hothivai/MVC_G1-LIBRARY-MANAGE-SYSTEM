@@ -7,6 +7,7 @@ if (session_status() == PHP_SESSION_NONE) session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <link rel="icon" href="/public/images/logo.jpg" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="/public/css/Register.css">
@@ -28,7 +29,7 @@ if (session_status() == PHP_SESSION_NONE) session_start();
         <?php unset($_SESSION['errors']); ?>
     <?php endif; ?>
 
-    <form method="POST" action="/auth/register">
+    <form method="POST" action="index.php?action=auth_register_post">
         <div class="mb-3 mt-3">
           <label for="fullname" class="form-label">Fullname</label>
           <input type="text" class="form-control" name="fullname" 
@@ -63,7 +64,7 @@ if (session_status() == PHP_SESSION_NONE) session_start();
     
     <?php unset($_SESSION['old_data']); // Xóa dữ liệu cũ sau khi hiện ?>
     
-    <p class="mt-3 text-center"> Already have an account? <a href="/login">Login</a></p>
+    <p class="mt-3 text-center"> Already have an account? <a href="index.php?action=auth_login">Login</a></p>
 </section>
 </body>
 </body>

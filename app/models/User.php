@@ -1,9 +1,27 @@
 <?php
+
 require_once __DIR__ . '/../core/Model.php';
 
-    // Lấy user theo email
 class User extends Model
 {
+    public function register($data) {
+        // Tự tạo username từ email (vì form không có ô username)
+        $username = explode('@', $data['email'])[0] . rand(100, 999);
+        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+
+        $sql = "INSERT INTO users (username, email, password, full_name, phone, role, status) 
+                VALUES (?, ?, ?, ?, ?, 'user', 'active')";
+        
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            $username,
+            $data['email'],
+            $hashedPassword,
+            $data['fullname'],
+            $data['phone']
+        ]);
+    }
+
     // AUTH / ACCOUNT
     // Tìm user theo email (login, register)
     public function findByEmail($email)
@@ -152,5 +170,13 @@ class User extends Model
         $user = $this->find($userId);
         return $user && $user['is_suspended'] == 1 && 
                (!empty($user['suspended_until']) && strtotime($user['suspended_until']) > time());
+    }
+
+    // Count total users
+    public function countUsers(): int
+    {
+        $sql = "SELECT COUNT(*) AS total FROM {$this->table}";
+        $stmt = $this->db->query($sql);
+        return (int) $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     }
 }

@@ -1,21 +1,13 @@
 <?php
+require_once __DIR__ . '/Auth.php';
 
 class Middleware
 {
-    protected static function startSession()
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-    }
-
     // Bắt buộc đăng nhập
     public static function requireLogin()
     {
-        self::startSession();
-
-        if (!isset($_SESSION['user'])) {
-            header('Location: /?action=login');
+        if (!Auth::check()) {
+            header('Location: index.php?action=auth_login');
             exit;
         }
     }
@@ -25,8 +17,8 @@ class Middleware
     {
         self::requireLogin();
 
-        if ($_SESSION['user']['role'] !== 'admin') {
-            echo "Access denied";
+        if (!Auth::isAdmin()) {
+            header('Location: index.php?action=home_index');
             exit;
         }
     }
@@ -36,8 +28,8 @@ class Middleware
     {
         self::requireLogin();
 
-        if ($_SESSION['user']['role'] !== 'user') {
-            echo "Access denied";
+        if (!Auth::isUser()) {
+            header('Location: index.php?action=home_index');
             exit;
         }
     }

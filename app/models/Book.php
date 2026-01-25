@@ -158,4 +158,14 @@ class Book extends Model
     {
         return $this->findWithCategory($id);
     }
+
+    /**
+     * Count total books
+     */
+    public function countAll(): int
+    {
+        $sql = "SELECT COUNT(*) AS total FROM {$this->table}";
+        $stmt = $this->db->query($sql);
+        return (int) $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    }
 }

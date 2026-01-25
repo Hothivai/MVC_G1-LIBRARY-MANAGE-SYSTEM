@@ -2,14 +2,14 @@
 <?php include '../app/views/layouts/header.php'; ?>
 
 <section class="borrow-history">
-    <h1>Lịch Sử Mượn Sách</h1>
+    <h1>Borrow History</h1>
     <table>
         <thead>
             <tr>
-                <th>Sách</th>
-                <th>Ngày Mượn</th>
-                <th>Ngày Trả</th>
-                <th>Trạng Thái</th>
+                <th>Book</th>
+                <th>Borrow Date</th>
+                <th>Return Date</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
