@@ -1,7 +1,7 @@
 <?php
-namespace App\Models;
+// use PDO;
 use App\Core\Database;
-use PDO;
+require_once __DIR__ . '/../core/Database.php';
 
 abstract class Model
 {
@@ -11,7 +11,6 @@ abstract class Model
 
     public function __construct()
     {
-        // Lấy PDO từ Database singleton
         $this->db = Database::getInstance()->getConnection();
     }
 

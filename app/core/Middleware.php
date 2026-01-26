@@ -1,74 +1,36 @@
 <?php
-// require_once './app/core/Auth.php';
-namespace App\Core;
+require_once __DIR__ . '/Auth.php';
+
 class Middleware
 {
+    // Bắt buộc đăng nhập
     public static function requireLogin()
     {
         if (!Auth::check()) {
-            header('Location: /auth/login');
+            header('Location: index.php?action=auth_login');
             exit;
         }
     }
 
+    // Chỉ admin
     public static function requireAdmin()
     {
         self::requireLogin();
 
-        if (Auth::user()['role'] !== 'admin') {
-            echo "Access denied";
+        if (!Auth::isAdmin()) {
+            header('Location: index.php?action=home_index');
             exit;
         }
     }
+
+    // Chỉ user thường
     public static function requireUser()
     {
         self::requireLogin();
 
-        if (Auth::user()['role'] !== 'user') {
-            echo "Access denied";
+        if (!Auth::isUser()) {
+            header('Location: index.php?action=home_index');
             exit;
         }
-    }
-}
-
-class AdminMiddleware extends Middleware {
-    public function handle() {
-        // Check if user is authenticated
-        if (!isset($_SESSION['user_id'])) {
-            header('Location: /login');
-            exit();
-        }
-        
-        // Check if user is admin
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            header('Location: /');
-            exit();
-        }
-        
-        return true;
-    }
-}
-
-class AuthMiddleware extends Middleware {
-    public function handle() {
-        if (!isset($_SESSION['user_id'])) {
-            header('Location: /login');
-            exit();
-        }
-        return true;
-    }
-}
-
-class GuestMiddleware extends Middleware {
-    public function handle() {
-        if (isset($_SESSION['user_id'])) {
-            if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
-                header('Location: /admin/dashboard');
-            } else {
-                header('Location: /');
-            }
-            exit();
-        }
-        return true;
     }
 }

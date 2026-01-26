@@ -1,22 +1,42 @@
 <?php
-use App\Controllers\Controller;
-class Admin_CategoryController extends Controller
+require_once __DIR__ . '/../core/Controller.php';
+class CategoryController extends Controller
 {
+    // action: admin_categories_index
     public function index()
     {
-        // Danh sách danh mục
-        return $this->view('admin/categories/index');
+        $this->requireAdmin();
+
+        $categoryModel = $this->model('Category');
+        $categories = $categoryModel->all();
+
+        $this->view('admin/categories/index', [
+            'categories' => $categories
+        ]);
     }
 
+    // action: admin_categories_create
     public function create()
     {
-        // Thêm danh mục
-        return $this->view('admin/categories/create');
+        $this->requireAdmin();
+        $this->view('admin/categories/create');
     }
 
+    // action: admin_categories_edit&id=1
     public function edit($id)
     {
-        // Sửa danh mục
-        return $this->view('admin/categories/edit');
+        $this->requireAdmin();
+
+        $categoryModel = $this->model('Category');
+        $category = $categoryModel->find($id);
+
+        if (!$category) {
+            $this->redirect('admin_categories_index');
+        }
+
+        $this->view('admin/categories/edit', [
+            'category' => $category
+        ]);
     }
 }
+?>

@@ -1,54 +1,32 @@
 <?php
-namespace App\Controllers;
-
-use App\Models\Book;
-use App\Models\Category;
+require_once __DIR__ . '/../core/Controller.php';
 
 class HomeController extends Controller
-
-
 {
-    
-    // public function index()
-    // {
-    //     $user = $_SESSION['user'] ?? null;
-
-    //     $this->view('home/index', [
-    //         'user' => $user
-    //     ]);
-    //     $bookModel = new Book();
-    //     $categoryModel = new Category();
-
-    //     $data = [
-    //         'featuredBooks' => $bookModel->getFeaturedBooks(4),
-    //         'latestBooks' => $bookModel->getLatestBooks(8),
-    //         'categories' => $categoryModel->all()
-    //     ];
-
-    //     // Debug
-    //     // error_log('Featured Books: ' . count($data['featuredBooks']));
-    //     // error_log('Categories: ' . count($data['categories']));
-
-    //     $this->view('home/index', $data);
-    // }
+    // action: home_index
     public function index()
     {
-    $user = $_SESSION['user'] ?? null;
+        $user = $_SESSION['user'] ?? null;
 
-    // Khởi tạo model (chuẩn MVC)
-    $bookModel = $this->model('Book');
-    $categoryModel = $this->model('Category');
+        // load model qua core Controller
+        $bookModel = $this->model('Book');
+        $categoryModel = $this->model('Category');
 
-    // Chuẩn bị dữ liệu
-    $data = [
-        'user' => $user,
-        'featuredBooks' => $bookModel->getFeaturedBooks(4),
-        'latestBooks' => $bookModel->getLatestBooks(8),
-        'categories' => $categoryModel->all()
-    ];
+        // chuẩn bị dữ liệu
+        $data = [
+            'user' => $user,
+            'featuredBooks' => $bookModel->getFeaturedBooks(4),
+            'latestBooks' => $bookModel->getLatestBooks(8),
+            'categories' => $categoryModel->all()
+        ];
 
-    // Render view DUY NHẤT 1 LẦN
-    $this->view('home/index', $data);
+        // render view 1 lần duy nhất
+        $this->view('home/index', $data);
+    }
+
+    // action: home_about
+    public function about()
+    {
+        $this->view('home/about');
+    }
 }
-}
-?>
