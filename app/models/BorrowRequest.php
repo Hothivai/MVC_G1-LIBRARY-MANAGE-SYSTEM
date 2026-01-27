@@ -1,73 +1,74 @@
 <?php
-namespace App\Models;
-use App\Core\Database;
-use PDO;
+require_once __DIR__ . '/../core/Model.php';
+class BorrowRequest extends Model {
 
-class BorrowRequest{
 
-    public static function create($userId, $bookId, $dueDate, $notes) {
-        $db = Database::getInstance()->getConnection();
-
-        $stmt = $db->prepare("
-            INSERT INTO borrow_requests 
+    public function create($userId, $bookId, $dueDate, $notes) {
+                $sql = "
+            INSERT INTO borrow_requests
             (user_id, book_id, borrow_date, due_date, notes, status)
             VALUES (?, ?, NOW(), ?, ?, 'pending')
-        ");
+        ";
+
+
+        $stmt = $this->db->prepare($sql);
         return $stmt->execute([$userId, $bookId, $dueDate, $notes]);
     }
 
-    public static function getPendingRequests() {
-        $db = Database::getInstance()->getConnection();
 
-        $stmt = $db->query("
-            SELECT 
-                br.id AS request_id,
-                br.book_id,
+    public function getPendingRequests()
+    {
+        $sql = "
+            SELECT
+                br.request_id,
                 br.user_id,
-                br.borrow_date,
-                br.due_date,
-                u.name AS member_name,
+                br.book_id,
+                br.quantity,
+                br.request_date,
+                br.status,
+                br.note,
+                u.name  AS member_name,
                 u.email AS member_email,
-                b.title AS book_title,
-                b.author,
-                b.available_copies
+                b.title AS book_title
             FROM borrow_requests br
-            JOIN users u ON br.user_id = u.id
-            JOIN books b ON br.book_id = b.id
+            JOIN users u ON br.user_id = u.user_id
+            JOIN books b ON br.book_id = b.book_id
             WHERE br.status = 'pending'
-            ORDER BY br.borrow_date DESC
-        ");
+            ORDER BY br.request_date DESC
+        ";
+
+
+        $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function find($id)
-    {
-        $db = Database::getInstance();
 
-        $stmt = $db->prepare("SELECT * FROM borrow_requests WHERE request_id = ?");
+    public function finds($id)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM borrow_requests WHERE request_id = ?");
         $stmt->execute([$id]);
+
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public static function approve($id) {
-        $db = Database::getInstance()->getConnection();
 
-        $stmt = $db->prepare("
-            UPDATE borrow_requests 
-            SET status='approved' 
-            WHERE id=?
+    public function approve($id)
+    {
+        $stmt = $this->db->prepare("
+            UPDATE borrow_requests
+            SET status='approved'
+            WHERE request_id=?
         ");
         return $stmt->execute([$id]);
     }
 
-    public static function reject($id) {
-        $db = Database::getInstance()->getConnection();
 
-        $stmt = $db->prepare("
-            UPDATE borrow_requests 
-            SET status='rejected' 
-            WHERE id=?
+    public function reject($id) {
+        $stmt = $this->db->prepare("
+            UPDATE borrow_requests
+            SET status='rejected'
+            WHERE request_id=?
         ");
         return $stmt->execute([$id]);
     }

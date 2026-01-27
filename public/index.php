@@ -101,7 +101,7 @@ switch ($action) {
 
     // ---------- USER BORROW ----------
     case 'user_borrow_index':
-        (new UserController())->borrowIndex();  // Giả định thêm method này
+        (new UserController())->borrowIndex();
         break;
 
     case 'user_books_borrow_request':
@@ -128,7 +128,7 @@ switch ($action) {
         break;
 
     case 'user_change_password':
-        (new UserController())->changePassword();  // Giả định thêm method này
+        (new UserController())->changePassword();
         break;
 
     // ---------- ADMIN DASHBOARD ----------
@@ -209,30 +209,36 @@ switch ($action) {
     // ---------- ADMIN USERS ----------
     case 'admin_users_index':
         Middleware::requireAdmin();
-        (new UserController())->adminIndex();  // Giả định thêm method này
+        (new UserController())->adminIndex();
         break;
 
     case 'admin_users_show':
         Middleware::requireAdmin();
         $id = $_GET['id'] ?? 0;
-        (new UserController())->adminShow($id);  // Giả định thêm method này
+        (new UserController())->adminShow($id);
         break;
 
     case 'admin_users_edit':
         Middleware::requireAdmin();
         $id = $_GET['id'] ?? 0;
-        (new UserController())->adminEdit($id);  // Giả định thêm method này
+        (new UserController())->adminEdit($id);
         break;
 
-case 'admin_requests':
-    Middleware::requireAdmin();
-    (new BorrowRequestController())->index();
-    break;
+    // ---------- ADMIN BORROW REQUESTS ----------
+    case 'admin_requests':
+        Middleware::requireAdmin();
+        (new BorrowRequestController())->index();
+        break;
 
-case 'admin_requests_approve':
-    Middleware::requireAdmin();
-    (new BorrowRequestController())->approve_request();
-    break;
+    case 'admin_requests_approve':
+        Middleware::requireAdmin();
+        (new BorrowRequestController())->approve();
+        break;
+
+    case 'admin_requests_reject':
+        Middleware::requireAdmin();
+        (new BorrowRequestController())->reject();
+        break;
 
     // ---------- DEFAULT ----------
     default:

@@ -1,71 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
-
+    <link rel="icon" href="/public/images/logo.jpg" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="/public/css/admin.css">
 </head>
 
 <body>
-    <div class="d-flex">
-        <!-- sidebar -->
-        <aside class="sidebar p-3">
-            <div class="text-center mb-4">
-                <img src="/public/images/logo.jpg" class="logo">
-                <h5 class="mt-2">ADMIN PANEL</h5>
-            </div>
+<div class="d-flex">
 
-            <ul class="nav flex-column">
-                <li class="nav-item <?= $active === 'dashboard' ? 'active' : '' ?>">
-                    <a href="/admin/dashboard/index">
-                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
-                    </a>
-                </li>
 
-                <li class="nav-item <?= $active === 'books' ? 'active' : '' ?>">
-                    <a href="/admin/books/index">
-                        <i class="bi bi-book  me-2"></i> Book Management
-                    </a>
-                </li>
+    <?php require_once __DIR__ . '/../sidebarAdmin.php'; ?>
 
-                <li class="nav-item <?= $active === 'users' ? 'active' : '' ?>">
-                    <a href="/admin/users/index">
-                        <i class="bi bi-people me-2"></i> Member Management
-                    </a>
-                </li>
 
-                <li class="nav-item <?= $active === 'borrow_requests' ? 'active' : '' ?>">
-                    <a href="index.php?action=admin_requests">
-                        <i class="bi bi-people me-2"></i> Borrow Requests
-                    </a>
-                </li>
+    <!-- MAIN -->
+    <div class="main-content">
 
-                <li class="nav-item <?= $active === 'transactions' ? 'active' : '' ?>">
-                    <a href="/admin/transactions/index">
-                        <i class="bi bi-arrow-left-right me-2"></i> Transactions
-                    </a>
-                </li>
-
-                <li class="nav-item <?= $active === 'categories' ? 'active' : '' ?>">
-                    <a href="/admin/categories/index">
-                        <i class="bi bi-tags me-2"></i> Categories
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="index.php?action=auth_login">
-                        <i class="bi bi-box-arrow-right me-2"></i> Logout
-                    </a>
-                </li>
-            </ul>
-        </aside>
-
-        <!-- MAIN -->
-        <div class="flex-grow-1">
 
             <!-- NAVBAR -->
             <nav class="navbar navbar-dark bg-success px-4">

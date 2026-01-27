@@ -3,9 +3,14 @@ body {
 }
 
 .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 320px;
-    min-height: 100vh;
+    height: 100vh;
     background: #fff;
+    border-right: 1px solid #e0e0e0;
+    z-index: 1000;
 }
 
 .sidebar .nav-item a {
@@ -35,6 +40,14 @@ body {
 .logo {
     width: 80px;
 }
+
+.main-content {
+    margin-left: 320px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
 
 
         .bg-dark-green { background-color: #145c38 !important; }
