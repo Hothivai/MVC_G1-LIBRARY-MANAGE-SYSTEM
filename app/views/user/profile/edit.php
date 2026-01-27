@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 <!-- Modal for editing user profile -->
 <div class="modal fade" id="editProfileModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
@@ -78,4 +76,3 @@
     </form>
   </div>
 </div>
->>>>>>> dafc32a52f62e5c8a400b867c3141f6f964a05de

@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,7 +13,7 @@
 <div class="container py-4">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb bg-success p-3 rounded shadow-sm">
-            <li class="breadcrumb-item"><a href="/" class="text-white text-decoration-none"><i class="fas fa-home me-1"></i> Home</a></li>
+            <li class="breadcrumb-item"><a href="index.php?action=home_index" class="text-white text-decoration-none"><i class="fas fa-home me-1"></i> Home</a></li>
             <li class="breadcrumb-item active text-white-50" aria-current="page">My Profile</li>
         </ol>
     </nav>
@@ -151,7 +149,7 @@
 <!-- EDIT PROFILE MODAL -->
 <div class="modal fade" id="editProfileModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <form method="POST" action="/user/updateProfile" class="modal-content">
+    <form method="POST" action="index.php?action=user_profile_update" class="modal-content">
 
       <div class="modal-header bg-success text-white">
         <h5 class="modal-title">
@@ -192,7 +190,7 @@
 <!-- CHANGE PASSWORD MODAL -->
 <div class="modal fade" id="changePasswordModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <form method="POST" action="/user/changePassword" class="modal-content">
+    <form method="POST" action="index.php?action=user_change_password" class="modal-content">
 
       <div class="modal-header bg-success text-white">
         <h5 class="modal-title">
@@ -245,4 +243,3 @@ document.getElementById('passwordForm').addEventListener('submit', function(e) {
 
 </body>
 </html>
->>>>>>> dafc32a52f62e5c8a400b867c3141f6f964a05de

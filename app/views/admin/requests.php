@@ -6,19 +6,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="/public/css/admin.css">
-    <style>
-        .bg-dark-green { background-color: #145c38 !important; }
-        .text-success { color: #16A34A !important; }
-        .btn-success { background-color: #16A34A; border: none; }
-        .btn-success:hover { background-color: #145c38; }
-        .badge-pending { background-color: #fff9e6; color: #f59e0b; border: 1px solid #fde68a; }
-        .request-card { border: 1px solid #edf2f7; border-radius: 12px; transition: 0.3s; }
-        .request-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .id-badge { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background-color: #16A34A; color: white; border-radius: 8px; font-weight: bold; }
-        .stat-small { font-size: 0.8rem; color: #718096; }
-    </style>
 </head>
 <body>
+    <form action="index.php?action=admin_requests" method="GET">
     <div class="d-flex">
         <aside class="sidebar p-3 border-end">
             <div class="text-center mb-4">
@@ -29,7 +19,8 @@
                 <li class="nav-item"><a href="/admin/dashboard/index"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
                 <li class="nav-item"><a href="/admin/books/index"><i class="bi bi-book me-2"></i> Book Management</a></li>
                 <li class="nav-item"><a href="/admin/users/index"><i class="bi bi-people me-2"></i> Member Management</a></li>
-                <li class="nav-item active"><a href="/admin/transactions/index"><i class="bi bi-arrow-left-right me-2"></i> Borrow Requests</a></li>
+                <li class="nav-item active"><a href="/admin/borrow_requests/index"><i class="bi bi-arrow-left-right me-2"></i> Borrow Requests</a></li>
+                <li class="nav-item"><a href="/admin/transactions/index"><i class="bi bi-arrow-left-right me-2"></i> Transactions</a></li>
                 <li class="nav-item"><a href="/admin/categories/index"><i class="bi bi-tags me-2"></i> Categories</a></li>
                 <li class="nav-item mt-5"><a href="/auth/logout"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
             </ul>
@@ -43,7 +34,6 @@
                     <i class="bi bi-person-circle fs-4"></i>
                 </div>
             </nav>
-
             <main class="p-4">
                 <div class="d-flex justify-content-between align-items-end mb-4">
                     <div>
@@ -156,5 +146,6 @@
             </main>
         </div>
     </div>
+</form>
 </body>
 </html>
