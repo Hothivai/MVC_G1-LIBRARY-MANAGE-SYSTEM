@@ -1,5 +1,6 @@
 <?php
 namespace App\Models;
+
 use PDO;
 class Transaction extends Model
 {
@@ -124,4 +125,21 @@ class Transaction extends Model
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    // *****   đoạn code mới nè
+
+// Tạo transaction khi admin duyệt mượn sách
+         public function createTransaction(int $userId, int $copyId, string $dueDate): bool
+     {
+    $sql = "
+        INSERT INTO transactions
+        (user_id, copy_id, borrow_date, due_date, status)
+        VALUES (?, ?, NOW(), ?, 'borrowed')
+    ";
+
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([$userId, $copyId, $dueDate]);
 }
+
+
+}
+

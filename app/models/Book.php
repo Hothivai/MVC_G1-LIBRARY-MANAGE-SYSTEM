@@ -160,4 +160,34 @@ class Book extends Model
     {
         return $this->findWithCategory($id);
     }
+// *****   đoạn code mới 
+
+
+    // Lấy 1 bản copy còn available của sách
+public function getAvailableCopy(int $bookId): ?int
+{
+    $stmt = $this->db->prepare("
+        SELECT copy_id 
+        FROM book_copies
+        WHERE book_id = ? AND status = 'available'
+        LIMIT 1
+    ");
+    $stmt->execute([$bookId]);
+    $copy = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $copy ? $copy['copy_id'] : null;
 }
+
+// Giảm số lượng available_copies (nếu bạn CÓ cột này)
+public function decreaseAvailable(int $bookId): bool
+{
+    $stmt = $this->db->prepare("
+        UPDATE books 
+        SET available_copies = available_copies - 1
+        WHERE book_id = ?
+    ");
+    return $stmt->execute([$bookId]);
+}
+
+}
+
