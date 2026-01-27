@@ -1,7 +1,5 @@
 <?php
-namespace App\Models;
-
-use PDO;
+require_once __DIR__ . '/../core/Model.php';
 class Transaction extends Model
 {
 
@@ -125,8 +123,6 @@ class Transaction extends Model
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    // *****   đoạn code mới nè
-
 // Tạo transaction khi admin duyệt mượn sách
          public function createTransaction(int $userId, int $copyId, string $dueDate): bool
      {
@@ -139,7 +135,7 @@ class Transaction extends Model
     $stmt = $this->db->prepare($sql);
     return $stmt->execute([$userId, $copyId, $dueDate]);
 }
-
-
 }
+
+
 

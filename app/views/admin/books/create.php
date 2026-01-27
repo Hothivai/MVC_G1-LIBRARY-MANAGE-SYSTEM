@@ -1,41 +1,59 @@
-<?php ?>
-<?php include '../app/views/layouts/header.php'; ?>
+<?php include APP_PATH . '/views/layouts/header.php'; ?>
 
 <section class="admin-book-create">
-    <h1>Thêm Sách Mới</h1>
-    <form method="POST" action="/admin/books" enctype="multipart/form-data">
+    <h1>Add New Book</h1>
+
+    <form method="POST"
+          action="index.php?action=admin_book_store"
+          enctype="multipart/form-data">
+
         <div class="form-group">
-            <label for="title">Tiêu Đề:</label>
-            <input type="text" id="title" name="title" required>
+            <label>Title:</label>
+            <input type="text" name="title" required>
         </div>
+
         <div class="form-group">
-            <label for="author">Tác Giả:</label>
-            <input type="text" id="author" name="author" required>
+            <label>Author:</label>
+            <input type="text" name="author" required>
         </div>
+
         <div class="form-group">
-            <label for="isbn">ISBN:</label>
-            <input type="text" id="isbn" name="isbn">
+            <label>ISBN:</label>
+            <input type="text" name="isbn">
         </div>
+
         <div class="form-group">
-            <label for="category_id">Danh Mục:</label>
-            <select id="category_id" name="category_id" required>
-                <!-- Categories will be listed here -->
+            <label>Category:</label>
+            <select name="category_id" required>
+                <?php if (!empty($categories)): ?>
+                    <?php foreach ($categories as $category): ?>
+                        <option value="<?= $category['category_id'] ?>">
+                            <?= $category['category_name'] ?>
+                        </option>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </select>
         </div>
+
         <div class="form-group">
-            <label for="description">Mô Tả:</label>
-            <textarea id="description" name="description"></textarea>
+            <label>Description:</label>
+            <textarea name="description"></textarea>
         </div>
+
         <div class="form-group">
-            <label for="quantity">Số Lượng:</label>
-            <input type="number" id="quantity" name="quantity" required>
+            <label>Quantity:</label>
+            <input type="number" name="quantity" required>
         </div>
+
         <div class="form-group">
-            <label for="cover_image">Ảnh Bìa:</label>
-            <input type="file" id="cover_image" name="cover_image" accept="image/*">
+            <label>Cover Image:</label>
+            <input type="file" name="cover_image" accept="image/*">
         </div>
-        <button type="submit" class="btn btn-primary">Thêm Sách</button>
+
+        <button type="submit" class="btn btn-primary">
+            Add Book
+        </button>
     </form>
 </section>
 
-<?php include '../app/views/layouts/footer.php'; ?>
+<?php include APP_PATH . '/views/layouts/footer.php'; ?>

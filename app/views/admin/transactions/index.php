@@ -2,18 +2,18 @@
 <?php include '../app/views/layouts/header.php'; ?>
 
 <section class="admin-transactions">
-    <h1>Quản Lý Giao Dịch Mượn/Trả</h1>
-    <a href="/admin/transactions/pending" class="btn btn-primary">Yêu Cầu Chờ Duyệt</a>
+    <h1>Transaction Management</h1>
+    <a href="/admin/transactions/pending" class="btn btn-primary">Pending Requests</a>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Người Dùng</th>
-                <th>Sách</th>
-                <th>Ngày Mượn</th>
-                <th>Ngày Trả</th>
-                <th>Trạng Thái</th>
-                <th>Hành Động</th>
+                <th>User</th>
+                <th>Book</th>
+                <th>Borrow Date</th>
+                <th>Return Date</th>
+                <th>Status</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>

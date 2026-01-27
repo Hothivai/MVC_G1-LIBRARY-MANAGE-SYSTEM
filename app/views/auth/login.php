@@ -5,12 +5,9 @@
     <title>Login</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/public/images/logo.jpg" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/public/css/login.css">
-<<<<<<< HEAD
-
-=======
->>>>>>> feature/LMS-8
 </head>
 
 <body>
@@ -20,11 +17,8 @@
         <h5 class="fw-bold">LIBRARY MANAGEMENT SYSTEM</h5>
     </div>
 
-<<<<<<< HEAD
-    <form action="/auth/login" method="post">
-=======
-    <form action="/public/auth/login" method="post">
->>>>>>> feature/LMS-8
+    <form action="index.php?action=auth_login_post" method="post">
+
         <div class="mb-3">
             <label>Email</label>
             <input type="email" class="form-control"
@@ -47,11 +41,9 @@
 
         <div class="text-center mt-3">
             Don't have an account?
-<<<<<<< HEAD
-            <a href="/register">Register now</a>
-=======
-            <a href="/auth/register">Register now</a>
->>>>>>> feature/LMS-8
+
+            <a href="index.php?action=auth_register">Register now</a>
+
         </div>
     </form>
 </div>

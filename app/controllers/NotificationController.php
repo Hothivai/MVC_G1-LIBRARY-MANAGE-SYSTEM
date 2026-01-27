@@ -1,24 +1,30 @@
 <?php
+require_once __DIR__ . '/../core/Controller.php';
 
-class Admin_NotificationController extends Controller
+class NotificationController extends Controller
 {
-    public function index()
+    // ---------- ADMIN METHODS ----------
+
+    // action: admin_notifications_index
+    public function adminIndex()
     {
-        // Danh sách thông báo đã gửi
-        return $this->view('admin/notifications/index');
+        $this->requireAdmin();
+        $this->view('admin/notifications/index');
     }
 
-    public function create()
+    // action: admin_notifications_create
+    public function adminCreate()
     {
-        // Tạo thông báo mới
-        return $this->view('admin/notifications/create');
+        $this->requireAdmin();
+        $this->view('admin/notifications/create');
     }
-}
-class User_NotificationController extends Controller
-{
-    public function index()
+
+    // ---------- USER METHODS ----------
+
+    // action: user_notifications_index
+    public function userIndex()
     {
-        // Danh sách thông báo
-        return $this->view('user/notifications/index');
+        $this->requireAuth();
+        $this->view('user/notifications/index');
     }
 }

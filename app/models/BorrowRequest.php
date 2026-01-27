@@ -3,10 +3,10 @@ namespace App\Models;
 use App\Core\Database;
 use PDO;
 
-class BorrowRequest {
+class BorrowRequest{
 
     public static function create($userId, $bookId, $dueDate, $notes) {
-        $db = Database::getInstance()->getConnection(); // ✅ sửa chỗ này
+        $db = Database::getInstance()->getConnection();
 
         $stmt = $db->prepare("
             INSERT INTO borrow_requests 
@@ -16,8 +16,8 @@ class BorrowRequest {
         return $stmt->execute([$userId, $bookId, $dueDate, $notes]);
     }
 
-    public static function getPending() {
-        $db = Database::getInstance()->getConnection(); // ✅ sửa
+    public static function getPendingRequests() {
+        $db = Database::getInstance()->getConnection();
 
         $stmt = $db->query("
             SELECT 
@@ -40,16 +40,18 @@ class BorrowRequest {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function find($id) {
-        $db = Database::getInstance()->getConnection(); // ✅ sửa
+    public static function find($id)
+    {
+        $db = Database::getInstance();
 
-        $stmt = $db->prepare("SELECT * FROM borrow_requests WHERE id = ?");
+        $stmt = $db->prepare("SELECT * FROM borrow_requests WHERE request_id = ?");
         $stmt->execute([$id]);
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public static function approve($id) {
-        $db = Database::getInstance()->getConnection(); // ✅ sửa
+        $db = Database::getInstance()->getConnection();
 
         $stmt = $db->prepare("
             UPDATE borrow_requests 
@@ -60,7 +62,7 @@ class BorrowRequest {
     }
 
     public static function reject($id) {
-        $db = Database::getInstance()->getConnection(); // ✅ sửa
+        $db = Database::getInstance()->getConnection();
 
         $stmt = $db->prepare("
             UPDATE borrow_requests 

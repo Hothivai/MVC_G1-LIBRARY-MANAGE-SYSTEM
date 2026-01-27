@@ -35,3 +35,14 @@ body {
 .logo {
     width: 80px;
 }
+
+
+        .bg-dark-green { background-color: #145c38 !important; }
+        .text-success { color: #16A34A !important; }
+        .btn-success { background-color: #16A34A; border: none; }
+        .btn-success:hover { background-color: #145c38; }
+        .badge-pending { background-color: #fff9e6; color: #f59e0b; border: 1px solid #fde68a; }
+        .request-card { border: 1px solid #edf2f7; border-radius: 12px; transition: 0.3s; }
+        .request-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .id-badge { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background-color: #16A34A; color: white; border-radius: 8px; font-weight: bold; }
+        .stat-small { font-size: 0.8rem; color: #718096; }

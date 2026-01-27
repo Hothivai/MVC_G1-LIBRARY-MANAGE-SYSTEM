@@ -2,16 +2,16 @@
 <?php include '../app/views/layouts/header.php'; ?>
 
 <section class="admin-notifications">
-    <h1>Quản Lý Thông Báo</h1>
-    <a href="/admin/notifications/create" class="btn btn-primary">Tạo Thông Báo Mới</a>
+    <h1>Notification Management</h1>
+    <a href="/admin/notifications/create" class="btn btn-primary">Create New Notification</a>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Tiêu Đề</th>
-                <th>Loại</th>
-                <th>Ngày Tạo</th>
-                <th>Hành Động</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Created At</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>

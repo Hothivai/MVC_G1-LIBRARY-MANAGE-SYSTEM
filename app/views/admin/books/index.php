@@ -2,17 +2,17 @@
 <?php include '../app/views/layouts/header.php'; ?>
 
 <section class="admin-books">
-    <h1>Quản Lý Sách</h1>
-    <a href="/admin/books/create" class="btn btn-primary">Thêm Sách Mới</a>
+    <h1>Book Management</h1>
+    <a href="/admin/books/create" class="btn btn-primary">Add New Book</a>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Tiêu Đề</th>
-                <th>Tác Giả</th>
-                <th>Danh Mục</th>
-                <th>Số Lượng</th>
-                <th>Hành Động</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>

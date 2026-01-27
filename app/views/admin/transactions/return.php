@@ -2,10 +2,10 @@
 <?php include '../app/views/layouts/header.php'; ?>
 
 <section class="admin-return-transaction">
-    <h1>Xử Lý Trả Sách</h1>
+    <h1>Process Book Return</h1>
     <form method="POST" action="/admin/transactions/return">
         <!-- Return form will be displayed here -->
-        <button type="submit" class="btn btn-primary">Xác Nhận Trả</button>
+        <button type="submit" class="btn btn-primary">Confirm Return</button>
     </form>
 </section>
 
