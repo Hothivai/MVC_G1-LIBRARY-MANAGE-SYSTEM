@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../core/Controller.php';
-
+use App\Models\Notification;
 class TransactionController extends Controller
 {
     // action: admin_transactions_index
@@ -30,4 +30,37 @@ class TransactionController extends Controller
         $this->requireAdmin();
         $this->view('admin/transactions/return', ['id' => $id]);
     }
+    public function checkDueDate()
+{
+    $transactions = $this->transactionModel->getBorrowed();
+    $noti = new Notification();
+    $today = date('Y-m-d');
+
+    foreach ($transactions as $t) {
+        $due = date('Y-m-d', strtotime($t['due_date']));
+        $diff = (strtotime($due) - strtotime($today)) / 86400;
+
+        // sắp trễ hạn (1 ngày)
+        if ($diff == 1 && !$noti->exists($t['user_id'], $t['transaction_id'], 'reminder')) {
+            $noti->create([
+                'user_id' => $t['user_id'],
+                'transaction_id' => $t['transaction_id'],
+                'type' => 'reminder',
+                'title' => 'Sắp đến hạn trả sách',
+                'message' => 'Sách bạn mượn sẽ đến hạn trả vào ngày mai.'
+            ]);
+        }
+
+        // quá hạn
+        if ($diff < 0 && !$noti->exists($t['user_id'], $t['transaction_id'], 'overdue')) {
+            $noti->create([
+                'user_id' => $t['user_id'],
+                'transaction_id' => $t['transaction_id'],
+                'type' => 'overdue',
+                'title' => 'Quá hạn trả sách',
+                'message' => 'Bạn đã quá hạn trả sách. Vui lòng trả sớm.'
+            ]);
+        }
+    }
+}
 }
