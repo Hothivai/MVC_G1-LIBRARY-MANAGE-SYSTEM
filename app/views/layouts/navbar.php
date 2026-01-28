@@ -1,4 +1,12 @@
 <?php
+use App\Models\Notification;
+
+$notificationCount = 0;
+if (isset($_SESSION['user_id'])) {
+    $notiModel = new Notification();
+    $notificationCount = $notiModel->countByUser($_SESSION['user_id']);
+}
+
 // Lấy action hiện tại để xử lý Active State
 $current_action = $_GET['action'] ?? 'home_index';
 
@@ -44,10 +52,17 @@ function isActive($action, $keyword) {
                 <ul class="nav navbar-nav navbar-right">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <li>
-                            <a href="index.php?action=user_notifications_index" style="border:none; font-size: 20px;">
+                            <a href="index.php?action=user_notifications_index" class="notification-bell">
                                 <i class="fa fa-bell"></i>
+
+                                <?php if ($notificationCount > 0): ?>
+                                    <span class="notification-badge">
+                                        <?= $notificationCount ?>
+                                    </span>
+                                <?php endif; ?>
                             </a>
                         </li>
+
                         <li class="dropdown user-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="border:none; display: flex; align-items: center;">
                                 <div style="width: 35px; height: 35px; background: #ccc; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-right: 10px;">
@@ -70,3 +85,4 @@ function isActive($action, $keyword) {
     </nav>
 </header>
 </html>
+<script src="/public/js/notification.js"></script>

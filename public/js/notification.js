@@ -29,3 +29,9 @@ function markNotificationAsRead(notificationId) {
     })
     .catch(error => console.error('Error:', error));
 }
+document.addEventListener('DOMContentLoaded', function () {
+    const badge = document.querySelector('.notification-badge');
+    if (badge && badge.innerText === '0') {
+        badge.style.display = 'none';
+    }
+});
