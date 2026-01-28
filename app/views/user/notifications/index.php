@@ -1,11 +1,14 @@
 <?php ?>
 <?php include '../app/views/layouts/header.php'; ?>
+<h3>Thông báo</h3>
 
-<section class="notifications">
-    <h1>Notifications</h1>
-    <div class="notifications-list">
-        <!-- Notifications will be displayed here -->
+<?php foreach ($notifications as $n): ?>
+    <div class="notification-item">
+        <strong><?= $n['title'] ?></strong>
+        <p><?= $n['message'] ?></p>
+        <small><?= $n['created_at'] ?></small>
     </div>
-</section>
+<?php endforeach; ?>
+
 
 <?php include '../app/views/layouts/footer.php'; ?>
