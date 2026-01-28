@@ -5,7 +5,6 @@ use App\Models\Notification;
 
 class NotificationController extends Controller
 {
-    // 👇 THÊM HÀM NÀY (QUAN TRỌNG)
     public function userIndex()
     {
         return $this->index();
