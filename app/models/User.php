@@ -179,4 +179,5 @@ class User extends Model
         $stmt = $this->db->query($sql);
         return (int) $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     }
+    
 }

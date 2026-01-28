@@ -147,4 +147,5 @@ class UserController extends Controller
         }
         $this->view('admin/users/edit', ['user' => $user]);
     }
+    
 }

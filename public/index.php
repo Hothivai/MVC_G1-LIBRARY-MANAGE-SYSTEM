@@ -239,4 +239,5 @@ case 'admin_requests_approve':
         http_response_code(404);
         echo "404 - Action not found: $action";
         break;
+        
 }
