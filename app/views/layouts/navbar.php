@@ -52,8 +52,9 @@ function isActive($action, $keyword) {
                 <ul class="nav navbar-nav navbar-right">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <li>
-                            <a href="index.php?action=user_notifications_index" class="notification-bell">
+                            <a href="index.php?controller=notification&action=index">
                                 <i class="fa fa-bell"></i>
+
 
                                 <?php if ($notificationCount > 0): ?>
                                     <span class="notification-badge">

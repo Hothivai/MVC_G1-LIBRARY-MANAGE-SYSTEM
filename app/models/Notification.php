@@ -1,11 +1,9 @@
 <?php
-namespace App\Models;
-
-use App\Core\Model;
+require_once dirname(__DIR__) . '/core/Model.php';
 
 class Notification extends Model
 {
-    protected $table = 'notifications';
+   protected string $table = 'notifications';
 
     public function create($data)
     {
@@ -37,10 +35,14 @@ class Notification extends Model
                 WHERE user_id = :user_id 
                   AND transaction_id = :transaction_id
                   AND type = :type";
-        return $this->db->query($sql, [
-            'user_id' => $userId,
-            'transaction_id' => $transactionId,
-            'type' => $type
-        ])->rowCount() > 0;
+                return $this->db->query(
+            $sql,
+            [
+                'user_id' => $userId,
+                'transaction_id' => $transactionId,
+                'type' => $type
+            ]
+        )->rowCount() > 0;
+
     }
 }
