@@ -33,4 +33,19 @@ class Middleware
             exit;
         }
     }
+    public static function checkOverdue($userId)
+    {
+        $db = Database::getInstance();
+        $sql = "SELECT 1 FROM transactions
+                WHERE user_id = :user_id
+                AND status = 'borrowed'
+                AND due_date < CURDATE()";
+        $stmt = $db->query($sql, ['user_id' => $userId]);
+
+        if ($stmt->rowCount() > 0) {
+            header('Location: /user/borrow?error=overdue');
+            exit;
+        }
+    }
+
 }
