@@ -7,17 +7,13 @@ class NotificationController extends Controller
 {
     public function userIndex()
     {
-        return $this->index();
-    }
-
-    // Hàm xử lý chính
-    public function index()
-    {
         $userId = Auth::id();
-        $model = new Notification();
+
+        $notificationModel = new Notification();
+        $notifications = $notificationModel->getByUser($userId);
 
         return $this->view('user/notifications/index', [
-            'notifications' => $model->getByUser($userId)
+            'notifications' => $notifications
         ]);
     }
 }
