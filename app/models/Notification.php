@@ -1,58 +1,46 @@
 <?php
-require_once __DIR__ . '/../core/Model.php';
+namespace App\Models;
+
+use App\Core\Model;
 
 class Notification extends Model
 {
-    protected string $table = 'notifications';
-    protected string $primaryKey = 'notification_id';
+    protected $table = 'notifications';
 
-    public function getByUser($userId, $limit = 10) {
-        $sql = "SELECT * FROM notifications 
-                WHERE user_id = ? 
-                ORDER BY created_at DESC 
-                LIMIT ?";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(1, $userId, PDO::PARAM_INT);
-        $stmt->bindValue(2, $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    public function create($data)
+    {
+        $sql = "INSERT INTO notifications 
+                (user_id, transaction_id, type, title, message)
+                VALUES (:user_id, :transaction_id, :type, :title, :message)";
+        return $this->db->query($sql, $data);
     }
 
-    public function getUnreadCount($userId) {
-        $sql = "SELECT COUNT(*) as count 
+    public function getByUser($userId)
+    {
+        $sql = "SELECT * FROM notifications
+                WHERE user_id = :user_id
+                ORDER BY created_at DESC";
+        return $this->db->query($sql, ['user_id' => $userId])->fetchAll();
+    }
+
+    public function countByUser($userId)
+    {
+        $sql = "SELECT COUNT(*) as total 
                 FROM notifications 
-                WHERE user_id = ? AND is_read = 0";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$userId]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result['count'];
+                WHERE user_id = :user_id";
+        return $this->db->query($sql, ['user_id' => $userId])->fetch()['total'];
     }
 
-    public function markAsRead($notificationId) {
-        $sql = "UPDATE notifications SET is_read = 1 WHERE notification_id = ?";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([$notificationId]);
-    }
-
-    public function markAllAsRead($userId) {
-        $sql = "UPDATE notifications SET is_read = 1 WHERE user_id = ?";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([$userId]);
-    }
-
-    public function create($data) {
-        $sql = "INSERT INTO notifications (user_id, transaction_id, type, title, message, created_at) 
-                VALUES (?, ?, ?, ?, ?, NOW())";
-        
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            $data['user_id'],
-            $data['transaction_id'] ?? null,
-            $data['type'],
-            $data['title'],
-            $data['message']
-        ]);
+    public function exists($userId, $transactionId, $type)
+    {
+        $sql = "SELECT notification_id FROM notifications
+                WHERE user_id = :user_id 
+                  AND transaction_id = :transaction_id
+                  AND type = :type";
+        return $this->db->query($sql, [
+            'user_id' => $userId,
+            'transaction_id' => $transactionId,
+            'type' => $type
+        ])->rowCount() > 0;
     }
 }
