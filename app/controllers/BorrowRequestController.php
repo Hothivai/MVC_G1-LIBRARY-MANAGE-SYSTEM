@@ -5,7 +5,7 @@ require_once __DIR__ . '/../models/BorrowRequest.php';
 require_once __DIR__ . '/../core/Controller.php';
 require_once __DIR__ . '/../core/Middleware.php';
 use App\Models\BorrowRequest;
-
+use App\Models\Notification;
 class BorrowRequestController
 {
     public function index()
@@ -51,4 +51,21 @@ class BorrowRequestController
         header('Location: index.php?action=admin_requests');
         exit;
     }
+    public function approve($transactionId)
+{
+    // logic duyệt mượn (đã có sẵn)
+    $transaction = $this->transactionModel->find($transactionId);
+    $this->transactionModel->approve($transactionId);
+
+    // tạo notification
+    $noti = new Notification();
+    $noti->create([
+        'user_id' => $transaction['user_id'],
+        'transaction_id' => $transactionId,
+        'type' => 'info',
+        'title' => 'Yêu cầu mượn sách được duyệt',
+        'message' => 'Yêu cầu mượn sách của bạn đã được admin duyệt.Ban hãy đến thư viện để nhận sách.'
+    ]);
+
+}
 }
