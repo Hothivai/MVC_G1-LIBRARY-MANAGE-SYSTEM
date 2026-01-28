@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../core/Model.php';
 class Transaction extends Model
 {
+    protected string $table = 'transactions';
+    protected string $primaryKey = 'transaction_id';
 
     // Đếm sách đang mượn
     public function countBorrowed()
@@ -82,9 +84,6 @@ class Transaction extends Model
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    protected string $table = 'transactions';
-    protected string $primaryKey = 'transaction_id';
-    
     public function getBorrowedBooks($userId) {
         $sql = "SELECT t.*, b.title, b.author, bc.barcode, t.due_date 
                 FROM transactions t
@@ -135,4 +134,14 @@ class Transaction extends Model
     $stmt = $this->db->prepare($sql);
     return $stmt->execute([$userId, $copyId, $dueDate]);
 }
+public function getBorrowed()
+{
+    $sql = "
+        SELECT transaction_id, user_id, due_date
+        FROM transactions
+        WHERE return_date IS NULL
+    ";
+    return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+}
+
 }

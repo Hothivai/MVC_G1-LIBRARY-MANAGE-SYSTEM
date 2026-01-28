@@ -1,11 +1,12 @@
-<?php
-use App\Models\Notification;
 
+<?php
 $notificationCount = 0;
-if (isset($_SESSION['user_id'])) {
-    $notiModel = new Notification();
-    $notificationCount = $notiModel->countByUser($_SESSION['user_id']);
-}
+
+// if (class_exists('Notification') && Auth::check()) {
+//     $notificationModel = new Notification();
+//     $notificationCount = $notificationModel->countByUser(Auth::getUserId());
+// }
+
 
 // Lấy action hiện tại để xử lý Active State
 $current_action = $_GET['action'] ?? 'home_index';

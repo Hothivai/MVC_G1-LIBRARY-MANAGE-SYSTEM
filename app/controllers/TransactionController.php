@@ -1,9 +1,16 @@
 <?php
 require_once __DIR__ . '/../core/Controller.php';
-use App\Models\Notification;
+require_once __DIR__ . '/../models/Notification.php';
+require_once __DIR__ . '/../models/Transaction.php';
 class TransactionController extends Controller
 {
     // action: admin_transactions_index
+     protected $transactionModel;
+
+    public function __construct()
+    {
+        $this->transactionModel = new Transaction();
+    }
     public function index()
     {
         $this->requireAdmin();
@@ -31,8 +38,10 @@ class TransactionController extends Controller
         $this->view('admin/transactions/return', ['id' => $id]);
     }
     public function checkDueDate()
-{
-    $transactions = $this->transactionModel->getBorrowed();
+{   
+    $userId = Auth::getUserId();
+    $transactionModel = new Transaction();
+    $transactions = $transactionModel->getBorrowedBooks($userId);
     $noti = new Notification();
     $today = date('Y-m-d');
 

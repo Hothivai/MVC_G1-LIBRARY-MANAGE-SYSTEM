@@ -3,7 +3,7 @@ require_once dirname(__DIR__) . '/core/Model.php';
 
 class Notification extends Model
 {
-    protected $table = 'notifications';
+    protected string $table = 'notifications';
 
     public function create($data)
     {

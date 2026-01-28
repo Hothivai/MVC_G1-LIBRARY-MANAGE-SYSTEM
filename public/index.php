@@ -111,8 +111,8 @@ switch ($action) {
 
     // ---------- USER NOTIFICATIONS ----------
     case 'user_notifications_index':
-    (new NotificationController())->userIndex();
-    break;
+        (new NotificationController())->userIndex();
+        break;
 
     // ---------- USER PROFILE ----------
     case 'user_profile_index':
@@ -196,11 +196,15 @@ switch ($action) {
         break;
 
     // ---------- ADMIN NOTIFICATIONS ----------
+    case 'admin_notifications_index':
+        Middleware::requireAdmin();
+        (new NotificationController())->adminIndex();
+        break;
 
-        case 'admin_notifications_create':
-            Middleware::requireAdmin();
-            (new NotificationController())->adminCreate();
-            break;
+    case 'admin_notifications_create':
+        Middleware::requireAdmin();
+        (new NotificationController())->adminCreate();
+        break;
 
     // ---------- ADMIN USERS ----------
     case 'admin_users_index':
