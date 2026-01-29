@@ -1,26 +1,23 @@
-<?php
-require_once dirname(__DIR__, 2) . '/layouts/header.php';
-?>
+
+<?php require_once __DIR__ . '/../../layouts/header.php'; ?>
+<link rel="stylesheet" href="/css/notifications.css">
 
 <div class="notification-wrapper">
-    <h3>Notifications</h3>
+    <h2>Thông báo</h2>
 
-    <?php foreach ($notifications as $n): ?>
-        <div class="notification-item notification-<?= $n['type'] ?>">
-            <div class="notification-title">
-                <?= htmlspecialchars($n['title']) ?>
+    <?php if (!empty($notifications)): ?>
+        <?php foreach ($notifications as $n): ?>
+            <div class="notification-item">
+                <h4><?= htmlspecialchars($n['title']) ?></h4>
+                <p><?= htmlspecialchars($n['message']) ?></p>
+                <small><?= $n['created_at'] ?></small>
             </div>
-            <p class="notification-message">
-                <?= htmlspecialchars($n['message']) ?>
-            </p>
-            <small class="notification-time">
-                <?= $n['created_at'] ?>
-            </small>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="empty">
+            Không có thông báo nào 
         </div>
-    <?php endforeach; ?>
+    <?php endif; ?>
 </div>
 
-<?php
-require_once dirname(__DIR__, 2) . '/layouts/footer.php';
-?>
-
+<?php include __DIR__ . '/../../layouts/footer.php'; ?>

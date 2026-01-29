@@ -1,6 +1,6 @@
 <?php
 // ============================
-// 1. DEBUG + SESSION
+// 1. DEBUG
 // ============================
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -13,25 +13,25 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // ============================
-// 3. LOAD CORE & CONFIG
+// 3. LOAD CONFIG + CORE
 // ============================
 require_once '../config/config.php';
 
 require_once '../app/core/Database.php';
-require_once '../app/core/Controller.php';
 require_once '../app/core/Model.php';
+require_once '../app/core/Controller.php';
 require_once '../app/core/Auth.php';
 require_once '../app/core/Middleware.php';
 
 // ============================
 // 4. LOAD MODELS
 // ============================
+require_once '../app/models/User.php';
 require_once '../app/models/Book.php';
 require_once '../app/models/Category.php';
-require_once '../app/models/Notification.php';
 require_once '../app/models/Transaction.php';
-require_once '../app/models/User.php';
 require_once '../app/models/BorrowRequest.php';
+require_once '../app/models/Notification.php';
 
 // ============================
 // 5. LOAD CONTROLLERS
@@ -41,21 +41,22 @@ require_once '../app/controllers/AuthController.php';
 require_once '../app/controllers/BookController.php';
 require_once '../app/controllers/CategoryController.php';
 require_once '../app/controllers/DashboardController.php';
-require_once '../app/controllers/NotificationController.php';
 require_once '../app/controllers/TransactionController.php';
-require_once '../app/controllers/UserController.php';
 require_once '../app/controllers/BorrowRequestController.php';
+require_once '../app/controllers/UserController.php';
+require_once '../app/controllers/NotificationController.php';
+
 // ============================
-// 6. LẤY ACTION
+// 6. GET ACTION
 // ============================
 $action = $_GET['action'] ?? 'home_index';
 
 // ============================
-// 7. SWITCH – CASE ACTION
+// 7. ROUTER
 // ============================
 switch ($action) {
 
-    // ---------- HOME ----------
+    // ===== HOME =====
     case 'home_index':
         (new HomeController())->index();
         break;
@@ -64,7 +65,7 @@ switch ($action) {
         (new HomeController())->about();
         break;
 
-    // ---------- AUTH ----------
+    // ===== AUTH =====
     case 'auth_register':
         (new AuthController())->register();
         break;
@@ -85,36 +86,30 @@ switch ($action) {
         (new AuthController())->logout();
         break;
 
-    // ---------- USER BOOKS ----------
+    // ===== USER BOOKS =====
     case 'user_books_index':
         (new BookController())->userIndex();
         break;
 
     case 'user_books_show':
-        $id = $_GET['id'] ?? 0;
-        (new BookController())->userShow($id);
+        (new BookController())->userShow($_GET['id'] ?? 0);
         break;
 
     case 'user_books_search':
         (new BookController())->userSearch();
         break;
 
-    // ---------- USER BORROW ----------
-    case 'user_borrow_index':
-        (new UserController())->borrowIndex();  // Giả định thêm method này
-        break;
-
     case 'user_books_borrow_request':
-        $controller = new BookController();
-        $controller->userBorrowRequest((int)$_GET['id']);
+        (new BookController())->userBorrowRequest((int)($_GET['id'] ?? 0));
         break;
 
-    // ---------- USER NOTIFICATIONS ----------
-    case 'user_notifications_index':
+    // ===== USER NOTIFICATIONS =====
+    case 'index':
         (new NotificationController())->userIndex();
         break;
 
-    // ---------- USER PROFILE ----------
+
+    // ===== USER PROFILE =====
     case 'user_profile_index':
         (new UserController())->profile();
         break;
@@ -128,16 +123,16 @@ switch ($action) {
         break;
 
     case 'user_change_password':
-        (new UserController())->changePassword();  // Giả định thêm method này
+        (new UserController())->changePassword();
         break;
 
-    // ---------- ADMIN DASHBOARD ----------
+    // ===== ADMIN DASHBOARD =====
     case 'admin_dashboard_index':
         Middleware::requireAdmin();
         (new DashboardController())->index();
         break;
 
-    // ---------- ADMIN BOOKS ----------
+    // ===== ADMIN BOOKS =====
     case 'admin_books_index':
         Middleware::requireAdmin();
         (new BookController())->adminIndex();
@@ -150,17 +145,15 @@ switch ($action) {
 
     case 'admin_books_edit':
         Middleware::requireAdmin();
-        $id = $_GET['id'] ?? 0;
-        (new BookController())->adminEdit($id);
+        (new BookController())->adminEdit($_GET['id'] ?? 0);
         break;
 
     case 'admin_books_show':
         Middleware::requireAdmin();
-        $id = $_GET['id'] ?? 0;
-        (new BookController())->adminShow($id);
+        (new BookController())->adminShow($_GET['id'] ?? 0);
         break;
 
-    // ---------- ADMIN CATEGORIES ----------
+    // ===== ADMIN CATEGORIES =====
     case 'admin_categories_index':
         Middleware::requireAdmin();
         (new CategoryController())->index();
@@ -173,11 +166,10 @@ switch ($action) {
 
     case 'admin_categories_edit':
         Middleware::requireAdmin();
-        $id = $_GET['id'] ?? 0;
-        (new CategoryController())->edit($id);
+        (new CategoryController())->edit($_GET['id'] ?? 0);
         break;
 
-    // ---------- ADMIN TRANSACTIONS ----------
+    // ===== ADMIN TRANSACTIONS =====
     case 'admin_transactions_index':
         Middleware::requireAdmin();
         (new TransactionController())->index();
@@ -185,17 +177,15 @@ switch ($action) {
 
     case 'admin_transactions_approve':
         Middleware::requireAdmin();
-        $id = $_GET['id'] ?? 0;
-        (new TransactionController())->approve($id);
+        (new TransactionController())->approve($_GET['id'] ?? 0);
         break;
 
     case 'admin_transactions_return':
         Middleware::requireAdmin();
-        $id = $_GET['id'] ?? 0;
-        (new TransactionController())->return($id);
+        (new TransactionController())->return($_GET['id'] ?? 0);
         break;
 
-    // ---------- ADMIN NOTIFICATIONS ----------
+    // ===== ADMIN NOTIFICATIONS =====
     case 'admin_notifications_index':
         Middleware::requireAdmin();
         (new NotificationController())->adminIndex();
@@ -206,37 +196,36 @@ switch ($action) {
         (new NotificationController())->adminCreate();
         break;
 
-    // ---------- ADMIN USERS ----------
+    // ===== ADMIN REQUESTS =====
+    case 'admin_requests':
+        Middleware::requireAdmin();
+        (new BorrowRequestController())->index();
+        break;
+
+    case 'admin_requests_approve':
+        Middleware::requireAdmin();
+        (new BorrowRequestController())->approve_request();
+        break;
+
+    // ===== ADMIN USERS =====
     case 'admin_users_index':
         Middleware::requireAdmin();
-        (new UserController())->adminIndex();  // Giả định thêm method này
+        (new UserController())->adminIndex();
         break;
 
     case 'admin_users_show':
         Middleware::requireAdmin();
-        $id = $_GET['id'] ?? 0;
-        (new UserController())->adminShow($id);  // Giả định thêm method này
+        (new UserController())->adminShow($_GET['id'] ?? 0);
         break;
 
     case 'admin_users_edit':
         Middleware::requireAdmin();
-        $id = $_GET['id'] ?? 0;
-        (new UserController())->adminEdit($id);  // Giả định thêm method này
+        (new UserController())->adminEdit($_GET['id'] ?? 0);
         break;
 
-case 'admin_requests':
-    Middleware::requireAdmin();
-    (new BorrowRequestController())->index();
-    break;
-
-case 'admin_requests_approve':
-    Middleware::requireAdmin();
-    (new BorrowRequestController())->approve_request();
-    break;
-
-    // ---------- DEFAULT ----------
+    // ===== 404 =====
     default:
         http_response_code(404);
-        echo "404 - Action not found: $action";
+        echo "404 - Action not found: {$action}";
         break;
 }

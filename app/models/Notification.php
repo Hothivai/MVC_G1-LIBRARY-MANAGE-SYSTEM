@@ -5,48 +5,62 @@ class Notification extends Model
 {
     protected string $table = 'notifications';
 
-    public function create($data)
+    // ================= CREATE =================
+    public function create(array $data): bool
     {
-        $sql = "INSERT INTO notifications 
+        $sql = "INSERT INTO notifications
                 (user_id, transaction_id, type, title, message)
-                VALUES (:user_id, :transaction_id, :type, :title, :message)";
-        $stmt = $this->db->query($sql);
-        return $stmt->execute($data);
+                VALUES (?, ?, ?, ?, ?)";
+
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            $data['user_id'],
+            $data['transaction_id'],
+            $data['type'],
+            $data['title'],
+            $data['message']
+        ]);
     }
 
-    public function getByUser($userId)
+    // ================= GET BY USER =================
+    public function getByUser(int $userId): array
     {
-        $sql = "SELECT * FROM notifications
-                WHERE user_id = :user_id
+        $sql = "SELECT *
+                FROM notifications
+                WHERE user_id = ?
                 ORDER BY created_at DESC";
-        $stmt = $this->db->query($sql);
-        $stmt->execute(['user_id' => $userId]);
-        return $stmt->fetchAll();
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function countByUser($userId)
+    // ================= COUNT =================
+    public function countByUser(int $userId): int
     {
         $sql = "SELECT COUNT(*) AS total
                 FROM notifications
-                WHERE user_id = :user_id";
-        $stmt = $this->db->query($sql);
-        $stmt->execute(['user_id' => $userId]);
-        return $stmt->fetch()['total'];
+                WHERE user_id = ?";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId]);
+
+        return (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
     }
 
-    public function exists($userId, $transactionId, $type)
+    // ================= EXISTS =================
+    public function exists(int $userId, int $transactionId, string $type): bool
     {
         $sql = "SELECT notification_id
                 FROM notifications
-                WHERE user_id = :user_id
-                  AND transaction_id = :transaction_id
-                  AND type = :type";
-        $stmt = $this->db->query($sql);
-        $stmt->execute([
-            'user_id' => $userId,
-            'transaction_id' => $transactionId,
-            'type' => $type
-        ]);
+                WHERE user_id = ?
+                  AND transaction_id = ?
+                  AND type = ?";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId, $transactionId, $type]);
+
         return $stmt->rowCount() > 0;
     }
 }
