@@ -179,5 +179,18 @@ class User extends Model
         $stmt = $this->db->query($sql);
         return (int) $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     }
+    // protected string $table = 'users';
+
+    public function getAllUsers()
+    {
+        $sql = "SELECT id, full_name, email, phone, status, created_at
+                FROM users
+                ORDER BY created_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     
 }
