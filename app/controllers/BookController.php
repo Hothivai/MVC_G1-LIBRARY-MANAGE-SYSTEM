@@ -208,4 +208,83 @@ public function userSearch()
             $this->redirect('admin_books_create');
         }
     }
+    // --- IMPORT VIEW ---
+    public function adminImport()
+    {
+        $this->requireAdmin();
+        $this->view('admin/books/import', [
+            'active' => 'books'
+        ]);
+    }
+
+    // --- IMPORT PROCESS (XỬ LÝ FILE CSV) ---
+    public function adminImportStore()
+    {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['csv_file'])) {
+            $fileName = $_FILES['csv_file']['tmp_name'];
+
+            if ($_FILES['csv_file']['size'] > 0) {
+                $file = fopen($fileName, "r");
+
+                // Load Models
+                $bookModel = $this->model('Book');
+                $categoryModel = $this->model('Category');
+
+                // Bỏ qua dòng tiêu đề (Header row)
+                fgetcsv($file);
+
+                $count = 0;
+                while (($column = fgetcsv($file, 10000, ",")) !== FALSE) {
+                    // Cấu trúc cột CSV: 
+                    // 0: Title, 1: Author, 2: Category Name, 3: ISBN, 4: Publisher, 5: Year, 6: Quantity, 7: Description
+
+                    // Kiểm tra dữ liệu cơ bản
+                    $title = $column[0] ?? '';
+                    if (empty($title)) continue; // Bỏ qua nếu không có tiêu đề sách
+
+                    // Xử lý Category: Tìm ID dựa trên Tên Category trong file
+                    $catName = $column[2] ?? '';
+                    $categoryId = 1; // Mặc định là 1 nếu không tìm thấy
+                    
+                    // Cần viết thêm hàm findByName trong CategoryModel, tạm thời ta giả định lấy tất cả và lọc
+                    // Để tối ưu, bạn nên thêm method findByName vào Model Category.
+                    // Ở đây tôi dùng cách đơn giản nhất:
+                    $catList = $categoryModel->all(); 
+                    foreach ($catList as $cat) {
+                        if (strcasecmp($cat['category_name'], trim($catName)) == 0) {
+                            $categoryId = $cat['category_id'];
+                            break;
+                        }
+                    }
+
+                    $data = [
+                        'title'          => $title,
+                        'author'         => $column[1] ?? 'Unknown',
+                        'category_id'    => $categoryId,
+                        'isbn'           => $column[3] ?? '',
+                        'publisher'      => $column[4] ?? '',
+                        'published_year' => is_numeric($column[5]) ? $column[5] : date('Y'),
+                        'quantity'       => is_numeric($column[6]) ? $column[6] : 0,
+                        'description'    => $column[7] ?? '',
+                        'cover_image'    => 'images/books/default.jpg' // Ảnh mặc định khi import
+                    ];
+
+                    // Gọi hàm create của Model Book
+                    $bookModel->create($data);
+                    $count++;
+                }
+                
+                fclose($file);
+                
+                // Redirect hoặc thông báo thành công (Có thể dùng Session flash message nếu có)
+                echo "<script>alert('Imported $count books successfully!'); window.location.href='index.php?action=admin_books_index';</script>";
+                return;
+            }
+        }
+        
+        $this->redirect('admin_books_index');
+    }
+    
 }

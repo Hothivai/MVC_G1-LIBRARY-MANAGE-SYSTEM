@@ -17,8 +17,7 @@
 
 
     <!-- MAIN -->
-    <div class="main-content">
-
+    <div class="flex-grow-1">
 
             <!-- NAVBAR -->
             <nav class="navbar navbar-dark bg-success px-4">

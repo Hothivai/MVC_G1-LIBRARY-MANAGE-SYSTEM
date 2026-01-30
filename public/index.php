@@ -159,6 +159,10 @@ switch ($action) {
         $id = $_GET['id'] ?? 0;
         (new BookController())->adminShow($id);
         break;
+    case 'admin_books_import':
+        Middleware::requireAdmin();
+        (new BookController())->adminImport();
+        break;
 
     // ---------- ADMIN CATEGORIES ----------
     case 'admin_categories_index':

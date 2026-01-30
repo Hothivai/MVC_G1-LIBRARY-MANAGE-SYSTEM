@@ -1,22 +1,75 @@
-<?php ?>
-<?php include '../app/views/layouts/header.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Category Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/css/admin.css">
+</head>
+<body>
+<div class="d-flex">
+    <?php require_once APP_PATH . '/views/admin/sidebarAdmin.php'; ?>
 
-<section class="admin-categories">
-    <h1>Category Management</h1>
-    <a href="/admin/categories/create" class="btn btn-primary">Add Category</a>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Category Name</th>
-                <th>Description</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Categories will be displayed here -->
-        </tbody>
-    </table>
-</section>
+    <div class="main-content flex-grow-1">
+        <nav class="navbar navbar-light bg-white px-4 border-bottom">
+            <span class="navbar-brand fw-bold">Category Management</span>
+            <div class="d-flex align-items-center">
+                <span class="me-2 fw-bold">Admin</span>
+                <i class="bi bi-person-circle fs-3"></i>
+            </div>
+        </nav>
 
-<?php include '../app/views/layouts/footer.php'; ?>
+        <div class="p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">Category List</h5>
+                <a href="index.php?action=admin_categories_create" class="btn btn-success text-white fw-bold">
+                    <i class="bi bi-plus-lg"></i> Add Category
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">ID</th>
+                                <th>Category Name</th>
+                                <th>Description</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if(!empty($categories)): ?>
+                                <?php foreach ($categories as $cat): ?>
+                                <tr>
+                                    <td class="ps-4 fw-bold">#<?= $cat['category_id'] ?></td>
+                                    <td>
+                                        <span class="badge bg-success bg-opacity-10 text-success fs-6 fw-normal border border-success">
+                                            <?= htmlspecialchars($cat['category_name']) ?>
+                                        </span>
+                                    </td>
+                                    <td class="text-muted"><?= htmlspecialchars($cat['description'] ?? 'No description') ?></td>
+                                    <td class="text-center">
+                                        <a href="index.php?action=admin_categories_edit&id=<?= $cat['category_id'] ?>" 
+                                           class="btn btn-sm btn-outline-warning mx-1">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-outline-danger mx-1">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="4" class="text-center py-4">No categories found.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
