@@ -1,48 +1,77 @@
 body {
-    background: #f4f6f9;
+  background: #f4f6f9;
 }
 
 .sidebar {
-    width: 320px;
-    min-height: 100vh;
-    background: #fff;
+  background: #fff;
 }
 
 .sidebar .nav-item a {
-    padding: 15px 10px;
-    font-size: 20px;
-    display: block;
-    color: #333;
-    text-decoration: none;
+  padding: 15px 10px;
+  font-size: 20px;
+  display: block;
+  color: #333;
+  text-decoration: none;
 }
 
 .sidebar .nav-item.active {
-    background: #22C55E;
+  background: #22c55e;
 }
 
 .sidebar .nav-item.active a {
-    color: #fff;
+  color: #fff;
 }
 
 .sidebar .nav-item:hover {
-    background: #22C55E;
+  background: #22c55e;
 }
 
 .sidebar .nav-item:hover a {
-    color: #fff;
+  color: #fff;
 }
 
 .logo {
-    width: 80px;
+  width: 80px;
 }
 
-
-        .bg-dark-green { background-color: #145c38 !important; }
-        .text-success { color: #16A34A !important; }
-        .btn-success { background-color: #16A34A; border: none; }
-        .btn-success:hover { background-color: #145c38; }
-        .badge-pending { background-color: #fff9e6; color: #f59e0b; border: 1px solid #fde68a; }
-        .request-card { border: 1px solid #edf2f7; border-radius: 12px; transition: 0.3s; }
-        .request-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .id-badge { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background-color: #16A34A; color: white; border-radius: 8px; font-weight: bold; }
-        .stat-small { font-size: 0.8rem; color: #718096; }
+.bg-dark-green {
+  background-color: #145c38 !important;
+}
+.text-success {
+  color: #16a34a !important;
+}
+.btn-success {
+  background-color: #16a34a;
+  border: none;
+}
+.btn-success:hover {
+  background-color: #145c38;
+}
+.badge-pending {
+  background-color: #fff9e6;
+  color: #f59e0b;
+  border: 1px solid #fde68a;
+}
+.request-card {
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+  transition: 0.3s;
+}
+.request-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.id-badge {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #16a34a;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+}
+.stat-small {
+  font-size: 0.8rem;
+  color: #718096;
+}

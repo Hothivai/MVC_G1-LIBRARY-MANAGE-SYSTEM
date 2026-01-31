@@ -1,54 +1,125 @@
 <?php
-require_once __DIR__ . '/../models/Book.php';
-require_once __DIR__ . '/../models/Transaction.php';
-require_once __DIR__ . '/../models/BorrowRequest.php';
 require_once __DIR__ . '/../core/Controller.php';
-require_once __DIR__ . '/../core/Middleware.php';
-use App\Models\BorrowRequest;
 
-class BorrowRequestController
+
+class BorrowRequestController extends Controller
 {
+    // action: admin_requests
     public function index()
     {
-        Middleware::requireAdmin();
+        $this->requireAdmin();
 
-        $model = new BorrowRequest();
-        $pendingRequests = $model->getPendingRequests();
+        // load model
+        $borrowRequestModel = $this->model('BorrowRequest');
 
-        $this->view('admin/request', [
-            'pendingRequests' => $pendingRequests
-        ]);
+        // lấy dữ liệu
+        $data = [
+            'pendingRequests' => $borrowRequestModel->getAdminRequests(),
+            'active'          => 'requests'
+        ];
+
+        // gọi view
+        $this->view('admin/requests', $data);
     }
 
-    public function approve_request()
+    // action: admin_requests_approve
+    public function approve()
     {
+        $this->requireAdmin();
+
         $requestId = $_POST['request_id'] ?? null;
-        if (!$requestId) return;
+        if (!$requestId) {
+            header('Location: index.php?action=admin_requests');
+            exit;
+        }
 
-        // static → OK
-        $request = BorrowRequest::find($requestId);
-        if (!$request) return;
+        $borrowRequestModel = $this->model('BorrowRequest');
+        $bookModel          = $this->model('Book');
+        $transactionModel   = $this->model('Transaction');
+        $notificationModel  = $this->model('Notification');
 
-        //  Book là NON-static → phải new
-        $bookModel = new Book();
+        $request = $borrowRequestModel->findById($requestId);
+        if (!$request) {
+            header('Location: index.php?action=admin_requests');
+            exit;
+        }
+
         $copyId = $bookModel->getAvailableCopy($request['book_id']);
-        if (!$copyId) return;
+        if (!$copyId) {
+            header('Location: index.php?action=admin_requests');
+            exit;
+        }
 
-        //  Transaction là NON-static → phải new
-        $transactionModel = new Transaction();
-        $transactionModel->createTransaction(
+        // tính ngày trả sách (14 ngày kể từ ngày mượn)
+        $dueDate = date('Y-m-d', strtotime('+14 days'));
+
+        // tạo transaction
+        $transactionId = $transactionModel->createTransaction(
             $request['user_id'],
             $copyId,
-            $request['due_date']
+            $dueDate
         );
 
-        // static → OK
-        BorrowRequest::approve($requestId);
+        if ($transactionId) {
+            // cập nhật request
+            $borrowRequestModel->approve($requestId);
 
-        // non-static → new
-        $bookModel->decreaseAvailable($request['book_id']);
+            // gửi thông báo đến user
+            $notificationModel->createNotification(
+                $request['user_id'],
+                "Your borrow request for the book '{$request['book_title']}' has been approved. Please return it by {$dueDate}."
+            );
+        }
+        header('Location: index.php?action=admin_requests');
+        exit;
+    }
+
+    // action: admin_requests_reject
+    public function reject()
+    {
+        $this->requireAdmin();
+
+        $requestId = $_POST['request_id'] ?? null;
+        if ($requestId) {
+            $borrowRequestModel = $this->model('BorrowRequest');
+            $notificationModel  = $this->model('Notification');
+
+            $request = $borrowRequestModel->findById($requestId);
+            if ($request) {
+                $borrowRequestModel->reject($requestId);
+            }
+        }
 
         header('Location: index.php?action=admin_requests');
+        exit;
+    }
+
+    // action: user_borrow_request_store
+    public function store()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: index.php?action=auth_login');
+            exit;
+        }
+
+        $userId   = $_SESSION['user_id'];
+        $bookId   = $_POST['book_id'] ?? null;
+        $quantity = $_POST['quantity'] ?? 1;
+        $note     = $_POST['notes'] ?? '';
+
+        if (!$bookId) {
+            header('Location: index.php?action=home_index');
+            exit;
+        }
+
+        $borrowRequestModel = $this->model('BorrowRequest');
+        $borrowRequestModel->create(
+            $userId,
+            $bookId,
+            $quantity,
+            $note
+        );
+        header('Location: index.php?action=home_index');
         exit;
     }
 }
