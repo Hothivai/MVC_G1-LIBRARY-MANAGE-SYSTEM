@@ -3,28 +3,40 @@ require_once __DIR__ . '/../core/Controller.php';
 
 class NotificationController extends Controller
 {
-    // ---------- ADMIN METHODS ----------
-
-    // action: admin_notifications_index
-    public function adminIndex()
+    public function index()
     {
-        $this->requireAdmin();
-        $this->view('admin/notifications/index');
+        return $this->userIndex();
     }
 
-    // action: admin_notifications_create
-    public function adminCreate()
-    {
-        $this->requireAdmin();
-        $this->view('admin/notifications/create');
-    }
-
-    // ---------- USER METHODS ----------
-
-    // action: user_notifications_index
+    // ================= USER =================
     public function userIndex()
     {
-        $this->requireAuth();
-        $this->view('user/notifications/index');
+        $userId = Auth::getUserId();
+
+        if (!$userId) {
+            return $this->view('user/notifications/index', [
+                'notifications' => []
+            ]);
+        }
+
+        $notificationModel = new Notification();
+        $notifications = $notificationModel->getByUser($userId);
+
+        return $this->view('user/notifications/index', [
+            'notifications' => $notifications
+        ]);
+    }
+
+    // ================= ADMIN =================
+    public function adminIndex()
+    {
+        return $this->view('admin/notifications/index', [
+            'notifications' => []
+        ]);
+    }
+
+    public function adminCreate()
+    {
+        return $this->view('admin/notifications/create');
     }
 }
