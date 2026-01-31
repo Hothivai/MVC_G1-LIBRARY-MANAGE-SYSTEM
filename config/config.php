@@ -4,12 +4,15 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// ================= PATH =================
-define('APPROOT', dirname(__DIR__)); // trỏ tới thư mục gốc project
+// ================= PATHS =================
+define('APPROOT', dirname(__DIR__));
 define('APP_PATH', APPROOT . '/app');
-
-// ================= URL =================
-define('URLROOT', 'http://localhost/MVC_G1-LIBRARY-MANAGE-SYSTEM/public');
-
-// ================= APP INFO =================
+define('URLROOT', 'http://localhost/MVC_G1-LIBRARY-MANAGE-SYSTEM/public'); 
 define('SITENAME', 'Library Management System');
+
+// ================= DATABASE =================
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'library_db');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_CHARSET', 'utf8mb4');

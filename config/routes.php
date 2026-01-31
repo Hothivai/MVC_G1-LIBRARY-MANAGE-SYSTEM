@@ -1,6 +1,6 @@
 <?php
 
-/*// Start session first
+// Start session first
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -10,86 +10,66 @@ require_once __DIR__ . '/../app/core/Router.php';
 
 $router = new Router();
 
-// REGISTER
-$router->get('/register', 'AuthController', 'register');
-$router->post('/register', 'AuthController', 'handleRegister');
-
-
-// AUTH
+// ==================== AUTH ROUTES ====================
 $router->get('/auth/login', 'AuthController', 'login');
 $router->post('/auth/login', 'AuthController', 'loginPost');
-
 $router->get('/auth/logout', 'AuthController', 'logout');
+$router->get('/auth/register', 'AuthController', 'register');
+$router->post('/auth/register', 'AuthController', 'registerPost');
 
-// DEFAULT
-$router->get('/', 'AuthController', 'login');
+// Direct auth routes
+$router->get('/login', 'AuthController', 'login');
+$router->get('/register', 'AuthController', 'register');
 
-// ADMIN
-$router->get('/admin/dashboard/index','admin/DashboardController','index');
-
-// HOME (USER)
-$router->get('/home/index', 'HomeController', 'index');
-
-// DEFAULT
-
+// ==================== HOME ROUTES ====================
 $router->get('/', 'HomeController', 'index');
-
-// ==================== PUBLIC ROUTES ====================
-// Home
-$router->add('GET', '', 'HomeController', 'index');
-$router->add('GET', 'index.php', 'HomeController', 'index');
-$router->add('GET', 'home', 'HomeController', 'index');
-$router->add('GET', 'about', 'AboutController', 'index');
-
-// Auth
-$router->add('GET', 'login', 'AuthController', 'showLogin');
-$router->add('POST', 'login', 'AuthController', 'login');
-$router->add('GET', 'register', 'AuthController', 'showRegister');
-$router->add('POST', 'register', 'AuthController', 'register');
-$router->add('GET', 'logout', 'AuthController', 'logout');
+$router->get('/home', 'HomeController', 'index');
+$router->get('/home/index', 'HomeController', 'index');
+$router->get('/home/about', 'HomeController', 'about');
 
 // ==================== USER ROUTES ====================
-// Books
-$router->add('GET', 'user/books', 'User\BookController', 'index');
-$router->add('GET', 'user/books/show/{id}', 'User\BookController', 'show');
-$router->add('GET', 'user/books/search', 'User\BookController', 'search');
-
-// Profile
-$router->add('GET', 'user/profile', 'User\ProfileController', 'index');
-$router->add('GET', 'user/profile/edit', 'User\ProfileController', 'edit');
-$router->add('POST', 'user/profile/update', 'User\ProfileController', 'update');
-
-// Borrow
-$router->add('GET', 'user/borrow', 'User\BorrowController', 'index');
-$router->add('GET', 'user/borrow/request/{id}', 'User\BorrowController', 'request');
-$router->add('POST', 'user/borrow/store', 'User\BorrowController', 'store');
-
-// Notifications
-$router->add('GET', 'user/notifications', 'User\NotificationController', 'index');
+$router->get('/profile', 'UserController', 'profile');
+$router->get('/user/profile', 'UserController', 'profile');
+$router->post('/user/updateProfile', 'UserController', 'updateProfile');
+$router->post('/user/changePassword', 'UserController', 'changePassword');
+$router->get('/user/books', 'BookController', 'index'); // User books listing
+$router->get('/user/notifications', 'NotificationController', 'index');
 
 // ==================== ADMIN ROUTES ====================
-// Dashboard
-$router->add('GET', 'admin/dashboard', 'Admin\DashboardController', 'index', 'AdminMiddleware');
+$router->get('/admin/dashboard', 'DashboardController', 'index');
+$router->get('/admin/dashboard/index', 'DashboardController', 'index');
 
-// Books Management
-$router->add('GET', 'admin/books', 'Admin\BookController', 'index', 'AdminMiddleware');
-$router->add('GET', 'admin/books/create', 'Admin\BookController', 'create', 'AdminMiddleware');
-$router->add('POST', 'admin/books/store', 'Admin\BookController', 'store', 'AdminMiddleware');
-$router->add('GET', 'admin/books/edit/{id}', 'Admin\BookController', 'edit', 'AdminMiddleware');
-$router->add('POST', 'admin/books/update/{id}', 'Admin\BookController', 'update', 'AdminMiddleware');
-$router->add('POST', 'admin/books/delete/{id}', 'Admin\BookController', 'delete', 'AdminMiddleware');
+// Admin Books
+$router->get('/admin/books', 'BookController', 'index');
+$router->get('/admin/books/index', 'BookController', 'index');
+$router->get('/admin/books/create', 'BookController', 'create');
+$router->post('/admin/books', 'BookController', 'store');
+$router->get('/admin/books/edit', 'BookController', 'edit');
+$router->post('/admin/books/update', 'BookController', 'update');
+$router->get('/admin/books/show', 'BookController', 'show');
 
-// Categories Management
-$router->add('GET', 'admin/categories', 'Admin\CategoryController', 'index', 'AdminMiddleware');
-$router->add('GET', 'admin/categories/create', 'Admin\CategoryController', 'create', 'AdminMiddleware');
-$router->add('POST', 'admin/categories/store', 'Admin\CategoryController', 'store', 'AdminMiddleware');
+// Admin Categories
+$router->get('/admin/categories', 'CategoryController', 'index');
+$router->get('/admin/categories/index', 'CategoryController', 'index');
+$router->get('/admin/categories/create', 'CategoryController', 'create');
+$router->post('/admin/categories', 'CategoryController', 'store');
+$router->get('/admin/categories/edit', 'CategoryController', 'edit');
+$router->post('/admin/categories/update', 'CategoryController', 'update');
 
-// Users Management
-$router->add('GET', 'admin/users', 'Admin\UserController', 'index', 'AdminMiddleware');
-$router->add('GET', 'admin/users/show/{id}', 'Admin\UserController', 'show', 'AdminMiddleware');
+// Admin Transactions
+$router->get('/admin/transactions', 'TransactionController', 'index');
+$router->get('/admin/transactions/index', 'TransactionController', 'index');
+$router->get('/admin/transactions/pending', 'TransactionController', 'pending');
+$router->get('/admin/transactions/approve', 'TransactionController', 'approve');
+$router->post('/admin/transactions/approve', 'TransactionController', 'approvePost');
+$router->get('/admin/transactions/return', 'TransactionController', 'return');
+$router->post('/admin/transactions/return', 'TransactionController', 'returnPost');
 
-// Transactions Management
-$router->add('GET', 'admin/transactions', 'Admin\TransactionController', 'index', 'AdminMiddleware');
-$router->add('POST', 'admin/transactions/approve/{id}', 'Admin\TransactionController', 'approve', 'AdminMiddleware');
-$router->add('POST', 'admin/transactions/return/{id}', 'Admin\TransactionController', 'returnBook', 'AdminMiddleware');
-*/
+// Admin Notifications
+$router->get('/admin/notifications', 'NotificationController', 'index');
+$router->get('/admin/notifications/index', 'NotificationController', 'index');
+$router->get('/admin/notifications/create', 'NotificationController', 'create');
+$router->post('/admin/notifications', 'NotificationController', 'store');
+
+// ==================== DEFAULT FALLBACK ====================
+return $router;
