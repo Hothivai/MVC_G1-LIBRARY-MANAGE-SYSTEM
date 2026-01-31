@@ -214,4 +214,76 @@ class User extends Model
     ]);
 }
 
+    // Lấy tất cả members (không lấy admin)
+    public function getAllMembers()
+    {
+        $sql = "SELECT * FROM {$this->table} 
+                WHERE role != 'admin' AND role != 'Admin'
+                ORDER BY created_at DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Tìm kiếm và lọc members theo search term và status
+    public function searchMembers($search = '', $status = '')
+    {
+        $sql = "SELECT * FROM {$this->table} 
+                WHERE role != 'admin' AND role != 'Admin'";
+        
+        $params = [];
+        
+        // Tìm kiếm theo tên, email, phone, username
+        if (!empty($search)) {
+            $sql .= " AND (full_name LIKE ? OR email LIKE ? OR phone LIKE ? OR username LIKE ?)";
+            $searchTerm = "%{$search}%";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+        
+        // Lọc theo status
+        if (!empty($status)) {
+            $sql .= " AND status = ?";
+            $params[] = $status;
+        }
+        
+        $sql .= " ORDER BY created_at DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Kiểm tra xem user có phải admin không
+    public function isAdmin($userId)
+    {
+        $user = $this->find($userId);
+        return $user && ($user['role'] === 'admin' || $user['role'] === 'Admin');
+    }
+
+    // Cập nhật thông tin member (admin update member)
+    public function updateMember($userId, $data)
+    {
+        $sql = "UPDATE users 
+                SET full_name = ?,
+                    email     = ?,
+                    phone     = ?,
+                    address   = ?,
+                    status    = ?
+                WHERE user_id = ? AND role != 'admin' AND role != 'Admin'";
+
+        $stmt = $this->db->prepare($sql);
+
+        return $stmt->execute([
+            $data['full_name'],
+            $data['email'],
+            $data['phone'],
+            $data['address'],
+            $data['status'],
+            $userId
+        ]);
+    }
+
 }

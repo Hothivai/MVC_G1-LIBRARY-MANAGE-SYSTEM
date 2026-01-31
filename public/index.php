@@ -221,7 +221,13 @@ switch ($action) {
     case 'admin_users_edit':
         Middleware::requireAdmin();
         $id = $_GET['id'] ?? 0;
-        (new UserController())->adminEdit($id);  // Giả định thêm method này
+        (new UserController())->adminEdit($id);
+        break;
+
+    case 'admin_users_update':
+        Middleware::requireAdmin();
+        $id = $_GET['id'] ?? 0;
+        (new UserController())->adminUpdate($id);
         break;
 
 case 'admin_requests':

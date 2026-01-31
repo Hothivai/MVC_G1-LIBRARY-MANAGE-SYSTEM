@@ -44,10 +44,11 @@
 
             <div class="col-md-6">
                 <label class="form-label">Role</label>
-                <select class="form-select" name="role">
-                    <option value="member">Member</option>
-                    <option value="admin">Admin</option>
+                <select class="form-select" name="role" disabled>
+                    <option value="member" selected>Member</option>
                 </select>
+                <input type="hidden" name="role" value="member">
+                <small class="text-muted">Chỉ có thể tạo tài khoản Member</small>
             </div>
 
             <div class="col-12">
