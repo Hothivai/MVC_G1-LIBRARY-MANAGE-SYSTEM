@@ -35,7 +35,7 @@ require_once dirname(__DIR__, 2) . '/layouts/navbar.php';
                         <h3 class="fw-bold text-dark mb-4">Borrow Request Form</h3>
                         <p class="text-muted mb-4">Please review the information and select the expected return date.</p>
 
-                        <form action="index.php?action=process_borrow" method="POST">
+                        <form action="index.php?action=home_index" method="POST">
                             <input type="hidden" name="book_id" value="<?= $book['book_id'] ?>">
                             
                             <div class="row g-3">

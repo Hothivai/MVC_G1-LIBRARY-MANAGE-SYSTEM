@@ -1,41 +1,52 @@
 .notification-wrapper {
-    max-width: 800px;
-    margin: 30px auto;
-    padding: 20px;
+    max-width: 900px;
+    margin: 40px auto 80px;
+    padding: 0 20px;
 }
 
 .notification-wrapper h2 {
-    margin-bottom: 20px;
-    font-size: 22px;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #166534;
+    border-left: 5px solid #166534;
+    padding-left: 12px;
 }
 
+/* từng thông báo */
 .notification-item {
-    background: #f9f9f9;
-    border-left: 5px solid #4f46e5;
-    padding: 15px 20px;
-    margin-bottom: 15px;
+    background: #f6fffa;
+    border-left: 5px solid #166534;
+    padding: 16px 20px;
+    margin-bottom: 16px;
     border-radius: 6px;
 }
 
+/* tiêu đề thông báo */
 .notification-item h4 {
-    margin: 0 0 8px;
+    margin: 0 0 6px;
     font-size: 16px;
-    color: #111;
+    font-weight: 600;
+    color: red;
 }
 
+/* nội dung */
 .notification-item p {
     margin: 0 0 6px;
-    color: #333;
-    line-height: 1.5;
+    color: black;
+    line-height: 1.6;
 }
 
+/* thời gian */
 .notification-item small {
-    color: #777;
     font-size: 13px;
+    color:black;
 }
 
+/* khi không có thông báo */
 .empty {
     text-align: center;
-    color: #777;
-    padding: 40px 0;
+    padding: 50px 20px;
+    font-size: 15px;
+    color: #166534;
 }

@@ -1,8 +1,10 @@
 
 <?php require_once __DIR__ . '/../../layouts/header.php'; ?>
-<link rel="stylesheet" href="/css/notifications.css">
+<?php require_once __DIR__ . '/../../layouts/navbar.php'; ?>
 
-<div class="notification-wrapper">
+<link rel="stylesheet" href="/../../public/css/notifications.css">
+
+    <div class="notification-wrapper">
     <h2>Thông báo</h2>
 
     <?php if (!empty($notifications)): ?>
@@ -21,3 +23,4 @@
 </div>
 
 <?php include __DIR__ . '/../../layouts/footer.php'; ?>
+
