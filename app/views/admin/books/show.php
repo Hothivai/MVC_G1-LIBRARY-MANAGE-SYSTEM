@@ -78,12 +78,15 @@
 
             <div class="row g-5">
                 <div class="col-md-4">
-                    <img src="../../../public/<?= htmlspecialchars($book['cover_image'] ?? 'images/books/1984.jpg') ?>" 
+                    <?php 
+                        $imagePath = $book['cover_image'] ?? $book['image_url'] ?? 'images/books/1984.jpg';
+                    ?>
+                    <img src="../../../public/<?= htmlspecialchars($imagePath) ?>" 
                          class="book-detail-cover" 
                          alt="<?= htmlspecialchars($book['title']) ?>"
                          onerror="this.src='../../../public/images/books/1984.jpg'">
                     <div class="border rounded p-3 mt-3 text-center">
-                        <div class="mb-1">Category: <strong><?= htmlspecialchars($book['category_name']) ?></strong></div>
+                        <div class="mb-1">Category: <strong><?= htmlspecialchars($book['category_name'] ?? 'N/A') ?></strong></div>
                         <div class="text-success fw-bold">Status: In Stock</div>
                     </div>
                 </div>
@@ -138,32 +141,28 @@
                             <?php if (!empty($history)): ?>
                                 <?php foreach ($history as $row): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($row['member_name']) ?> (<?= $row['member_code'] ?? 'MEM' ?>)</td>
-                                    <td><?= date('d/m/Y', strtotime($row['borrow_date'])) ?></td>
+                                    <td><?= htmlspecialchars($row['member_name'] ?? 'Unknown') ?> (<?= $row['member_code'] ?? 'N/A' ?>)</td>
+                                    <td><?= $row['borrow_date'] ? date('d/m/Y', strtotime($row['borrow_date'])) : '-' ?></td>
                                     <td><?= $row['return_date'] ? date('d/m/Y', strtotime($row['return_date'])) : '-' ?></td>
                                     <td>
-                                        <?php if($row['status'] == 'returned'): ?>
+                                        <?php 
+                                            $status = $row['status'] ?? 'borrowed';
+                                            if($status == 'returned'): 
+                                        ?>
                                             <span class="text-success">Returned</span>
-                                        <?php elseif($row['status'] == 'borrowing'): ?>
+                                        <?php elseif($status == 'borrowed'): ?>
                                             <span class="text-warning fw-bold">Borrowing</span>
-                                        <?php else: ?>
+                                        <?php elseif($status == 'overdue'): ?>
                                             <span class="text-danger">Overdue</span>
+                                        <?php else: ?>
+                                            <span class="text-warning fw-bold">Borrowing</span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td>Nguyen Van A (MEM001)</td>
-                                    <td>15/12/2024</td>
-                                    <td>20/12/2024</td>
-                                    <td class="text-success">Returned</td>
-                                </tr>
-                                <tr>
-                                    <td>Tran Thi B (MEM002)</td>
-                                    <td>20/12/2024</td>
-                                    <td>-</td>
-                                    <td class="text-warning fw-bold">Borrowing</td>
+                                    <td colspan="4" class="text-center py-4 text-muted">No borrowing history found for this book.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../core/Controller.php';
+use App\Core\Database;
 
 class BookController extends Controller
 {
@@ -139,16 +140,55 @@ public function userSearch()
     public function adminIndex()
     {
         $this->requireAdmin();
+        
         $bookModel = $this->model('Book');
-        $books = $bookModel->all();  // Giả định lấy tất cả books
-        $this->view('admin/books/index', ['books' => $books]);
+        $categoryModel = $this->model('Category');
+
+        // Get pagination and filter parameters
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $perPage = 12;
+        $searchQuery = $_GET['search'] ?? '';
+        $selectedCategory = isset($_GET['category']) ? (string)$_GET['category'] : '';
+
+        // Get books with search and category filter
+        $categoryId = $selectedCategory ? (int)$selectedCategory : null;
+        
+        if ($searchQuery || $selectedCategory) {
+            $allBooks = $bookModel->search($searchQuery, $categoryId);
+        } else {
+            $allBooks = $bookModel->getAllWithStats($categoryId);
+        }
+
+        // Calculate pagination
+        $totalBooks = count($allBooks);
+        $totalPages = ceil($totalBooks / $perPage);
+        $page = min($page, $totalPages ?: 1);
+        $offset = ($page - 1) * $perPage;
+        $books = array_slice($allBooks, $offset, $perPage);
+
+        // Get categories for filter
+        $categories = $categoryModel->all();
+
+        $data = [
+            'books'            => $books,
+            'categories'       => $categories,
+            'searchQuery'      => $searchQuery,
+            'selectedCategory' => $selectedCategory,
+            'currentPage'      => $page,
+            'totalPages'       => $totalPages,
+            'totalBooks'       => $totalBooks
+        ];
+
+        $this->view('admin/books/index', $data);
     }
 
     // action: admin_books_create
     public function adminCreate()
     {
         $this->requireAdmin();
-        $this->view('admin/books/create');
+        $categoryModel = $this->model('Category');
+        $categories = $categoryModel->all();
+        $this->view('admin/books/create', ['categories' => $categories]);
     }
 
     // action: admin_books_edit
@@ -156,11 +196,18 @@ public function userSearch()
     {
         $this->requireAdmin();
         $bookModel = $this->model('Book');
+        $categoryModel = $this->model('Category');
+        
         $book = $bookModel->find($id);
         if (!$book) {
             $this->redirect('admin_books_index');
         }
-        $this->view('admin/books/edit', ['book' => $book]);
+        
+        $categories = $categoryModel->all();
+        $this->view('admin/books/edit', [
+            'book' => $book,
+            'categories' => $categories
+        ]);
     }
 
     // action: admin_books_show
@@ -168,11 +215,20 @@ public function userSearch()
     {
         $this->requireAdmin();
         $bookModel = $this->model('Book');
+        $transactionModel = $this->model('Transaction');
+        
         $book = $bookModel->find($id);
         if (!$book) {
             $this->redirect('admin_books_index');
         }
-        $this->view('admin/books/show', ['book' => $book]);
+        
+        // Get borrowing history for this book
+        $history = $transactionModel->getHistoryByBook($id);
+        
+        $this->view('admin/books/show', [
+            'book' => $book,
+            'history' => $history
+        ]);
     }
     // action: admin_book_store
     public function adminStore()
@@ -182,30 +238,95 @@ public function userSearch()
             $this->redirect('admin_books_index');
         }
 
-        // Xử lý upload ảnh (giả định)
-        $coverImage = null;
+        $bookModel = $this->model('Book');
+        $bookId = isset($_POST['book_id']) ? (int)$_POST['book_id'] : null;
+        $isUpdate = !empty($bookId);
+
+        // Xử lý upload ảnh
+        $imageUrl = null;
         if (!empty($_FILES['cover_image']['name'])) {
-            $coverImage = 'uploads/' . time() . '_' . $_FILES['cover_image']['name'];
-            move_uploaded_file($_FILES['cover_image']['tmp_name'], APP_PATH . '/public/' . $coverImage);
+            // Lưu vào thư mục images/books/
+            $uploadDir = APP_PATH . '/public/images/books/';
+            
+            // Kiểm tra và tạo thư mục nếu chưa tồn tại
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            // Lấy tên file gốc (bỏ đuôi cũ) và thêm đuôi .jpg mới
+            $filename = pathinfo($_FILES['cover_image']['name'], PATHINFO_FILENAME);
+            $newFileName = time() . '_' . uniqid() . '.jpg';
+
+            // Đường dẫn đầy đủ để lưu file
+            $targetPath = $uploadDir . $newFileName;
+
+            // Convert và lưu ảnh dưới dạng JPG
+            $this->convertToJpg($_FILES['cover_image']['tmp_name'], $targetPath);
+
+            // Đường dẫn tương đối để lưu vào database
+            $imageUrl = 'images/books/' . $newFileName;
+            
+        } elseif ($isUpdate) {
+            // Nếu là update và không có ảnh mới, giữ ảnh cũ
+            $existingBook = $bookModel->find($bookId);
+            $imageUrl = $existingBook['image_url'] ?? $existingBook['cover_image'] ?? null;
         }
 
         $data = [
-            'title' => $_POST['title'],
-            'author' => $_POST['author'],
-            'isbn' => $_POST['isbn'],
-            'category_id' => $_POST['category_id'],
-            'description' => $_POST['description'],
-            'quantity' => $_POST['quantity'],
-            'cover_image' => $coverImage,
-            'created_at' => date('Y-m-d H:i:s')
+            'title' => $_POST['title'] ?? '',
+            'author' => $_POST['author'] ?? '',
+            'isbn' => $_POST['isbn'] ?? '',
+            'category_id' => $_POST['category_id'] ?? null,
+            'description' => $_POST['description'] ?? '',
+            'publisher' => $_POST['publisher'] ?? '',
+            'published_year' => isset($_POST['published_year']) ? (int)$_POST['published_year'] : null
         ];
+        
+        // Lưu quantity để tạo book_copies sau khi tạo book
+        $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
 
-        $bookModel = $this->model('Book');
-        if ($bookModel->create($data)) {  // Giả định Model có create()
-            $this->redirect('admin_books_index');
+        if ($imageUrl !== null) {
+            $data['image_url'] = $imageUrl;
+        }
+
+        if ($isUpdate) {
+            // Update existing book
+            if ($bookModel->update($bookId, $data)) {
+                $this->redirect('admin_books_index');
+            } else {
+                $this->redirect('admin_books_edit&id=' . $bookId);
+            }
         } else {
-            // Handle error
-            $this->redirect('admin_books_create');
+            // Create new book
+            $data['created_at'] = date('Y-m-d H:i:s');
+            if ($bookModel->create($data)) {
+                $newBookId = $this->db->lastInsertId();
+                
+                // Tạo book_copies dựa trên quantity
+                if ($quantity > 0 && $newBookId) {
+                    $this->createBookCopies($newBookId, $quantity);
+                }
+                
+                $this->redirect('admin_books_index');
+            } else {
+                $this->redirect('admin_books_create');
+            }
+        }
+    }
+
+    /**
+     * Tạo các bản copy của sách
+     */
+    private function createBookCopies(int $bookId, int $quantity): void
+    {
+        $db = Database::getInstance()->getConnection();
+        
+        for ($i = 0; $i < $quantity; $i++) {
+            $barcode = 'BC' . str_pad($bookId, 6, '0', STR_PAD_LEFT) . '-' . str_pad($i + 1, 3, '0', STR_PAD_LEFT);
+            
+            $sql = "INSERT INTO book_copies (book_id, barcode, status) VALUES (?, ?, 'available')";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$bookId, $barcode]);
         }
     }
     // --- IMPORT VIEW ---
@@ -313,13 +434,19 @@ public function userSearch()
                     'isbn'           => $isbn,
                     'publisher'      => $publisher,
                     'published_year' => is_numeric($year) ? (int)$year : date('Y'),
-                    'quantity'       => is_numeric($quantity) ? (int)$quantity : 0,
                     'description'    => $description,
-                    'cover_image'    => 'images/books/default.jpg'
+                    'image_url'      => 'images/books/default.jpg'
                 ];
 
                 // Tạo sách mới
                 if ($bookModel->create($data)) {
+                    $newBookId = $this->db->lastInsertId();
+                    
+                    // Tạo book_copies dựa trên quantity
+                    if (is_numeric($quantity) && $quantity > 0 && $newBookId) {
+                        $this->createBookCopies($newBookId, (int)$quantity);
+                    }
+                    
                     $count++;
                 } else {
                     $errors[] = "Lỗi import dòng " . ($index + 1) . ": $title";
@@ -391,6 +518,53 @@ public function userSearch()
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save('php://output');
         exit;
+    }
+
+    /**
+     * Convert ảnh sang định dạng JPG
+     */
+    private function convertToJpg(string $sourcePath, string $targetPath): bool
+    {
+        // Lấy thông tin ảnh
+        $imageInfo = getimagesize($sourcePath);
+        if ($imageInfo === false) {
+            return false;
+        }
+
+        $mimeType = $imageInfo['mime'];
+        $width = $imageInfo[0];
+        $height = $imageInfo[1];
+
+        // Tạo image resource từ file gốc
+        switch ($mimeType) {
+            case 'image/jpeg':
+                $sourceImage = imagecreatefromjpeg($sourcePath);
+                break;
+            case 'image/png':
+                $sourceImage = imagecreatefrompng($sourcePath);
+                break;
+            case 'image/gif':
+                $sourceImage = imagecreatefromgif($sourcePath);
+                break;
+            case 'image/webp':
+                $sourceImage = imagecreatefromwebp($sourcePath);
+                break;
+            default:
+                // Nếu không hỗ trợ, copy file trực tiếp
+                return copy($sourcePath, $targetPath);
+        }
+
+        if ($sourceImage === false) {
+            return false;
+        }
+
+        // Tạo ảnh mới với chất lượng JPG
+        $result = imagejpeg($sourceImage, $targetPath, 85); // 85% quality
+        
+        // Giải phóng bộ nhớ
+        imagedestroy($sourceImage);
+
+        return $result;
     }
     
 }

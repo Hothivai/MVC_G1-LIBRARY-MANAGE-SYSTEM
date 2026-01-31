@@ -199,4 +199,51 @@ public function getAvailableCopy(int $bookId): ?int
         ");
         return $stmt->execute([$bookId]);
     }
+
+    /**
+     * Create a new book
+     */
+    public function create(array $data): bool
+    {
+        $fields = [];
+        $placeholders = [];
+        $values = [];
+
+        foreach ($data as $key => $value) {
+            if ($value !== null) {
+                $fields[] = $key;
+                $placeholders[] = '?';
+                $values[] = $value;
+            }
+        }
+
+        $sql = "INSERT INTO {$this->table} (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $placeholders) . ")";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($values);
+    }
+
+    /**
+     * Update an existing book
+     */
+    public function update(int $id, array $data): bool
+    {
+        $fields = [];
+        $values = [];
+
+        foreach ($data as $key => $value) {
+            if ($key !== $this->primaryKey && $value !== null) {
+                $fields[] = "$key = ?";
+                $values[] = $value;
+            }
+        }
+
+        if (empty($fields)) {
+            return false;
+        }
+
+        $values[] = $id;
+        $sql = "UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE {$this->primaryKey} = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($values);
+    }
 }

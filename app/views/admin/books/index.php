@@ -129,7 +129,13 @@
                     <div class="col-md-3 col-sm-6">
                         <div class="book-card p-3 h-100 d-flex flex-column">
                             <div class="book-cover-placeholder mb-3">
-                                <img src="../../../public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
+                                <?php 
+                                    $imagePath = $book['cover_image'] ?? $book['image_url'] ?? '/images/books/1984.jpg';
+                                    if (substr($imagePath, 0, 1) !== '/') {
+                                        $imagePath = '/' . $imagePath;
+                                    }
+                                ?>
+                                <img src="../../../public<?= htmlspecialchars($imagePath) ?>" 
                                      class="book-cover-img" 
                                      alt="<?= htmlspecialchars($book['title']) ?>"
                                      onerror="this.src='../../../public/images/books/1984.jpg'">
