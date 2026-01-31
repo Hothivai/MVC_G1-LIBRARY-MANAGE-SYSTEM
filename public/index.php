@@ -164,6 +164,16 @@ switch ($action) {
         (new BookController())->adminImport();
         break;
 
+    case 'admin_books_import_store':
+        Middleware::requireAdmin();
+        (new BookController())->adminImportStore();
+        break;
+
+    case 'admin_books_import_sample':
+        Middleware::requireAdmin();
+        (new BookController())->adminImportSample();
+        break;
+
     // ---------- ADMIN CATEGORIES ----------
     case 'admin_categories_index':
         Middleware::requireAdmin();

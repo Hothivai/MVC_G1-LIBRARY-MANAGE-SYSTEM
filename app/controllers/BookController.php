@@ -217,74 +217,180 @@ public function userSearch()
         ]);
     }
 
-    // --- IMPORT PROCESS (XỬ LÝ FILE CSV) ---
+    // --- IMPORT PROCESS (XỬ LÝ FILE EXCEL/CSV với PHPSpreadsheet) ---
     public function adminImportStore()
     {
         $this->requireAdmin();
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['csv_file'])) {
-            $fileName = $_FILES['csv_file']['tmp_name'];
-
-            if ($_FILES['csv_file']['size'] > 0) {
-                $file = fopen($fileName, "r");
-
-                // Load Models
-                $bookModel = $this->model('Book');
-                $categoryModel = $this->model('Category');
-
-                // Bỏ qua dòng tiêu đề (Header row)
-                fgetcsv($file);
-
-                $count = 0;
-                while (($column = fgetcsv($file, 10000, ",")) !== FALSE) {
-                    // Cấu trúc cột CSV: 
-                    // 0: Title, 1: Author, 2: Category Name, 3: ISBN, 4: Publisher, 5: Year, 6: Quantity, 7: Description
-
-                    // Kiểm tra dữ liệu cơ bản
-                    $title = $column[0] ?? '';
-                    if (empty($title)) continue; // Bỏ qua nếu không có tiêu đề sách
-
-                    // Xử lý Category: Tìm ID dựa trên Tên Category trong file
-                    $catName = $column[2] ?? '';
-                    $categoryId = 1; // Mặc định là 1 nếu không tìm thấy
-                    
-                    // Cần viết thêm hàm findByName trong CategoryModel, tạm thời ta giả định lấy tất cả và lọc
-                    // Để tối ưu, bạn nên thêm method findByName vào Model Category.
-                    // Ở đây tôi dùng cách đơn giản nhất:
-                    $catList = $categoryModel->all(); 
-                    foreach ($catList as $cat) {
-                        if (strcasecmp($cat['category_name'], trim($catName)) == 0) {
-                            $categoryId = $cat['category_id'];
-                            break;
-                        }
-                    }
-
-                    $data = [
-                        'title'          => $title,
-                        'author'         => $column[1] ?? 'Unknown',
-                        'category_id'    => $categoryId,
-                        'isbn'           => $column[3] ?? '',
-                        'publisher'      => $column[4] ?? '',
-                        'published_year' => is_numeric($column[5]) ? $column[5] : date('Y'),
-                        'quantity'       => is_numeric($column[6]) ? $column[6] : 0,
-                        'description'    => $column[7] ?? '',
-                        'cover_image'    => 'images/books/default.jpg' // Ảnh mặc định khi import
-                    ];
-
-                    // Gọi hàm create của Model Book
-                    $bookModel->create($data);
-                    $count++;
-                }
-                
-                fclose($file);
-                
-                // Redirect hoặc thông báo thành công (Có thể dùng Session flash message nếu có)
-                echo "<script>alert('Imported $count books successfully!'); window.location.href='index.php?action=admin_books_index';</script>";
-                return;
-            }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_FILES['import_file'])) {
+            $this->redirect('admin_books_import');
+            return;
         }
+
+        $file = $_FILES['import_file'];
         
-        $this->redirect('admin_books_index');
+        // Validate file
+        if ($file['error'] !== UPLOAD_ERR_OK || $file['size'] == 0) {
+            echo "<script>alert('Lỗi upload file!'); window.location.href='index.php?action=admin_books_import';</script>";
+            return;
+        }
+
+        // Check file extension
+        $allowedExtensions = ['xlsx', 'xls', 'csv'];
+        $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        
+        if (!in_array($fileExtension, $allowedExtensions)) {
+            echo "<script>alert('Chỉ hỗ trợ file Excel (.xlsx, .xls) hoặc CSV!'); window.location.href='index.php?action=admin_books_import';</script>";
+            return;
+        }
+
+        // Load PHPSpreadsheet
+        require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
+
+        try {
+            // Create reader based on file type
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file['tmp_name']);
+            $worksheet = $spreadsheet->getActiveSheet();
+            $rows = $worksheet->toArray();
+
+            // Load Models
+            $bookModel = $this->model('Book');
+            $categoryModel = $this->model('Category');
+
+            // Get option for creating new categories
+            $createNewCategory = isset($_POST['create_category']) && $_POST['create_category'] == '1';
+
+            $count = 0;
+            $errors = [];
+            $skipped = 0;
+
+            // Skip header row (first row)
+            foreach ($rows as $index => $row) {
+                if ($index === 0) continue; // Skip header
+
+                // Cấu trúc cột: 
+                // 0: Title, 1: Author, 2: Category Name, 3: ISBN, 4: Publisher, 5: Year, 6: Quantity, 7: Description
+
+                $title = trim($row[0] ?? '');
+                if (empty($title)) {
+                    $skipped++;
+                    continue; // Bỏ qua nếu không có tiêu đề sách
+                }
+
+                // Xử lý Category
+                $catName = trim($row[2] ?? '');
+                $categoryId = null;
+
+                if (!empty($catName)) {
+                    // Tìm category theo tên
+                    $category = $categoryModel->findByName($catName);
+                    
+                    if ($category) {
+                        $categoryId = $category['category_id'];
+                    } elseif ($createNewCategory) {
+                        // Tạo category mới nếu được phép
+                        $categoryId = $categoryModel->createCategory($catName);
+                    }
+                }
+
+                // Nếu không tìm thấy và không tạo mới, dùng category mặc định (ID = 1)
+                if (!$categoryId) {
+                    $categoryId = 1;
+                }
+
+                // Validate và xử lý dữ liệu
+                $author = trim($row[1] ?? '');
+                $isbn = trim($row[3] ?? '');
+                $publisher = trim($row[4] ?? '');
+                $year = $row[5] ?? '';
+                $quantity = $row[6] ?? 0;
+                $description = trim($row[7] ?? '');
+
+                $data = [
+                    'title'          => $title,
+                    'author'         => !empty($author) ? $author : 'Unknown',
+                    'category_id'    => $categoryId,
+                    'isbn'           => $isbn,
+                    'publisher'      => $publisher,
+                    'published_year' => is_numeric($year) ? (int)$year : date('Y'),
+                    'quantity'       => is_numeric($quantity) ? (int)$quantity : 0,
+                    'description'    => $description,
+                    'cover_image'    => 'images/books/default.jpg'
+                ];
+
+                // Tạo sách mới
+                if ($bookModel->create($data)) {
+                    $count++;
+                } else {
+                    $errors[] = "Lỗi import dòng " . ($index + 1) . ": $title";
+                }
+            }
+
+            // Thông báo kết quả
+            $message = "Import thành công $count sách!";
+            if ($skipped > 0) {
+                $message .= " ($skipped dòng bị bỏ qua do thiếu tiêu đề)";
+            }
+            if (!empty($errors)) {
+                $message .= " Có " . count($errors) . " lỗi.";
+            }
+
+            echo "<script>alert('$message'); window.location.href='index.php?action=admin_books_index';</script>";
+            return;
+
+        } catch (\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
+            echo "<script>alert('Lỗi đọc file: " . addslashes($e->getMessage()) . "'); window.location.href='index.php?action=admin_books_import';</script>";
+            return;
+        } catch (\Exception $e) {
+            echo "<script>alert('Lỗi: " . addslashes($e->getMessage()) . "'); window.location.href='index.php?action=admin_books_import';</script>";
+            return;
+        }
+    }
+
+    // --- DOWNLOAD SAMPLE EXCEL FILE ---
+    public function adminImportSample()
+    {
+        $this->requireAdmin();
+
+        require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Books Import Template');
+
+        // Header row
+        $headers = ['Title', 'Author', 'Category Name', 'ISBN', 'Publisher', 'Year', 'Quantity', 'Description'];
+        $sheet->fromArray($headers, null, 'A1');
+
+        // Style header row
+        $headerStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '4472C4']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
+        ];
+        $sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
+
+        // Sample data rows
+        $sampleData = [
+            ['The Great Gatsby', 'F. Scott Fitzgerald', 'Fiction', '978-0743273565', 'Scribner', 1925, 5, 'A novel about the American Dream'],
+            ['Clean Code', 'Robert C. Martin', 'Programming', '978-0132350884', 'Prentice Hall', 2008, 3, 'A handbook of agile software craftsmanship'],
+            ['1984', 'George Orwell', 'Fiction', '978-0451524935', 'Signet Classic', 1949, 4, 'A dystopian social science fiction novel'],
+        ];
+        $sheet->fromArray($sampleData, null, 'A2');
+
+        // Auto-size columns
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Output file
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="books_import_template.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
+        exit;
     }
     
 }
