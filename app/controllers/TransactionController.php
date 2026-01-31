@@ -7,27 +7,65 @@ class TransactionController extends Controller
     public function index()
     {
         $this->requireAdmin();
-        $this->view('admin/transactions/index');
-    }
 
-    // action: admin_transactions_pending (nếu cần, thêm vào index.php nếu thiếu)
-    public function pending()
-    {
-        $this->requireAdmin();
-        $this->view('admin/transactions/pending');
+        $transactionModel = $this->model('Transaction');
+
+        $data = [
+            'transactions' => $transactionModel->getRecent(),
+            'active'       => 'transactions'
+        ];
+
+        $this->view('admin/transactions/index', $data);
     }
 
     // action: admin_transactions_approve
-    public function approve($id)
+    public function processReturn()
     {
         $this->requireAdmin();
-        $this->view('admin/transactions/approve', ['id' => $id]);
+
+        // Lấy ID từ POST (khớp với form ở View)
+        $transactionId = $_POST['transaction_id'] ?? null;
+
+        if ($transactionId) {
+            $transactionModel = $this->model('Transaction');
+            $notificationModel = $this->model('Notification');
+
+            // 1. Cập nhật trạng thái 'returned' và 'return_date'
+            if ($transactionModel->markAsReturned($transactionId)) {
+
+                // 2. Lấy thông tin để gửi thông báo cho User
+                $transaction = $transactionModel->findById($transactionId);
+            }
+        }
+
+        // Quay lại trang danh sách giao dịch
+        header('Location: index.php?action=admin_transactions_index');
+        exit;
     }
 
     // action: admin_transactions_return
     public function return($id)
     {
         $this->requireAdmin();
-        $this->view('admin/transactions/return', ['id' => $id]);
+
+        if (!$id) {
+            header('Location: index.php?action=admin_transactions_index');
+            exit;
+        }
+
+        $transactionModel = $this->model('Transaction');
+
+        $transaction = $transactionModel->findById($id);
+        if (!$transaction) {
+            header('Location: index.php?action=admin_transactions_index');
+            exit;
+        }
+
+        $data = [
+            'transaction' => $transaction,
+            'active'      => 'transactions'
+        ];
+
+        $this->view('admin/transactions/index', $data);
     }
 }

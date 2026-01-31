@@ -6,9 +6,7 @@ class Book extends Model
     protected string $table = 'books';
     protected string $primaryKey = 'book_id';
 
-    /**
-     * Get books with category and availability stats (for book index page)
-     */
+    // Get books with category and availability stats (for book index page)
     public function getAllWithStats(?int $categoryId = null): array
     {
         $sql = "
@@ -61,9 +59,7 @@ class Book extends Model
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Get latest books for homepage
-     */
+    // Get latest books for homepage
     public function getLatestBooks(int $limit): array
     {
         $sql = "
@@ -86,12 +82,10 @@ class Book extends Model
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-/**
- * Search books by keyword and/or category
- */
-public function search(string $keyword = '', ?int $categoryId = null): array
-{
-    $sql = "
+    // Search books by keyword and/or category
+    public function search(string $keyword = '', ?int $categoryId = null): array
+    {
+        $sql = "
         SELECT 
             b.*,
             c.category_name,
@@ -105,35 +99,32 @@ public function search(string $keyword = '', ?int $categoryId = null): array
         LEFT JOIN book_copies bc ON b.book_id = bc.book_id
     ";
 
-    $conditions = [];
-    $params     = [];
+        $conditions = [];
+        $params     = [];
 
-    if ($keyword !== '') {
-        $conditions[] = "(b.title LIKE :kw OR b.author LIKE :kw OR b.isbn LIKE :kw)";
-        $params[':kw'] = '%' . $keyword . '%';
+        if ($keyword !== '') {
+            $conditions[] = "(b.title LIKE :kw OR b.author LIKE :kw OR b.isbn LIKE :kw)";
+            $params[':kw'] = '%' . $keyword . '%';
+        }
+
+        if ($categoryId !== null) {
+            $conditions[] = "b.category_id = :cat";
+            $params[':cat'] = $categoryId;
+        }
+
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(' AND ', $conditions);
+        }
+
+        $sql .= " GROUP BY b.book_id ORDER BY b.created_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    if ($categoryId !== null) {
-        $conditions[] = "b.category_id = :cat";
-        $params[':cat'] = $categoryId;
-    }
-
-    if (!empty($conditions)) {
-        $sql .= " WHERE " . implode(' AND ', $conditions);
-    }
-
-    $sql .= " GROUP BY b.book_id ORDER BY b.created_at DESC";
-
-    $stmt = $this->db->prepare($sql);
-    $stmt->execute($params);
-
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-
-    /**
-     * Find book with category information
-     */
+    // Find book with category information
     public function findWithCategory(int $id): ?array
     {
         $sql = "
@@ -155,48 +146,33 @@ public function search(string $keyword = '', ?int $categoryId = null): array
 
         return $book ?: null;
     }
-    
-    /**
-     * Override find method to include category
-     */
+
+    // Override find method to include category
     public function find($id)
     {
         return $this->findWithCategory($id);
     }
 
-    /**
-     * Count total books
-     */
+    // Count total books
     public function countAll(): int
     {
         $sql = "SELECT COUNT(*) AS total FROM {$this->table}";
         $stmt = $this->db->query($sql);
         return (int) $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     }
-    
+
     // Lấy 1 bản copy còn available của sách
-public function getAvailableCopy(int $bookId): ?int
-{
-    $stmt = $this->db->prepare("
+    public function getAvailableCopy(int $bookId): ?int
+    {
+        $stmt = $this->db->prepare("
         SELECT copy_id 
         FROM book_copies
         WHERE book_id = ? AND status = 'available'
         LIMIT 1
     ");
-    $stmt->execute([$bookId]);
-    $copy = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute([$bookId]);
+        $copy = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    return $copy ? $copy['copy_id'] : null;
-}
-
-// Giảm số lượng available_copies (nếu bạn CÓ cột này)
-    public function decreaseAvailable(int $bookId): bool
-    {
-        $stmt = $this->db->prepare("
-            UPDATE books 
-            SET available_copies = available_copies - 1
-            WHERE book_id = ?
-        ");
-        return $stmt->execute([$bookId]);
+        return $copy ? $copy['copy_id'] : null;
     }
 }

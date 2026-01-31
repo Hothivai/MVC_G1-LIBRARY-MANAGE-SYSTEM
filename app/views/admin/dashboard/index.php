@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
@@ -10,21 +11,21 @@
 </head>
 
 <body>
-<div class="d-flex">
+    <div class="d-flex">
 
 
-    <?php require_once __DIR__ . '/../sidebarAdmin.php'; ?>
+        <?php require_once __DIR__ . '/../sidebarAdmin.php'; ?>
 
 
-    <!-- MAIN -->
-    <div class="main-content">
+        <!-- MAIN -->
+        <div class="flex-grow-1">
 
 
             <!-- NAVBAR -->
             <nav class="navbar navbar-dark bg-success px-4">
                 <span class="navbar-brand">Dashboard</span>
                 <div class="text-white fs-5 d-flex align-items-center gap-3">
-                    <?= htmlspecialchars($admin['name'] ?? 'Admin') ?>
+                    <?= htmlspecialchars($_SESSION['user']['full_name'] ?? 'Admin') ?>
                     <i class="bi bi-person-circle fs-4 me-2"></i>
                 </div>
             </nav>

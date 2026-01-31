@@ -109,6 +109,10 @@ switch ($action) {
         $controller->userBorrowRequest((int)$_GET['id']);
         break;
 
+    case 'user_borrow_request_store':
+        (new BorrowRequestController())->store();
+        break;
+
     // ---------- USER NOTIFICATIONS ----------
     case 'user_notifications_index':
         (new NotificationController())->userIndex();
@@ -186,7 +190,7 @@ switch ($action) {
     case 'admin_transactions_approve':
         Middleware::requireAdmin();
         $id = $_GET['id'] ?? 0;
-        (new TransactionController())->approve($id);
+        (new TransactionController())->processReturn();
         break;
 
     case 'admin_transactions_return':
