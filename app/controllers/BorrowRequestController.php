@@ -52,7 +52,7 @@ class BorrowRequestController
         exit;
     }
     public function approve($transactionId)
-{
+{6
     // logic duyệt mượn (đã có sẵn)
     $transaction = $this->transactionModel->find($transactionId);
     $this->transactionModel->approve($transactionId);
