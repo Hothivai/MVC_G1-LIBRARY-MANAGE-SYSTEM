@@ -1,0 +1,17 @@
+# Các tệp môi trường (Chứa mật khẩu, API key nên phải chặn)
+.env
+.env.local
+
+# Thư mục thư viện (Không cần đưa lên Git vì quá nặng)
+/vendor/
+node_modules/
+
+# File tạm của hệ điều hành và IDE
+.DS_Store
+.vscode/
+.idea/
+*.log
+
+# Quản lý file upload nhưng giữ lại thư mục bằng .gitkeep
+uploads/*
+!uploads/.gitkeep

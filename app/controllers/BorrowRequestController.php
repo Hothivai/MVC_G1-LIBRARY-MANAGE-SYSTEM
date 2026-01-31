@@ -65,10 +65,13 @@ class BorrowRequestController extends Controller
             $borrowRequestModel->approve($requestId);
 
             // gửi thông báo đến user
-            $notificationModel->createNotification(
-                $request['user_id'],
-                "Your borrow request for the book '{$request['book_title']}' has been approved. Please return it by {$dueDate}."
-            );
+            $notificationModel->create([
+                'user_id' => $request['user_id'],
+                'transaction_id' => $transactionId,
+                'type' => 'approved',
+                'title' => 'Yêu cầu mượn sách đã được chấp nhận',
+                'message' => 'Yêu cầu mượn sách của bạn đã được chấp nhận, hãy tới thư viện để lấy sách'
+            ]);
         }
         header('Location: index.php?action=admin_requests');
         exit;

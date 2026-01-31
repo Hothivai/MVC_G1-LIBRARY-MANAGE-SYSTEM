@@ -217,4 +217,23 @@ class Transaction extends Model
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([$id]);
     }
+
+    public function getHistoryByBook($bookId)
+{
+    $sql = "
+        SELECT 
+            t.*,
+            u.full_name as member_name,
+            u.user_id as member_code
+        FROM transactions t
+        JOIN users u ON t.user_id = u.user_id
+        JOIN book_copies bc ON t.copy_id = bc.copy_id
+        WHERE bc.book_id = ?
+        ORDER BY t.borrow_date DESC
+        LIMIT 10
+    ";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$bookId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }

@@ -20,6 +20,11 @@ class NotificationController extends Controller
         }
 
         $notificationModel = new Notification();
+        
+        // Kiểm tra và tạo thông báo nhắc nhở/quá hạn tự động
+        $notificationModel->checkAndCreateReminders($userId);
+        
+        // Lấy tất cả thông báo của user
         $notifications = $notificationModel->getByUser($userId);
 
         return $this->view('user/notifications/index', [

@@ -63,4 +63,84 @@ class Notification extends Model
 
         return $stmt->rowCount() > 0;
     }
+
+    // ================= EXISTS TODAY =================
+    /**
+     * Kiểm tra xem đã có thông báo được tạo hôm nay chưa
+     */
+    public function existsToday(int $userId, int $transactionId, string $type): bool
+    {
+        $sql = "SELECT notification_id
+                FROM notifications
+                WHERE user_id = ?
+                  AND transaction_id = ?
+                  AND type = ?
+                  AND DATE(created_at) = CURDATE()";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId, $transactionId, $type]);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    // ================= CHECK AND CREATE REMINDERS =================
+    /**
+     * Kiểm tra và tạo thông báo nhắc nhở trả sách trước 1 ngày
+     * Kiểm tra và tạo thông báo khi quá hạn
+     */
+    public function checkAndCreateReminders(int $userId): void
+    {
+        $sql = "
+            SELECT 
+                t.transaction_id,
+                t.due_date,
+                b.title AS book_title,
+                DATEDIFF(t.due_date, CURDATE()) AS days_until_due,
+                DATEDIFF(CURDATE(), t.due_date) AS days_overdue
+            FROM transactions t
+            JOIN book_copies bc ON t.copy_id = bc.copy_id
+            JOIN books b ON bc.book_id = b.book_id
+            WHERE t.user_id = ?
+              AND t.return_date IS NULL
+              AND t.status IN ('borrowed', 'overdue')
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId]);
+        $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($transactions as $transaction) {
+            $transactionId = $transaction['transaction_id'];
+            $daysUntilDue = (int)$transaction['days_until_due'];
+            $daysOverdue = (int)$transaction['days_overdue'];
+            $bookTitle = $transaction['book_title'];
+
+            // Kiểm tra và tạo thông báo quá hạn
+            if ($daysOverdue > 0) {
+                // Tạo thông báo mới mỗi ngày để cập nhật số ngày quá hạn mới nhất
+                if (!$this->existsToday($userId, $transactionId, 'overdue')) {
+                    $this->create([
+                        'user_id' => $userId,
+                        'transaction_id' => $transactionId,
+                        'type' => 'overdue',
+                        'title' => 'Sách đã quá hạn trả',
+                        'message' => "Bạn đã trễ hẹn {$daysOverdue} ngày. Vui lòng trả sách '{$bookTitle}' ngay lập tức."
+                    ]);
+                }
+            }
+            // Kiểm tra và tạo thông báo nhắc nhở trước 1 ngày
+            elseif ($daysUntilDue == 1) {
+                // Chỉ tạo thông báo nếu chưa có thông báo nhắc nhở cho transaction này
+                if (!$this->exists($userId, $transactionId, 'reminder')) {
+                    $this->create([
+                        'user_id' => $userId,
+                        'transaction_id' => $transactionId,
+                        'type' => 'reminder',
+                        'title' => 'Nhắc nhở trả sách',
+                        'message' => "Sách '{$bookTitle}' của bạn sẽ đến hạn trả vào ngày mai. Vui lòng chuẩn bị trả sách."
+                    ]);
+                }
+            }
+        }
+    }
 }

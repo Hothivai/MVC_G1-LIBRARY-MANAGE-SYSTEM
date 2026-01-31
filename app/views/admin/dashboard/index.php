@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,13 +13,13 @@
 <body>
     <div class="d-flex">
 
-
         <?php require_once __DIR__ . '/../sidebarAdmin.php'; ?>
-
 
         <!-- MAIN -->
         <div class="flex-grow-1">
 
+    <!-- MAIN -->
+    <div class="flex-grow-1">
 
             <!-- NAVBAR -->
             <nav class="navbar navbar-dark bg-success px-4">
@@ -157,4 +155,3 @@
 </body>
 
 </html>
->>>>>>> dafc32a52f62e5c8a400b867c3141f6f964a05de

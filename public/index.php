@@ -162,7 +162,33 @@ switch ($action) {
         (new BookController())->adminShow($_GET['id'] ?? 0);
         break;
 
+    case 'admin_books_delete':
+        Middleware::requireAdmin();
+        (new BookController())->adminDelete($_GET['id'] ?? 0);
+        break;
+
     // ===== ADMIN CATEGORIES =====
+    case 'admin_book_store':
+        Middleware::requireAdmin();
+        (new BookController())->adminStore();
+        break;
+
+    case 'admin_books_import':
+        Middleware::requireAdmin();
+        (new BookController())->adminImport();
+        break;
+
+    case 'admin_books_import_store':
+        Middleware::requireAdmin();
+        (new BookController())->adminImportStore();
+        break;
+
+    case 'admin_books_import_sample':
+        Middleware::requireAdmin();
+        (new BookController())->adminImportSample();
+        break;
+
+    // ---------- ADMIN CATEGORIES ----------
     case 'admin_categories_index':
         Middleware::requireAdmin();
         (new CategoryController())->index();
