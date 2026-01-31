@@ -100,9 +100,11 @@
                     </select>
                 </div>
 
-                <a href="/admin/users/create" class="btn btn-outline-dark">
+                <a href="index.php?action=admin_users_create" class="btn btn-outline-dark">
                     <i class="bi bi-plus-lg"></i> ADD MEMBER
                 </a>
+
+
             </div>
 
             <!-- TABLE -->
@@ -123,7 +125,7 @@
                 <?php if (!empty($users)): ?>
                     <?php foreach ($users as $user): ?>
                         <tr>
-                            <td>#<?= htmlspecialchars($user['id']) ?></td>
+                            <td><?= htmlspecialchars($user['user_id']) ?></td>
                             <td><?= htmlspecialchars($user['full_name']) ?></td>
                             <td><?= htmlspecialchars($user['email']) ?></td>
                             <td><?= htmlspecialchars($user['phone']) ?></td>
@@ -134,7 +136,7 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                <a href="/admin/users/edit?id=<?= $user['id'] ?>"
+                                <a href="/admin/users/edit?id=<?= $user['user_id'] ?>"
                                    class="btn btn-sm btn-outline-warning">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
@@ -154,5 +156,8 @@
         </main>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
 </body>
 </html>

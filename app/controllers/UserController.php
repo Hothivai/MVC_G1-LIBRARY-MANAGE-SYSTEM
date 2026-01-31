@@ -148,6 +148,46 @@ class UserController extends Controller
         $this->view('admin/users/edit', ['user' => $user]);
     }
 
+        public function adminCreate()
+        {
+         $this->requireAdmin();
+
+            $this->view('admin/users/create', [
+              'active' => 'users'
+         ]);
+        }
 
     
+        // action: admin_users_store
+public function adminStore()
+{
+    $this->requireAdmin();
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        $this->redirect('admin_users_index');
+    }
+
+    $userModel = $this->model('User');
+
+    $data = [
+        'username'  => trim($_POST['username'] ?? ''),
+        'email'     => trim($_POST['email'] ?? ''),
+        'password'  => password_hash($_POST['password'], PASSWORD_DEFAULT),
+        'full_name' => trim($_POST['full_name'] ?? ''),
+        'phone'     => trim($_POST['phone'] ?? ''),
+        'address'   => trim($_POST['address'] ?? ''),
+        'role'      => $_POST['role'] ?? 'member',
+        'status'    => $_POST['status'] ?? 'active'
+    ];
+
+    // (optional) validate nhanh
+    if ($data['username'] === '' || $data['email'] === '') {
+        $_SESSION['error'] = 'Username & Email are required';
+        $this->redirect('admin_users_create');
+    }
+
+    $userModel->create($data);
+
+    $this->redirect('admin_users_index');
+    }
 }

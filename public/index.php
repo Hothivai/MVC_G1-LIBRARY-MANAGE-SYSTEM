@@ -239,11 +239,15 @@ case 'admin_requests_approve':
         http_response_code(404);
         echo "404 - Action not found: $action";
         break;
-        // quản lý user
-    case 'admin_users_index':
-    $controller = new UserController();
-    $controller->adminIndex();
+    
+        case 'admin_users_create':
+    Middleware::requireAdmin();
+    (new UserController())->adminCreate();
     break;
 
-        
+case 'admin_users_store':
+    Middleware::requireAdmin();
+    (new UserController())->adminStore();
+    break;
+     
 }

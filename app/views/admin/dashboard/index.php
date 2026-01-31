@@ -32,11 +32,12 @@
                     </a>
                 </li>
 
-                <li class="nav-item <?= $active === 'users' ? 'active' : '' ?>">
-                    <a href="/admin/users/index">
-                        <i class="bi bi-people me-2"></i> Member Management
-                    </a>
-                </li>
+            <li class="nav-item <?= $active === 'users' ? 'active' : '' ?>">
+             <a href="index.php?action=admin_users_index">
+                 <i class="bi bi-people me-2"></i> Member Management
+                </a>
+            </li>
+
 
                 <li class="nav-item <?= $active === 'borrow_requests' ? 'active' : '' ?>">
                     <a href="index.php?action=admin_requests">

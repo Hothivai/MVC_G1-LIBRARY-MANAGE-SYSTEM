@@ -193,4 +193,25 @@ class User extends Model
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    public function create($data)
+{
+    $sql = "INSERT INTO users 
+            (username, email, password, full_name, phone, address, role, status, created_at)
+            VALUES 
+            (:username, :email, :password, :full_name, :phone, :address, :role, :status, NOW())";
+
+    $stmt = $this->db->prepare($sql);
+
+    return $stmt->execute([
+        ':username'  => $data['username'],
+        ':email'     => $data['email'],
+        ':password'  => $data['password'],
+        ':full_name' => $data['full_name'],
+        ':phone'     => $data['phone'],
+        ':address'   => $data['address'],
+        ':role'      => $data['role'],
+        ':status'    => $data['status'],
+    ]);
+}
+
 }
