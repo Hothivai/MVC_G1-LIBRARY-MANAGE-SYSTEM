@@ -230,6 +230,41 @@ public function userSearch()
             'history' => $history
         ]);
     }
+
+    // action: admin_books_delete
+    public function adminDelete($id)
+    {
+        $this->requireAdmin();
+        
+        $bookModel = $this->model('Book');
+        $book = $bookModel->find($id);
+        
+        if (!$book) {
+            $this->redirect('admin_books_index');
+        }
+
+        // Xóa ảnh nếu có
+        if (!empty($book['image_url'])) {
+            $imagePath = dirname(APP_PATH) . '/public/' . $book['image_url'];
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+
+        // Xóa các book_copies liên quan trước
+        $this->deleteBookCopies($id);
+
+        // Xóa sách
+        if ($bookModel->delete($id)) {
+            // Thông báo thành công (có thể dùng session flash message)
+            header('Location: index.php?action=admin_books_index&deleted=1');
+            exit;
+        } else {
+            // Thông báo lỗi
+            header('Location: index.php?action=admin_books_index&error=1');
+            exit;
+        }
+    }
     // action: admin_book_store
     public function adminStore()
     {
@@ -245,8 +280,8 @@ public function userSearch()
         // Xử lý upload ảnh
         $imageUrl = null;
         if (!empty($_FILES['cover_image']['name'])) {
-            // Lưu vào thư mục images/books/
-            $uploadDir = APP_PATH . '/public/images/books/';
+            // Lưu vào thư mục images/books/ (public nằm ngang hàng với app)
+            $uploadDir = dirname(APP_PATH) . '/public/images/books/';
             
             // Kiểm tra và tạo thư mục nếu chưa tồn tại
             if (!is_dir($uploadDir)) {
@@ -329,6 +364,17 @@ public function userSearch()
             $stmt->execute([$bookId, $barcode]);
         }
     }
+
+    /**
+     * Xóa các bản copy của sách
+     */
+    private function deleteBookCopies(int $bookId): void
+    {
+        $db = Database::getInstance()->getConnection();
+        $sql = "DELETE FROM book_copies WHERE book_id = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$bookId]);
+    }
     // --- IMPORT VIEW ---
     public function adminImport()
     {
@@ -349,10 +395,24 @@ public function userSearch()
         }
 
         $file = $_FILES['import_file'];
-        
+        $uploadErrors = [
+            UPLOAD_ERR_INI_SIZE => 'File vượt quá giới hạn upload của server.',
+            UPLOAD_ERR_FORM_SIZE => 'File quá lớn (tối đa 10MB).',
+            UPLOAD_ERR_PARTIAL => 'File chỉ upload một phần. Vui lòng thử lại.',
+            UPLOAD_ERR_NO_FILE => 'Chưa chọn file. Vui lòng chọn file Excel/CSV.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Lỗi server: thiếu thư mục tạm.',
+            UPLOAD_ERR_CANT_WRITE => 'Lỗi server: không ghi được file.',
+            UPLOAD_ERR_EXTENSION => 'Lỗi extension PHP chặn upload.',
+        ];
+
         // Validate file
-        if ($file['error'] !== UPLOAD_ERR_OK || $file['size'] == 0) {
-            echo "<script>alert('Lỗi upload file!'); window.location.href='index.php?action=admin_books_import';</script>";
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $msg = $uploadErrors[$file['error']] ?? 'Lỗi upload file (mã ' . $file['error'] . ').';
+            $this->alertRedirect($msg, 'admin_books_import');
+            return;
+        }
+        if ($file['size'] == 0 || empty($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
+            $this->alertRedirect('File không hợp lệ hoặc không đọc được. Vui lòng chọn file khác.', 'admin_books_import');
             return;
         }
 
@@ -361,12 +421,16 @@ public function userSearch()
         $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         
         if (!in_array($fileExtension, $allowedExtensions)) {
-            echo "<script>alert('Chỉ hỗ trợ file Excel (.xlsx, .xls) hoặc CSV!'); window.location.href='index.php?action=admin_books_import';</script>";
+            $this->alertRedirect('Chỉ hỗ trợ file Excel (.xlsx, .xls) hoặc CSV!', 'admin_books_import');
             return;
         }
 
-        // Load PHPSpreadsheet
-        require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
+        $vendorAutoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
+        if (!file_exists($vendorAutoload)) {
+            $this->alertRedirect('Thư viện đọc Excel chưa được cài. Vui lòng chạy: composer install', 'admin_books_import');
+            return;
+        }
+        require_once $vendorAutoload;
 
         try {
             // Create reader based on file type
@@ -462,14 +526,14 @@ public function userSearch()
                 $message .= " Có " . count($errors) . " lỗi.";
             }
 
-            echo "<script>alert('$message'); window.location.href='index.php?action=admin_books_index';</script>";
+            $this->alertRedirect($message, 'admin_books_index');
             return;
 
         } catch (\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
-            echo "<script>alert('Lỗi đọc file: " . addslashes($e->getMessage()) . "'); window.location.href='index.php?action=admin_books_import';</script>";
+            $this->alertRedirect('Lỗi đọc file: ' . $e->getMessage(), 'admin_books_import');
             return;
         } catch (\Exception $e) {
-            echo "<script>alert('Lỗi: " . addslashes($e->getMessage()) . "'); window.location.href='index.php?action=admin_books_import';</script>";
+            $this->alertRedirect('Lỗi: ' . $e->getMessage(), 'admin_books_import');
             return;
         }
     }
@@ -479,7 +543,17 @@ public function userSearch()
     {
         $this->requireAdmin();
 
-        require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
+        $vendorAutoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
+        if (!file_exists($vendorAutoload)) {
+            $this->alertRedirect('Thư viện Excel chưa được cài. Vui lòng chạy: composer install', 'admin_books_import');
+            return;
+        }
+        require_once $vendorAutoload;
+
+        // Tránh "headers already sent": xóa output buffer trước khi gửi file
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
 
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -512,8 +586,9 @@ public function userSearch()
 
         // Output file
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="books_import_template.xlsx"');
+        header('Content-Disposition: attachment; filename="books_import_template.xlsx"');
         header('Cache-Control: max-age=0');
+        header('Pragma: public');
 
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save('php://output');
@@ -521,44 +596,73 @@ public function userSearch()
     }
 
     /**
+     * Hiển thị alert và redirect (tránh lặp code, dùng URLROOT nếu có)
+     */
+    private function alertRedirect(string $message, string $action): void
+    {
+        $url = (defined('URLROOT') ? URLROOT : '') . '/index.php?action=' . $action;
+        $msg = addslashes($message);
+        echo "<script>alert('" . $msg . "'); window.location.href='" . $url . "';</script>";
+        exit;
+    }
+
+    /**
      * Convert ảnh sang định dạng JPG
+     * Nếu GD extension không có, chỉ copy file và đổi tên thành .jpg
      */
     private function convertToJpg(string $sourcePath, string $targetPath): bool
     {
+        // Kiểm tra xem GD extension có sẵn không
+        if (!extension_loaded('gd')) {
+            // Nếu không có GD, chỉ copy file và đổi tên
+            return copy($sourcePath, $targetPath);
+        }
+
         // Lấy thông tin ảnh
         $imageInfo = getimagesize($sourcePath);
         if ($imageInfo === false) {
-            return false;
+            // Nếu không đọc được ảnh, copy file trực tiếp
+            return copy($sourcePath, $targetPath);
         }
 
         $mimeType = $imageInfo['mime'];
-        $width = $imageInfo[0];
-        $height = $imageInfo[1];
 
         // Tạo image resource từ file gốc
+        $sourceImage = false;
         switch ($mimeType) {
             case 'image/jpeg':
-                $sourceImage = imagecreatefromjpeg($sourcePath);
+                if (function_exists('imagecreatefromjpeg')) {
+                    $sourceImage = imagecreatefromjpeg($sourcePath);
+                }
                 break;
             case 'image/png':
-                $sourceImage = imagecreatefrompng($sourcePath);
+                if (function_exists('imagecreatefrompng')) {
+                    $sourceImage = imagecreatefrompng($sourcePath);
+                }
                 break;
             case 'image/gif':
-                $sourceImage = imagecreatefromgif($sourcePath);
+                if (function_exists('imagecreatefromgif')) {
+                    $sourceImage = imagecreatefromgif($sourcePath);
+                }
                 break;
             case 'image/webp':
-                $sourceImage = imagecreatefromwebp($sourcePath);
+                if (function_exists('imagecreatefromwebp')) {
+                    $sourceImage = imagecreatefromwebp($sourcePath);
+                }
                 break;
-            default:
-                // Nếu không hỗ trợ, copy file trực tiếp
-                return copy($sourcePath, $targetPath);
         }
 
+        // Nếu không tạo được image resource, copy file trực tiếp
         if ($sourceImage === false) {
-            return false;
+            return copy($sourcePath, $targetPath);
         }
 
         // Tạo ảnh mới với chất lượng JPG
+        if (!function_exists('imagejpeg')) {
+            imagedestroy($sourceImage);
+            return copy($sourcePath, $targetPath);
+        }
+
         $result = imagejpeg($sourceImage, $targetPath, 85); // 85% quality
         
         // Giải phóng bộ nhớ

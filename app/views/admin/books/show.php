@@ -81,10 +81,10 @@
                     <?php 
                         $imagePath = $book['cover_image'] ?? $book['image_url'] ?? 'images/books/1984.jpg';
                     ?>
-                    <img src="../../../public/<?= htmlspecialchars($imagePath) ?>" 
+                    <img src="/public/<?= htmlspecialchars($imagePath) ?>" 
                          class="book-detail-cover" 
                          alt="<?= htmlspecialchars($book['title']) ?>"
-                         onerror="this.src='../../../public/images/books/1984.jpg'">
+                         onerror="this.src='/public/images/books/1984.jpg'">
                     <div class="border rounded p-3 mt-3 text-center">
                         <div class="mb-1">Category: <strong><?= htmlspecialchars($book['category_name'] ?? 'N/A') ?></strong></div>
                         <div class="text-success fw-bold">Status: In Stock</div>

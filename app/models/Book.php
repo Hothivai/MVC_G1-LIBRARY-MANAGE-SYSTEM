@@ -246,4 +246,14 @@ public function getAvailableCopy(int $bookId): ?int
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($values);
     }
+
+    /**
+     * Delete a book by ID
+     */
+    public function delete(int $id): bool
+    {
+        $sql = "DELETE FROM {$this->table} WHERE {$this->primaryKey} = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$id]);
+    }
 }

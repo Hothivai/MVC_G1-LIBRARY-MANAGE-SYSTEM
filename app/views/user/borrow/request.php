@@ -19,10 +19,10 @@ require_once dirname(__DIR__, 2) . '/layouts/navbar.php';
                     <div class="col-md-4 bg-light p-4 text-center border-end">
                         <h5 class="text-success fw-bold mb-4">BOOK INFORMATION</h5>
                                 <a href="index.php?action=user_books_show&id=<?= $book['book_id'] ?>">
-                                    <img src="../../../public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
+                                    <img src="/public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
                                         class="book-img"
                                         alt="<?= htmlspecialchars($book['title']) ?>"
-                                        onerror="this.src='../../../public/images/books/1984.jpg'">
+                                        onerror="this.src='/public/images/books/1984.jpg'">
                                 </a>
                         <h6 class="fw-bold mb-1"><?= htmlspecialchars($book['title']) ?></h6>
                         <p class="text-muted small">Author: <?= htmlspecialchars($book['author']) ?></p>

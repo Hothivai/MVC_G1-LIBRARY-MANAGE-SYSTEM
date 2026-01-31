@@ -135,10 +135,10 @@
                                         $imagePath = '/' . $imagePath;
                                     }
                                 ?>
-                                <img src="../../../public<?= htmlspecialchars($imagePath) ?>" 
+                                <img src="/public<?= htmlspecialchars($imagePath) ?>" 
                                      class="book-cover-img" 
                                      alt="<?= htmlspecialchars($book['title']) ?>"
-                                     onerror="this.src='../../../public/images/books/1984.jpg'">
+                                     onerror="this.src='/public/images/books/1984.jpg'">
                             </div>
                             <h6 class="fw-bold mb-1 text-truncate" title="<?= htmlspecialchars($book['title']) ?>">
                                 <?= htmlspecialchars($book['title']) ?>

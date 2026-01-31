@@ -77,10 +77,10 @@
                         <div class="card h-100 border-0 shadow-sm book-card-hover">
                             <div class="position-relative overflow-hidden" style="height: 280px;">
                                 <a href="index.php?action=user_books_show&id=<?= $book['book_id'] ?>">
-                                    <img src="../../../public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
+                                    <img src="/public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
                                         class="book-img"
                                         alt="<?= htmlspecialchars($book['title']) ?>"
-                                        onerror="this.src='../../../public/images/books/1984.jpg'">
+                                        onerror="this.src='/public/images/books/1984.jpg'">
                                 </a>
                                 
                                 <?php if(($book['available_copies'] ?? 0) > 0): ?>

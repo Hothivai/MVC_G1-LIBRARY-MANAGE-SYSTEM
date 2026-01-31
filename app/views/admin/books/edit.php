@@ -72,7 +72,7 @@
                                 <?php if (!empty($book['cover_image']) || !empty($book['image_url'])): ?>
                                     <?php $currentImage = $book['cover_image'] ?? $book['image_url'] ?? ''; ?>
                                     <div class="mb-2">
-                                        <img src="../../../public/<?= htmlspecialchars($currentImage) ?>" alt="Current cover" style="max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
+                                        <img src="/public/<?= htmlspecialchars($currentImage) ?>" alt="Current cover" style="max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
                                     </div>
                                 <?php endif; ?>
                                 <input type="file" name="cover_image" class="form-control">

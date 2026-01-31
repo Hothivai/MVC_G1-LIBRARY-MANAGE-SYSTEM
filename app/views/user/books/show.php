@@ -16,10 +16,10 @@ require_once dirname(__DIR__,2) . '/layouts/navbar.php';
         <div class="col-md-4 text-center">
             <div class="book-cover-container p-4 bg-white shadow-sm rounded border">
                                 <a href="index.php?action=user_books_show&id=<?= $book['book_id'] ?>">
-                                    <img src="../../../public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
+                                    <img src="/public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>" 
                                         class="book-img"
                                         alt="<?= htmlspecialchars($book['title']) ?>"
-                                        onerror="this.src='../../../public/images/books/1984.jpg'">
+                                        onerror="this.src='/public/images/books/1984.jpg'">
                                 </a>
 
                 <div class="mt-4 d-grid gap-3">

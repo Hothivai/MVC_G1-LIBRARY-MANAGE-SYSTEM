@@ -66,7 +66,7 @@
                     </div>
 
                     <!-- Upload Form -->
-                    <form action="index.php?action=admin_books_import_store" method="POST" enctype="multipart/form-data" id="importForm">
+                    <form action="<?= defined('URLROOT') ? URLROOT : '' ?>/index.php?action=admin_books_import_store" method="POST" enctype="multipart/form-data" id="importForm">
                         <div class="mb-4">
                             <label for="import_file" class="form-label fw-bold">
                                 <i class="bi bi-cloud-upload me-1"></i> Chọn file Excel/CSV
@@ -99,11 +99,11 @@
                         <hr>
 
                         <div class="d-flex justify-content-between align-items-center">
-                            <a href="index.php?action=admin_books_import_sample" class="btn btn-outline-primary">
+                            <a href="<?= defined('URLROOT') ? URLROOT : '' ?>/index.php?action=admin_books_import_sample" class="btn btn-outline-primary" download>
                                 <i class="bi bi-download me-1"></i> Tải File Mẫu (.xlsx)
                             </a>
                             <div>
-                                <a href="index.php?action=admin_books_index" class="btn btn-secondary me-2">
+                                <a href="<?= defined('URLROOT') ? URLROOT : '' ?>/index.php?action=admin_books_index" class="btn btn-secondary me-2">
                                     <i class="bi bi-x-lg me-1"></i> Hủy
                                 </a>
                                 <button type="submit" class="btn btn-success fw-bold px-4" id="submitBtn">

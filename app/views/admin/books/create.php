@@ -49,11 +49,7 @@
                                 <input type="text" name="isbn" class="form-control" placeholder="e.g. 978-3-16-148410-0">
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Quantity</label>
-                                <input type="number" name="quantity" class="form-control" min="1" value="1" required>
-                            </div>
-
+                        
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Publisher</label>
                                 <input type="text" name="publisher" class="form-control">
