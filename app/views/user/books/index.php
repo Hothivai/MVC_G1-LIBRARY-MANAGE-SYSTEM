@@ -72,17 +72,6 @@ require_once __DIR__ . '/../../layouts/navbar.php';
             <div class="row g-4">
                 <?php if (!empty($books)): ?>
                     <?php foreach ($books as $book): ?>
-<<<<<<< HEAD
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm book-card-hover">
-                                <div class="position-relative overflow-hidden" style="height: 280px;">
-                                    <a href="index.php?action=user_books_show&id=<?= $book['book_id'] ?>">
-                                        <img src="../../../public<?= htmlspecialchars($book['image_url'] ?? '/images/books/1984.jpg') ?>"
-                                            class="book-img"
-                                            alt="<?= htmlspecialchars($book['title']) ?>"
-                                            onerror="this.src='../../../public/images/books/1984.jpg'">
-                                    </a>
-=======
                     <div class="col-md-4">
                         <div class="card h-100 border-0 shadow-sm book-card-hover">
                             <div class="position-relative overflow-hidden" style="height: 280px;">
@@ -99,7 +88,6 @@ require_once __DIR__ . '/../../layouts/navbar.php';
                                     <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-3 py-2 shadow-sm">Out of stock</span>
                                 <?php endif; ?>
                             </div>
->>>>>>> LMS-15
 
                                     <?php if (($book['available_copies'] ?? 0) > 0): ?>
                                         <span class="badge bg-success position-absolute top-0 start-0 m-2 px-3 py-2 shadow-sm">Book available</span>

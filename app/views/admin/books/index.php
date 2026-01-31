@@ -6,67 +6,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="/public/css/admin.css">
-    <style>
-        /* CSS Riêng cho trang Book Management theo thiết kế */
-        .book-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            transition: 0.3s;
-            background: #fff;
-        }
-        .book-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .book-cover-placeholder {
-            background-color: #e0e0e0; /* Màu xám giống thiết kế */
-            height: 180px;
-            width: 100%;
-            border-radius: 8px 8px 0 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .book-cover-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .action-btn {
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            color: #fd7e14; /* Màu cam giống hình */
-            transition: 0.2s;
-        }
-        .action-btn:hover {
-            background: #fd7e14;
-            color: white;
-            border-color: #fd7e14;
-        }
-        .action-btn.delete:hover {
-            background: #dc3545;
-            border-color: #dc3545;
-        }
-        .page-link-custom {
-            color: #333;
-            border: 1px solid #dee2e6;
-            margin: 0 5px;
-            border-radius: 4px;
-            padding: 8px 16px;
-            text-decoration: none;
-        }
-        .page-link-custom.active {
-            background-color: #e0e0e0;
-            border-color: #ccc;
-            font-weight: bold;
-        }
-    </style>
 </head>
 
 <body>
@@ -195,12 +134,7 @@
     </div>
 </div>
 
-<script>
-function confirmDelete(id) {
-    if(confirm('Are you sure you want to delete this book?')) {
-        window.location.href = 'index.php?action=admin_books_delete&id=' + id;
-    }
-}
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/public/js/admin.js"></script>
 </body>
 </html>

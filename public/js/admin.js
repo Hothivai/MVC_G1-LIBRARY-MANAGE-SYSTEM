@@ -260,3 +260,54 @@ window.utils = {
     showSearchResults,
     hideSearchResults
 };
+
+// ==================== BOOK MANAGEMENT ====================
+function confirmDelete(id) {
+    if(confirm('Are you sure you want to delete this book?')) {
+        window.location.href = 'index.php?action=admin_books_delete&id=' + id;
+    }
+}
+
+// ==================== SIDEBAR ACTIVE STATE ====================
+document.addEventListener('DOMContentLoaded', function() {
+    // Highlight active sidebar item based on current URL
+    const currentUrl = window.location.href;
+    const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+    
+    sidebarLinks.forEach(link => {
+        const linkHref = link.getAttribute('href');
+        // Check if current URL contains the action from link href
+        if (linkHref && (currentUrl.includes(linkHref) || linkHref.includes(currentUrl.split('action=')[1]?.split('&')[0]))) {
+            link.classList.add('active');
+        }
+        
+        // Add click handler for active state
+        link.addEventListener('click', function(e) {
+            // Remove active from all links
+            sidebarLinks.forEach(l => {
+                if (!l.classList.contains('text-danger')) {
+                    l.classList.remove('active');
+                }
+            });
+            // Add active to clicked link (except logout)
+            if (!this.classList.contains('text-danger')) {
+                this.classList.add('active');
+            }
+        });
+        
+        // Add hover effect
+        link.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('text-danger')) {
+                this.style.backgroundColor = '#0d6efd';
+                this.style.color = '#fff';
+            }
+        });
+        
+        link.addEventListener('mouseleave', function() {
+            if (!this.classList.contains('active') && !this.classList.contains('text-danger')) {
+                this.style.backgroundColor = '';
+                this.style.color = '';
+            }
+        });
+    });
+});

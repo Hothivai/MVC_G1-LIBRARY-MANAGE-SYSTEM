@@ -120,8 +120,24 @@ class UserController extends Controller
     {
         $this->requireAdmin();
         $userModel = $this->model('User');
-        $users = $userModel->all();  // Giả định lấy tất cả users
-        $this->view('admin/users/index', ['users' => $users]);
+        
+        // Lấy search term và status filter từ GET parameters
+        $search = trim($_GET['search'] ?? '');
+        $status = trim($_GET['status'] ?? '');
+        
+        // Nếu có search hoặc filter thì dùng searchMembers, không thì dùng getAllMembers
+        if (!empty($search) || !empty($status)) {
+            $users = $userModel->searchMembers($search, $status);
+        } else {
+            $users = $userModel->getAllMembers();
+        }
+        
+        $this->view('admin/users/index', [
+            'users' => $users,
+            'active' => 'users',
+            'search' => $search,
+            'status_filter' => $status
+        ]);
     }
 
     // action: admin_users_show
@@ -130,7 +146,9 @@ class UserController extends Controller
         $this->requireAdmin();
         $userModel = $this->model('User');
         $user = $userModel->find($id);
-        if (!$user) {
+        if (!$user || $userModel->isAdmin($id)) {
+            // Chặn xem admin users
+            $_SESSION['error'] = 'Cannot view admin accounts';
             $this->redirect('admin_users_index');
         }
         $this->view('admin/users/show', ['user' => $user]);
@@ -142,9 +160,102 @@ class UserController extends Controller
         $this->requireAdmin();
         $userModel = $this->model('User');
         $user = $userModel->find($id);
-        if (!$user) {
+        if (!$user || $userModel->isAdmin($id)) {
+            // Chặn sửa admin users
+            $_SESSION['error'] = 'Cannot edit admin accounts';
             $this->redirect('admin_users_index');
         }
-        $this->view('admin/users/edit', ['user' => $user]);
+        $this->view('admin/users/edit', [
+            'user' => $user,
+            'active' => 'users'
+        ]);
+    }
+
+        public function adminCreate()
+        {
+         $this->requireAdmin();
+
+            $this->view('admin/users/create', [
+              'active' => 'users'
+         ]);
+        }
+
+    
+        // action: admin_users_store
+public function adminStore()
+{
+    $this->requireAdmin();
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        $this->redirect('admin_users_index');
+    }
+
+    $userModel = $this->model('User');
+
+    $data = [
+        'username'  => trim($_POST['username'] ?? ''),
+        'email'     => trim($_POST['email'] ?? ''),
+        'password'  => password_hash($_POST['password'], PASSWORD_DEFAULT),
+        'full_name' => trim($_POST['full_name'] ?? ''),
+        'phone'     => trim($_POST['phone'] ?? ''),
+        'address'   => trim($_POST['address'] ?? ''),
+        'role'      => 'member',  // Chỉ cho phép tạo member, không cho tạo admin
+        'status'    => $_POST['status'] ?? 'active'
+    ];
+
+    // (optional) validate nhanh
+    if ($data['username'] === '' || $data['email'] === '') {
+        $_SESSION['error'] = 'Username & Email are required';
+        $this->redirect('admin_users_create');
+    }
+
+    $userModel->create($data);
+    $_SESSION['success'] = 'Member created successfully';
+
+    $this->redirect('admin_users_index');
+    }
+
+    // action: admin_users_update
+    public function adminUpdate($id)
+    {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('admin_users_index');
+        }
+
+        $userModel = $this->model('User');
+        
+        // Chặn update admin users
+        if ($userModel->isAdmin($id)) {
+            $_SESSION['error'] = 'Cannot update admin accounts';
+            $this->redirect('admin_users_index');
+        }
+
+        $user = $userModel->find($id);
+        if (!$user) {
+            $_SESSION['error'] = 'User not found';
+            $this->redirect('admin_users_index');
+        }
+
+        $data = [
+            'full_name' => trim($_POST['full_name'] ?? ''),
+            'email'     => trim($_POST['email'] ?? ''),
+            'phone'     => trim($_POST['phone'] ?? ''),
+            'address'   => trim($_POST['address'] ?? ''),
+            'status'    => $_POST['status'] ?? 'active'
+        ];
+
+        // Validate
+        if ($data['full_name'] === '' || $data['email'] === '') {
+            $_SESSION['error'] = 'Full name & Email are required';
+            header("Location: index.php?action=admin_users_edit&id=$id");
+            exit;
+        }
+
+        $userModel->updateMember($id, $data);
+        $_SESSION['success'] = 'Member updated successfully';
+
+        $this->redirect('admin_users_index');
     }
 }

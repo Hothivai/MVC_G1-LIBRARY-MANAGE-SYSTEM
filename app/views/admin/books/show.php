@@ -6,59 +6,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="/public/css/admin.css">
-    <style>
-        .book-detail-cover {
-            width: 100%;
-            height: 400px;
-            object-fit: contain; /* Hiển thị trọn vẹn ảnh */
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: #f8f9fa;
-            padding: 5px;
-        }
-        .info-label {
-            font-weight: bold;
-            min-width: 140px;
-            display: inline-block;
-            color: #333;
-        }
-        .btn-action {
-            border: 1px solid #333;
-            color: #333;
-            font-weight: 600;
-            padding: 8px 20px;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            background: white;
-            transition: 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-        }
-        .btn-action:hover {
-            background: #f0f0f0;
-            color: #333;
-        }
-        .section-header {
-            border-bottom: 2px solid #22c55e;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        /* Table Style */
-        .table-custom thead {
-            background-color: #22c55e;
-            color: white;
-        }
-        .table-custom th {
-            font-weight: 500;
-            border: none;
-            padding: 12px;
-        }
-        .table-custom td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
-    </style>
 </head>
 <body>
 <div class="d-flex">
@@ -172,13 +119,7 @@
         </div>
     </div>
 </div>
-
-<script>
-function confirmDelete(id) {
-    if(confirm('Are you sure you want to delete this book?')) {
-        window.location.href = 'index.php?action=admin_books_delete&id=' + id;
-    }
-}
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/public/js/admin.js"></script>
 </body>
 </html>

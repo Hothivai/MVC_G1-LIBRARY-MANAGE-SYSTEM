@@ -249,6 +249,21 @@ switch ($action) {
         (new UserController())->adminEdit($id);
         break;
 
+    case 'admin_users_update':
+        Middleware::requireAdmin();
+        $id = $_GET['id'] ?? 0;
+        (new UserController())->adminUpdate($id);
+        break;
+    case 'admin_users_create':
+        Middleware::requireAdmin();
+        (new UserController())->adminCreate();
+        break;
+
+    case 'admin_users_store':
+        Middleware::requireAdmin();
+        (new UserController())->adminStore();
+        break;
+
     // ---------- ADMIN BORROW REQUESTS ----------
     case 'admin_requests':
         Middleware::requireAdmin();
