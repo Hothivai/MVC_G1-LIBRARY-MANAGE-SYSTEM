@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../core/Controller.php';
+require_once __DIR__ . '/../models/Book.php';
 use App\Core\Database;
 
 class BookController extends Controller
@@ -280,29 +281,15 @@ public function userSearch()
         // Xử lý upload ảnh
         $imageUrl = null;
         if (!empty($_FILES['cover_image']['name'])) {
-            // Lưu vào thư mục images/books/ (public nằm ngang hàng với app)
             $uploadDir = dirname(APP_PATH) . '/public/images/books/';
-            
-            // Kiểm tra và tạo thư mục nếu chưa tồn tại
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
-
-            // Lấy tên file gốc (bỏ đuôi cũ) và thêm đuôi .jpg mới
-            $filename = pathinfo($_FILES['cover_image']['name'], PATHINFO_FILENAME);
             $newFileName = time() . '_' . uniqid() . '.jpg';
-
-            // Đường dẫn đầy đủ để lưu file
             $targetPath = $uploadDir . $newFileName;
-
-            // Convert và lưu ảnh dưới dạng JPG
             $this->convertToJpg($_FILES['cover_image']['tmp_name'], $targetPath);
-
-            // Đường dẫn tương đối để lưu vào database
             $imageUrl = 'images/books/' . $newFileName;
-            
         } elseif ($isUpdate) {
-            // Nếu là update và không có ảnh mới, giữ ảnh cũ
             $existingBook = $bookModel->find($bookId);
             $imageUrl = $existingBook['image_url'] ?? $existingBook['cover_image'] ?? null;
         }
@@ -316,8 +303,7 @@ public function userSearch()
             'publisher' => $_POST['publisher'] ?? '',
             'published_year' => isset($_POST['published_year']) ? (int)$_POST['published_year'] : null
         ];
-        
-        // Lưu quantity để tạo book_copies sau khi tạo book
+
         $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
 
         if ($imageUrl !== null) {
@@ -325,25 +311,39 @@ public function userSearch()
         }
 
         if ($isUpdate) {
-            // Update existing book
+            // Update logic remains the same for now
             if ($bookModel->update($bookId, $data)) {
+                $this->setFlash('success', 'Cập nhật sách thành công!');
                 $this->redirect('admin_books_index');
             } else {
+                $this->setFlash('error', 'Cập nhật sách thất bại.');
                 $this->redirect('admin_books_edit&id=' . $bookId);
             }
         } else {
             // Create new book
-            $data['created_at'] = date('Y-m-d H:i:s');
-            if ($bookModel->create($data)) {
-                $newBookId = $this->db->lastInsertId();
-                
-                // Tạo book_copies dựa trên quantity
-                if ($quantity > 0 && $newBookId) {
-                    $this->createBookCopies($newBookId, $quantity);
+            try {
+                $data['created_at'] = date('Y-m-d H:i:s');
+                if ($bookModel->create($data)) {
+                    $newBookId = $this->db->lastInsertId();
+                    
+                    if ($quantity > 0 && $newBookId) {
+                        $this->createBookCopies($newBookId, $quantity);
+                    }
+                    
+                    $this->setFlash('success', 'Thêm sách thành công!');
+                    $this->redirect('admin_books_index');
+                } else {
+                    $this->setFlash('error', 'Thêm sách thất bại. Vui lòng thử lại.');
+                    $this->redirect('admin_books_create');
                 }
-                
-                $this->redirect('admin_books_index');
-            } else {
+            } catch (PDOException $e) {
+                if ($e->getCode() == 23000) { // Integrity constraint violation
+                    $this->setFlash('error', 'Lỗi: Sách với mã ISBN "' . htmlspecialchars($data['isbn']) . '" đã tồn tại.');
+                } else {
+                    // Log the error for the admin, show a generic message to the user
+                    error_log('Book creation error: ' . $e->getMessage());
+                    $this->setFlash('error', 'Đã xảy ra lỗi khi thêm sách. Vui lòng liên hệ quản trị viên.');
+                }
                 $this->redirect('admin_books_create');
             }
         }
@@ -364,6 +364,7 @@ public function userSearch()
             $stmt->execute([$bookId, $barcode]);
         }
     }
+    
 
     /**
      * Xóa các bản copy của sách
@@ -386,157 +387,148 @@ public function userSearch()
 
     // --- IMPORT PROCESS (XỬ LÝ FILE EXCEL/CSV với PHPSpreadsheet) ---
     public function adminImportStore()
-    {
-        $this->requireAdmin();
+{
+    $this->requireAdmin();
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_FILES['import_file'])) {
-            $this->redirect('admin_books_import');
-            return;
-        }
+    // 1. Kiểm tra Request và File
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_FILES['import_file'])) {
+        $this->redirect('admin_books_import');
+        return;
+    }
 
-        $file = $_FILES['import_file'];
+    $file = $_FILES['import_file'];
+    
+    // 2. Validate lỗi upload
+    if ($file['error'] !== UPLOAD_ERR_OK) {
         $uploadErrors = [
-            UPLOAD_ERR_INI_SIZE => 'File vượt quá giới hạn upload của server.',
-            UPLOAD_ERR_FORM_SIZE => 'File quá lớn (tối đa 10MB).',
-            UPLOAD_ERR_PARTIAL => 'File chỉ upload một phần. Vui lòng thử lại.',
-            UPLOAD_ERR_NO_FILE => 'Chưa chọn file. Vui lòng chọn file Excel/CSV.',
-            UPLOAD_ERR_NO_TMP_DIR => 'Lỗi server: thiếu thư mục tạm.',
-            UPLOAD_ERR_CANT_WRITE => 'Lỗi server: không ghi được file.',
-            UPLOAD_ERR_EXTENSION => 'Lỗi extension PHP chặn upload.',
+            UPLOAD_ERR_INI_SIZE   => 'File vượt quá giới hạn upload của server.',
+            UPLOAD_ERR_FORM_SIZE  => 'File quá lớn.',
+            UPLOAD_ERR_PARTIAL    => 'File chỉ upload một phần.',
+            UPLOAD_ERR_NO_FILE    => 'Chưa chọn file.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Thiếu thư mục tạm.',
+            UPLOAD_ERR_CANT_WRITE => 'Không ghi được file.',
         ];
+        $msg = $uploadErrors[$file['error']] ?? 'Lỗi upload không xác định.';
+        $this->alertRedirect($msg, 'admin_books_import');
+        return;
+    }
 
-        // Validate file
-        if ($file['error'] !== UPLOAD_ERR_OK) {
-            $msg = $uploadErrors[$file['error']] ?? 'Lỗi upload file (mã ' . $file['error'] . ').';
-            $this->alertRedirect($msg, 'admin_books_import');
-            return;
-        }
-        if ($file['size'] == 0 || empty($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
-            $this->alertRedirect('File không hợp lệ hoặc không đọc được. Vui lòng chọn file khác.', 'admin_books_import');
-            return;
-        }
+    // 3. Kiểm tra định dạng file
+    $allowedExtensions = ['xlsx', 'xls', 'csv'];
+    $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($fileExtension, $allowedExtensions)) {
+        $this->alertRedirect('Chỉ hỗ trợ file Excel (.xlsx, .xls) hoặc CSV!', 'admin_books_import');
+        return;
+    }
 
-        // Check file extension
-        $allowedExtensions = ['xlsx', 'xls', 'csv'];
-        $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        
-        if (!in_array($fileExtension, $allowedExtensions)) {
-            $this->alertRedirect('Chỉ hỗ trợ file Excel (.xlsx, .xls) hoặc CSV!', 'admin_books_import');
-            return;
-        }
+    // 4. Kiểm tra Composer Autoload
+    $vendorAutoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
+    if (!file_exists($vendorAutoload)) {
+        $this->alertRedirect('Thư viện PhpSpreadsheet chưa được cài đặt.', 'admin_books_import');
+        return;
+    }
+    require_once $vendorAutoload;
 
-        $vendorAutoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
-        if (!file_exists($vendorAutoload)) {
-            $this->alertRedirect('Thư viện đọc Excel chưa được cài. Vui lòng chạy: composer install', 'admin_books_import');
-            return;
-        }
-        require_once $vendorAutoload;
+    try {
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file['tmp_name']);
+        $worksheet = $spreadsheet->getActiveSheet();
+        $rows = $worksheet->toArray();
 
-        try {
-            // Create reader based on file type
-            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file['tmp_name']);
-            $worksheet = $spreadsheet->getActiveSheet();
-            $rows = $worksheet->toArray();
+        $bookModel = $this->model('Book');
+        $categoryModel = $this->model('Category');
+        $createNewCategory = isset($_POST['create_category']) && $_POST['create_category'] == '1';
 
-            // Load Models
-            $bookModel = $this->model('Book');
-            $categoryModel = $this->model('Category');
+        $count = 0;
+        $skipped = 0;
+        $errors = [];
 
-            // Get option for creating new categories
-            $createNewCategory = isset($_POST['create_category']) && $_POST['create_category'] == '1';
+        foreach ($rows as $index => $row) {
+            if ($index === 0) continue; // Bỏ qua tiêu đề
 
-            $count = 0;
-            $errors = [];
-            $skipped = 0;
+            $title    = trim($row[0] ?? '');
+            $isbn     = trim($row[3] ?? '');
+            
+            // Validate dữ liệu tối thiểu
+            if (empty($title)) {
+                $skipped++;
+                continue;
+            }
 
-            // Skip header row (first row)
-            foreach ($rows as $index => $row) {
-                if ($index === 0) continue; // Skip header
-
-                // Cấu trúc cột: 
-                // 0: Title, 1: Author, 2: Category Name, 3: ISBN, 4: Publisher, 5: Year, 6: Quantity, 7: Description
-
-                $title = trim($row[0] ?? '');
-                if (empty($title)) {
+            // KIỂM TRA ISBN (Đã chuyển vào trong vòng lặp)
+            if (!empty($isbn)) {
+                $existing = $bookModel->findByIsbn($isbn);
+                if ($existing) {
                     $skipped++;
-                    continue; // Bỏ qua nếu không có tiêu đề sách
+                    continue; 
                 }
+            }
 
-                // Xử lý Category
-                $catName = trim($row[2] ?? '');
-                $categoryId = null;
+            // Xử lý Category
+            $catName = trim($row[2] ?? '');
+            $categoryId = 1; // Mặc định
 
-                if (!empty($catName)) {
-                    // Tìm category theo tên
-                    $category = $categoryModel->findByName($catName);
-                    
-                    if ($category) {
-                        $categoryId = $category['category_id'];
-                    } elseif ($createNewCategory) {
-                        // Tạo category mới nếu được phép
-                        $categoryId = $categoryModel->createCategory($catName);
+            if (!empty($catName)) {
+                $category = $categoryModel->findByName($catName);
+                if ($category) {
+                    $categoryId = $category['category_id'];
+                } elseif ($createNewCategory) {
+                    $categoryId = $categoryModel->createCategory($catName);
+                }
+            }
+
+            // Chuẩn bị dữ liệu
+            $author    = trim($row[1] ?? 'Unknown');
+            $publisher = trim($row[4] ?? '');
+            $year      = $row[5] ?? date('Y');
+            $quantity  = (int)($row[6] ?? 0);
+            $desc      = trim($row[7] ?? '');
+
+            $data = [
+                'title'          => $title,
+                'author'         => $author,
+                'category_id'    => $categoryId,
+                'isbn'           => $isbn,
+                'publisher'      => $publisher,
+                'published_year' => is_numeric($year) ? (int)$year : date('Y'),
+                'description'    => $desc,
+                'image_url'      => 'images/books/default.jpg'
+            ];
+
+            // Thực hiện thêm vào DB
+            try {
+                // Giả sử $bookModel->create trả về ID hoặc dùng lastInsertId
+                $newBookId = $bookModel->create($data); 
+                
+                if ($newBookId) {
+                    // Nếu create() trả về true thay vì ID, lấy từ DB
+                    if ($newBookId === true) {
+                        $newBookId = $this->db->lastInsertId();
                     }
-                }
 
-                // Nếu không tìm thấy và không tạo mới, dùng category mặc định (ID = 1)
-                if (!$categoryId) {
-                    $categoryId = 1;
-                }
-
-                // Validate và xử lý dữ liệu
-                $author = trim($row[1] ?? '');
-                $isbn = trim($row[3] ?? '');
-                $publisher = trim($row[4] ?? '');
-                $year = $row[5] ?? '';
-                $quantity = $row[6] ?? 0;
-                $description = trim($row[7] ?? '');
-
-                $data = [
-                    'title'          => $title,
-                    'author'         => !empty($author) ? $author : 'Unknown',
-                    'category_id'    => $categoryId,
-                    'isbn'           => $isbn,
-                    'publisher'      => $publisher,
-                    'published_year' => is_numeric($year) ? (int)$year : date('Y'),
-                    'description'    => $description,
-                    'image_url'      => 'images/books/default.jpg'
-                ];
-
-                // Tạo sách mới
-                if ($bookModel->create($data)) {
-                    $newBookId = $this->db->lastInsertId();
-                    
-                    // Tạo book_copies dựa trên quantity
-                    if (is_numeric($quantity) && $quantity > 0 && $newBookId) {
-                        $this->createBookCopies($newBookId, (int)$quantity);
+                    // Tạo bản sao sách
+                    if ($quantity > 0) {
+                        $this->createBookCopies($newBookId, $quantity);
                     }
-                    
                     $count++;
                 } else {
-                    $errors[] = "Lỗi import dòng " . ($index + 1) . ": $title";
+                    $errors[] = "Dòng " . ($index + 1) . ": Không thể lưu vào database.";
                 }
+            } catch (\Exception $e) {
+                $errors[] = "Dòng " . ($index + 1) . ": " . $e->getMessage();
             }
-
-            // Thông báo kết quả
-            $message = "Import thành công $count sách!";
-            if ($skipped > 0) {
-                $message .= " ($skipped dòng bị bỏ qua do thiếu tiêu đề)";
-            }
-            if (!empty($errors)) {
-                $message .= " Có " . count($errors) . " lỗi.";
-            }
-
-            $this->alertRedirect($message, 'admin_books_index');
-            return;
-
-        } catch (\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
-            $this->alertRedirect('Lỗi đọc file: ' . $e->getMessage(), 'admin_books_import');
-            return;
-        } catch (\Exception $e) {
-            $this->alertRedirect('Lỗi: ' . $e->getMessage(), 'admin_books_import');
-            return;
         }
+
+        // Thông báo kết quả
+        $msg = "Import hoàn tất! Thành công: $count.";
+        if ($skipped > 0) $msg .= " Bỏ qua: $skipped (Trùng ISBN hoặc trống tên).";
+        if (count($errors) > 0) $msg .= " Lỗi: " . count($errors);
+
+        $this->alertRedirect($msg, 'admin_books_index');
+
+    } catch (\Exception $e) {
+        $this->alertRedirect('Lỗi hệ thống: ' . $e->getMessage(), 'admin_books_import');
     }
+}
 
     // --- DOWNLOAD SAMPLE EXCEL FILE ---
     public function adminImportSample()
@@ -596,13 +588,12 @@ public function userSearch()
     }
 
     /**
-     * Hiển thị alert và redirect (tránh lặp code, dùng URLROOT nếu có)
+     * Hiển thị alert và redirect (dùng URL tương đối để tránh 404)
      */
     private function alertRedirect(string $message, string $action): void
     {
-        $url = (defined('URLROOT') ? URLROOT : '') . '/index.php?action=' . $action;
         $msg = addslashes($message);
-        echo "<script>alert('" . $msg . "'); window.location.href='" . $url . "';</script>";
+        echo "<script>alert('" . $msg . "'); window.location.href='index.php?action=" . $action . "';</script>";
         exit;
     }
 

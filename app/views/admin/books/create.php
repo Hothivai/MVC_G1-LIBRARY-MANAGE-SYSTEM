@@ -23,6 +23,16 @@
         <div class="p-4">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
+                    <?php if (isset($flash_error)): ?>
+                        <div class="alert alert-danger" role="alert">
+                            <?= htmlspecialchars($flash_error) ?>
+                        </div>
+                    <?php endif; ?>
+                    <?php if (isset($flash_success)): ?>
+                        <div class="alert alert-success" role="alert">
+                            <?= htmlspecialchars($flash_success) ?>
+                        </div>
+                    <?php endif; ?>
                     <form action="index.php?action=admin_book_store" method="POST" enctype="multipart/form-data">
                         <div class="row g-3">
                             <div class="col-md-6">

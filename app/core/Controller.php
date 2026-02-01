@@ -11,13 +11,39 @@ class Controller
 
     public function __construct()
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         // PDO dùng chung cho toàn hệ thống
         $this->db = Database::getInstance()->getConnection();
+    }
+
+    protected function setFlash(string $key, string $message): void
+    {
+        $_SESSION['flash'][$key] = $message;
+    }
+
+    protected function getFlash(string $key): ?string
+    {
+        if (isset($_SESSION['flash'][$key])) {
+            $message = $_SESSION['flash'][$key];
+            unset($_SESSION['flash'][$key]);
+            return $message;
+        }
+        return null;
     }
 
     /* ================= VIEW ================= */
     protected function view($viewPath, $data = [])
     {
+        // Pass flash messages to the view
+        if (isset($_SESSION['flash'])) {
+            foreach ($_SESSION['flash'] as $key => $message) {
+                $data['flash_' . $key] = $message;
+            }
+            unset($_SESSION['flash']);
+        }
+        
         extract($data);
 
         $viewFile = APP_PATH . '/views/' . $viewPath . '.php';

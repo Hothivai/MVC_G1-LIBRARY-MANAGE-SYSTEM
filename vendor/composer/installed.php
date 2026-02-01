@@ -3,7 +3,7 @@
         'name' => 'mvc/library-manage-system',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '0e541a62628ef2e9b34b6a533ae9eac179a553a2',
+        'reference' => 'a99d3d2df88063f5650296149a411aee44d3e813',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -58,7 +58,7 @@
         'mvc/library-manage-system' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '0e541a62628ef2e9b34b6a533ae9eac179a553a2',
+            'reference' => 'a99d3d2df88063f5650296149a411aee44d3e813',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
