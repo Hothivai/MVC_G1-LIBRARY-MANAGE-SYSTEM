@@ -33,15 +33,15 @@ class NotificationController extends Controller
     }
 
     // ================= ADMIN =================
-    public function adminIndex()
-    {
-        return $this->view('admin/notifications/index', [
-            'notifications' => []
-        ]);
-    }
+    // public function adminIndex()
+    // {
+    //     return $this->view('admin/notifications/index', [
+    //         'notifications' => []
+    //     ]);
+    // }
 
-    public function adminCreate()
-    {
-        return $this->view('admin/notifications/create');
-    }
+    // public function adminCreate()
+    // {
+    //     return $this->view('admin/notifications/create');
+    // }
 }
