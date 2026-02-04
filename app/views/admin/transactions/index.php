@@ -19,7 +19,7 @@
 
             <!-- NAVBAR -->
             <nav class="navbar navbar-dark bg-success px-4">
-                <span class="navbar-brand">Dashboard</span>
+                <span class="navbar-brand">Transaction Management</span>
                 <div class="text-white fs-5 d-flex align-items-center gap-3">
                     <?= htmlspecialchars($admin['name'] ?? 'Admin') ?>
                     <i class="bi bi-person-circle fs-4 me-2"></i>
@@ -28,7 +28,7 @@
 
             <!-- CONTENT -->
             <main class="p-4">
-                <h5>Transaction Management</h5>
+                <h5>Transaction List</h5>
                 <table class="table table-bordered align-middle mt-3">
                     <thead class="table-light">
                         <tr>

@@ -12,13 +12,13 @@
     <?php require_once APP_PATH . '/views/admin/sidebarAdmin.php'; ?>
 
     <div class="main-content flex-grow-1">
-        <nav class="navbar navbar-light bg-white px-4 border-bottom">
-            <span class="navbar-brand fw-bold">Category Management</span>
-            <div class="d-flex align-items-center">
-                <span class="me-2 fw-bold">Admin</span>
-                <i class="bi bi-person-circle fs-3"></i>
-            </div>
-        </nav>
+            <nav class="navbar navbar-dark bg-success px-4">
+                <span class="navbar-brand">Category Management</span>
+                <div class="text-white fs-5 d-flex align-items-center gap-3">
+                    <?= htmlspecialchars($_SESSION['user']['full_name'] ?? 'Admin') ?>
+                    <i class="bi bi-person-circle fs-4 me-2"></i>
+                </div>
+            </nav>
 
         <div class="p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">

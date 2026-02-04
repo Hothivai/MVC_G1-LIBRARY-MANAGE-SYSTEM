@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // ================= PATHS =================
 define('APPROOT', dirname(__DIR__));
 define('APP_PATH', APPROOT . '/app');
-define('URLROOT', 'http://localhost/MVC_G1-LIBRARY-MANAGE-SYSTEM/public'); 
+define('URLROOT', 'http://localhost:3000/public'); 
 define('SITENAME', 'Library Management System');
 
 // ================= DATABASE =================

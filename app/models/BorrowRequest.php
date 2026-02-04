@@ -13,7 +13,6 @@ class BorrowRequest extends Model
             (user_id, book_id, quantity, note)
             VALUES (?, ?, ?, ?)
         ";
-
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             $userId,

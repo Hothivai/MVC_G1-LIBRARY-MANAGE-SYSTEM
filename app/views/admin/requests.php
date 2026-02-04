@@ -24,7 +24,7 @@
 
             <!-- NAVBAR -->
             <nav class="navbar navbar-dark bg-success px-4">
-                <span class="navbar-brand">Dashboard</span>
+                <span class="navbar-brand">Borrow Requests</span>
                 <div class="text-white fs-5 d-flex align-items-center gap-3">
                     <?= htmlspecialchars($admin['name'] ?? 'Admin') ?>
                     <i class="bi bi-person-circle fs-4 me-2"></i>

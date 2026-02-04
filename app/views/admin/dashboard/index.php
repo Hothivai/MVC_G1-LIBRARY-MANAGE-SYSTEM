@@ -37,8 +37,10 @@
                 <div class="row mt-3">
                     <div class="col-md-3">
                         <div class="card text-center p-3">
-                            <h5>Total Books</h5>
-                            <h3 class="fw-bold"><?= $totalBooks ?></h3>
+                            <a href="index.php?action=admin_books_index" class="text-decoration-none">
+                                <h5>Total Books</h5>
+                                <h3 class="fw-bold"><?= $totalBooks ?></h3>
+                            </a>
                             <div class="d-flex fs-5 justify-content-center align-items-center gap-2">
                                 <i class="bi bi-book"></i>
                                 <span>copies</span>
@@ -48,8 +50,10 @@
 
                     <div class="col-md-3">
                         <div class="card text-center p-3">
-                            <h5>Borrowed</h5>
-                            <h3 class="fw-bold"><?= $borrowedBooks ?></h3>
+                            <a href="index.php?action=admin_transactions_index" class="text-decoration-none">
+                                <h5>Borrowed</h5>
+                                <h3 class="fw-bold"><?= $borrowedBooks ?></h3>
+                            </a>
                             <div class="d-flex fs-5 justify-content-center align-items-center gap-2">
                                 <i class="bi bi-arrow-repeat"></i>
                                 <span>transactions</span>
@@ -59,8 +63,10 @@
 
                     <div class="col-md-3">
                         <div class="card text-center p-3">
-                            <h5>Members</h5>
-                            <h3 class="fw-bold"><?= $members ?></h3>
+                            <a href="index.php?action=admin_users_index" class="text-decoration-none">
+                                <h5>Members</h5>
+                                <h3 class="fw-bold"><?= $members ?></h3>
+                            </a>
                             <div class="d-flex fs-5 justify-content-center align-items-center gap-2">
                                 <i class="bi bi-people"></i>
                                 <span>users</span>

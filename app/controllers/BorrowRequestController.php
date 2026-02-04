@@ -8,58 +8,47 @@ class BorrowRequestController extends Controller
     public function index()
     {
         $this->requireAdmin();
-
         // load model
         $borrowRequestModel = $this->model('BorrowRequest');
-
         // lấy dữ liệu
         $data = [
             'pendingRequests' => $borrowRequestModel->getAdminRequests(),
             'active'          => 'requests'
         ];
-
         // gọi view
         $this->view('admin/requests', $data);
     }
-
     // action: admin_requests_approve
     public function approve()
     {
         $this->requireAdmin();
-
         $requestId = $_POST['request_id'] ?? null;
         if (!$requestId) {
             header('Location: index.php?action=admin_requests');
             exit;
         }
-
         $borrowRequestModel = $this->model('BorrowRequest');
         $bookModel          = $this->model('Book');
         $transactionModel   = $this->model('Transaction');
         $notificationModel  = $this->model('Notification');
-
         $request = $borrowRequestModel->findById($requestId);
         if (!$request) {
             header('Location: index.php?action=admin_requests');
             exit;
         }
-
         $copyId = $bookModel->getAvailableCopy($request['book_id']);
         if (!$copyId) {
             header('Location: index.php?action=admin_requests');
             exit;
         }
-
         // tính ngày trả sách (14 ngày kể từ ngày mượn)
         $dueDate = date('Y-m-d', strtotime('+14 days'));
-
         // tạo transaction
         $transactionId = $transactionModel->createTransaction(
             $request['user_id'],
             $copyId,
             $dueDate
         );
-
         if ($transactionId) {
             // cập nhật request
             $borrowRequestModel->approve($requestId);
@@ -104,7 +93,6 @@ class BorrowRequestController extends Controller
             header('Location: index.php?action=auth_login');
             exit;
         }
-
         $userId   = $_SESSION['user_id'];
         $bookId   = $_POST['book_id'] ?? null;
         $quantity = $_POST['quantity'] ?? 1;
@@ -114,7 +102,6 @@ class BorrowRequestController extends Controller
             header('Location: index.php?action=home_index');
             exit;
         }
-
         $borrowRequestModel = $this->model('BorrowRequest');
         $borrowRequestModel->create(
             $userId,

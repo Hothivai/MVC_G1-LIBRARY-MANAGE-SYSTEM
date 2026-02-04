@@ -56,17 +56,12 @@ require_once __DIR__ . '/../../layouts/navbar.php';
 
         <main class="col-md-9">
             <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 shadow-sm rounded">
-                <form action="index.php?action=user_books_search" method="GET" class="input-group w-50">
-                    <input type="text" name="search" class="form-control border-success" placeholder="Search books...">
-                    <button class="btn btn-success" type="button" style="background-color: #16A34A;"><i class="fa fa-search"></i></button>
+                <form action="index.php" method="GET" class="input-group w-50">
+                    <input type="hidden" name="action" value="user_books_search">
+                    <input type="text" name="search" class="form-control border-success search-input" placeholder="Search books..." value="<?= htmlspecialchars($searchQuery ?? '') ?>">
+                    <button class="btn btn-success" type="submit" style="background-color: #16A34A;"><i class="fa fa-search"></i></button>
                 </form>
-                <div class="d-flex align-items-center">
-                    <label class="me-2 small text-muted">Sort by:</label>
-                    <select class="form-select form-select-sm border-success">
-                        <option>Newest</option>
-                        <option>Oldest</option>
-                    </select>
-                </div>
+               
             </div>
 
             <div class="row g-4">
@@ -89,27 +84,21 @@ require_once __DIR__ . '/../../layouts/navbar.php';
                                 <?php endif; ?>
                             </div>
 
-                                    <?php if (($book['available_copies'] ?? 0) > 0): ?>
-                                        <span class="badge bg-success position-absolute top-0 start-0 m-2 px-3 py-2 shadow-sm">Book available</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-3 py-2 shadow-sm">Out of stock</span>
-                                    <?php endif; ?>
-                                </div>
+                            <div class="card-body p-3">
 
-                                <div class="card-body p-3">
-                                    <p class="text-muted small mb-1"><?= htmlspecialchars($book['category_name'] ?? 'Chưa phân loại') ?></p>
-                                    <h6 class="card-title fw-bold text-dark mb-1 line-clamp-2"><?= htmlspecialchars($book['title']) ?></h6>
-                                    <p class="card-text small text-secondary mb-3">by <?= htmlspecialchars($book['author']) ?></p>
+                            <p class="text-muted small mb-1"><?= htmlspecialchars($book['category_name'] ?? 'Chưa phân loại') ?></p>
+                            <h6 class="card-title fw-bold text-dark mb-1 line-clamp-2"><?= htmlspecialchars($book['title']) ?></h6>
+                            <p class="card-text small text-secondary mb-3">by <?= htmlspecialchars($book['author']) ?></p>
 
-                                    <div class="d-flex gap-2">
-                                        <a href="index.php?action=user_books_show&id=<?= $book['book_id'] ?>" class="btn btn-outline-success btn-sm flex-grow-1 border-2 fw-bold">Detail</a>
-                                        <?php if (($book['available_copies'] ?? 0) > 0): ?>
-                                            <a href="index.php?action=user_books_borrow_request&id=<?= $book['book_id'] ?>" class="btn btn-success btn-sm flex-grow-1 fw-bold" style="background-color: #16A34A;">Borrow</a>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
+                            <div class="d-flex gap-2">
+                                <a href="index.php?action=user_books_show&id=<?= $book['book_id'] ?>" class="btn btn-outline-success btn-sm flex-grow-1 border-2 fw-bold">Detail</a>
+                                <?php if (($book['available_copies'] ?? 0) > 0): ?>
+                                    <a href="index.php?action=user_books_borrow_request&id=<?= $book['book_id'] ?>" class="btn btn-success btn-sm flex-grow-1 fw-bold">Borrow</a>
+                                <?php endif; ?>
                             </div>
                         </div>
+                    </div>
+                </div>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="col-12 text-center py-5">
@@ -119,65 +108,62 @@ require_once __DIR__ . '/../../layouts/navbar.php';
                 <?php endif; ?>
             </div>
 
-            <nav class="mt-5">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item disabled"><a class="page-link text-success" href="#">Previous</a></li>
-                    <li class="page-item active"><a class="page-link bg-success border-success" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link text-success" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link text-success" href="#">Next</a></li>
-                </ul>
+            <?php
+            $totalPages = (int)($totalPages ?? 1);
+            $currentPage = (int)($currentPage ?? 1);
+            $totalBooks = (int)($totalBooks ?? 0);
+            $searchQuery = $searchQuery ?? '';
+            $selectedCategory = $selectedCategory ?? '';
+            $baseParams = ['action' => 'user_books_index'];
+            if ($searchQuery !== '') $baseParams['search'] = $searchQuery;
+            if ($selectedCategory !== '') $baseParams['category'] = $selectedCategory;
+            ?>
+            <?php if ($totalPages > 1): ?>
+            <nav class="mt-5" aria-label="Phân trang sách">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <p class="text-muted small mb-0">
+                        Trang <?= $currentPage ?> / <?= $totalPages ?>
+                        (<?= $totalBooks ?> sách)
+                    </p>
+                    <ul class="pagination justify-content-center mb-0">
+                        <?php
+                        $prevParams = $baseParams;
+                        $prevParams['page'] = $currentPage - 1;
+                        $prevUrl = 'index.php?' . http_build_query($prevParams);
+                        ?>
+                        <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
+                            <a class="page-link text-success" href="<?= $currentPage <= 1 ? '#' : $prevUrl ?>">Previous</a>
+                        </li>
+
+                        <?php
+                        $start = max(1, $currentPage - 2);
+                        $end = min($totalPages, $currentPage + 2);
+                        for ($i = $start; $i <= $end; $i++):
+                            $pageParams = $baseParams;
+                            $pageParams['page'] = $i;
+                            $pageUrl = 'index.php?' . http_build_query($pageParams);
+                        ?>
+                        <li class="page-item <?= $i === $currentPage ? 'active' : '' ?>">
+                            <a class="page-link <?= $i === $currentPage ? 'bg-success border-success text-white' : 'text-success' ?>" href="<?= $pageUrl ?>"><?= $i ?></a>
+                        </li>
+                        <?php endfor; ?>
+
+                        <?php
+                        $nextParams = $baseParams;
+                        $nextParams['page'] = $currentPage + 1;
+                        $nextUrl = 'index.php?' . http_build_query($nextParams);
+                        ?>
+                        <li class="page-item <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
+                            <a class="page-link text-success" href="<?= $currentPage >= $totalPages ? '#' : $nextUrl ?>">Next</a>
+                        </li>
+                    </ul>
+                </div>
             </nav>
+            <?php endif; ?>
         </main>
     </div>
 </div>
 
-<style>
-    /* Custom CSS để đồng bộ màu xanh lá cây của dự án */
-    :root {
-        --primary-green: #2ecc71;
-        --dark-green: #145c38;
-    }
-
-    .accent-success {
-        accent-color: #16A34A;
-    }
-
-    .book-card-hover {
-        transition: all 0.3s ease;
-        border-radius: 12px;
-    }
-
-    .book-card-hover:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .pagination .page-link {
-        color: #16A34A;
-        border-radius: 8px;
-        margin: 0 3px;
-    }
-
-    .bg-success {
-        background-color: #16A34A !important;
-    }
-
-    .btn-outline-success {
-        color: #16A34A;
-        border-color: #16A34A;
-    }
-
-    .btn-outline-success:hover {
-        background-color: #16A34A;
-        color: white;
-    }
-</style>
+<link rel="stylesheet" href="/public/css/user.css">
 
 <?php require_once __DIR__ . '/../../layouts/footer.php';?>

@@ -67,16 +67,13 @@
     <?php require_once __DIR__ . '/../sidebarAdmin.php'; ?>
     <!-- RIGHT CONTENT -->
     <div class="flex-grow-1">
-
-        <!-- TOP HEADER -->
-        <header class="d-flex justify-content-between align-items-center px-4"
-                style="height:60px; background-color:#0f5132; color:white;">
-            <h6 class="mb-0">Member Management</h6>
-            <div class="d-flex align-items-center gap-2">
-                <span>Admin</span>
-                <i class="bi bi-person-circle fs-5"></i>
-            </div>
-        </header>
+            <nav class="navbar navbar-dark bg-success px-4">
+                <span class="navbar-brand">Member Management</span>
+                <div class="text-white fs-5 d-flex align-items-center gap-3">
+                    <?= htmlspecialchars($_SESSION['user']['full_name'] ?? 'Admin') ?>
+                    <i class="bi bi-person-circle fs-4 me-2"></i>
+                </div>
+            </nav>
 
         <!-- MAIN -->
         <main class="p-4">

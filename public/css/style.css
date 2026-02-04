@@ -100,6 +100,19 @@ body {
     border: none;
     padding-left: 20px;
     width: 100%;
+    color: #000 !important;
+    background-color: #fff !important;
+}
+
+.hero-search-box input::placeholder {
+    color: #6c757d !important;
+    opacity: 1;
+}
+
+.hero-search-box input:focus {
+    color: #000 !important;
+    background-color: #fff !important;
+    outline: none;
 }
 
 .hero-search-box button {

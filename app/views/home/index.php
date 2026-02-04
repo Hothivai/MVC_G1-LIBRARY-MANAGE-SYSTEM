@@ -6,8 +6,9 @@
     <div class="container">
         <h1 class="hero-title">LIBRARY MANAGEMENT SYSTEM</h1>
 
-        <form action="index.php?action=user_books_search" method="GET" class="hero-search-box">
-            <input type="text" name="search" placeholder="Find the book you want...">
+        <form action="index.php" method="GET" class="hero-search-box">
+            <input type="hidden" name="action" value="user_books_search">
+            <input type="text" name="search" placeholder="Find the book you want..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
             <button type="submit"><i class="fa fa-search"></i></button>
         </form>
     </div>

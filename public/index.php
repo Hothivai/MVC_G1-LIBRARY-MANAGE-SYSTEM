@@ -220,16 +220,7 @@ switch ($action) {
         (new TransactionController())->return($_GET['id'] ?? 0);
         break;
 
-    // ===== ADMIN NOTIFICATIONS =====
-    case 'admin_notifications_index':
-        Middleware::requireAdmin();
-        (new NotificationController())->adminIndex();
-        break;
-
-    case 'admin_notifications_create':
-        Middleware::requireAdmin();
-        (new NotificationController())->adminCreate();
-        break;
+    
 
     // ===== ADMIN USERS =====
     case 'admin_users_index':

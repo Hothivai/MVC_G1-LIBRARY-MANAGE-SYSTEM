@@ -232,4 +232,12 @@ class Book extends Model
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([$id]);
     }
+// Check ISBN trước khi insert
+    public function findByIsbn(string $isbn)
+{
+    $sql = "SELECT book_id FROM books WHERE isbn = :isbn LIMIT 1";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute(['isbn' => $isbn]);
+    return $stmt->fetch();
+}
 }

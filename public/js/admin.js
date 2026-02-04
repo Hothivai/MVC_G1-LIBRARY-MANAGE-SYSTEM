@@ -248,11 +248,6 @@ tooltipStyle.textContent = `
 `;
 document.head.appendChild(tooltipStyle);
 
-// Global BASE_URL (defined in footer.php)
-if (typeof BASE_URL === 'undefined') {
-    console.warn('BASE_URL is not defined. Make sure it is set in the footer.php file.');
-}
-
 // Expose functions for other scripts
 window.utils = {
     escapeHtml,
