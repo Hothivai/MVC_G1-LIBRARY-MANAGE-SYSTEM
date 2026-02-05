@@ -1,0 +1,180 @@
+/* CSS cho trang user (books, profile, notifications) */
+:root {
+    --main-green: #28a745;
+    --primary-green: #16A34A;
+    --dark-green: #145c38;
+    --light-gray: #f8f9fa;
+    --border-color: #dee2e6;
+}
+
+body {
+    background-color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ==================== BOOKS PAGE ==================== */
+.accent-success {
+    accent-color: #16A34A;
+}
+
+.book-card-hover {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+}
+
+.book-card-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.pagination .page-link {
+    color: #16A34A;
+    border-radius: 8px;
+    margin: 0 3px;
+}
+
+.pagination .page-link:hover {
+    background-color: #16A34A;
+    color: white;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #16A34A;
+    border-color: #16A34A;
+    color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.pagination .page-link {
+    min-width: 40px;
+    text-align: center;
+}
+
+.bg-success {
+    background-color: #16A34A !important;
+}
+
+.btn-success {
+    background-color: #16A34A !important;
+    border-color: #16A34A !important;
+}
+
+.btn-success:hover {
+    background-color: #145c38 !important;
+    border-color: #145c38 !important;
+}
+
+.btn-outline-success {
+    color: #16A34A;
+    border-color: #16A34A;
+}
+
+.btn-outline-success:hover {
+    background-color: #16A34A;
+    color: white;
+}
+
+.book-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0;
+}
+
+/* ==================== SEARCH INPUT ==================== */
+.search-input {
+    color: #000 !important;
+    background-color: #fff !important;
+}
+
+.search-input::placeholder {
+    color: #6c757d !important;
+    opacity: 1;
+}
+
+.search-input:focus {
+    color: #000 !important;
+    background-color: #fff !important;
+    border-color: #16A34A !important;
+    box-shadow: 0 0 0 0.2rem rgba(22, 163, 74, 0.25);
+}
+
+.form-control.border-success {
+    color: #000 !important;
+}
+
+.form-control.border-success:focus {
+    color: #000 !important;
+}
+
+/* Avatar hình tròn xám */
+.avatar-circle {
+    width: 120px;
+    height: 120px;
+    background-color: #ced4da;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #6c757d;
+    border: 5px solid #e9ecef;
+}
+
+/* Badge Active */
+.bg-success-light {
+    background-color: #e8f5e9;
+}
+
+/* Các ô thống kê */
+.stat-card {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    height: 100%;
+}
+
+/* Header của bảng */
+.table-success-custom {
+    background-color: var(--main-green) !important;
+    color: white;
+}
+
+.table thead th {
+    border: none;
+    font-weight: 500;
+}
+
+/* Thông tin cá nhân */
+.info-section p {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.info-section hr {
+    margin: 0.5rem 0;
+    opacity: 0.1;
+}
+
+/* Box quy định */
+.regulation-box {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    color: #495057;
+}
+
+/* Hiệu ứng nút khi di chuột */
+.btn-outline-dark:hover {
+    background-color: #343a40;
+    color: white;
+}

@@ -1,0 +1,243 @@
+/* public/css/style.css */
+
+:root {
+    --primary-green: #2ecc71;       /* Màu xanh lá sáng cho button */
+    --dark-green: #145c38;          /* Màu xanh đậm cho Header/Footer */
+    --hover-green: #27ae60;
+    --bg-light: #f0f9f4;            /* Màu nền xanh rất nhạt */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-light);
+    padding-top: 80px; /* Tăng padding để không bị header che mất */
+}
+
+/* --- HEADER & NAVBAR --- */
+.main-header .navbar {
+    background-color: #d2f1c8; /* Nền trắng như Figma */
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 10px 0;
+    margin-bottom: 0;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    height: auto;
+    padding: 5px 15px;
+}
+
+.navbar-brand img {
+    height: 50px; /* Logo to hơn chút */
+    margin-right: 10px;
+}
+
+/* Style cho các Nav Button (Home, Books, About...) */
+.nav.navbar-nav > li > a {
+    border: 2px solid #ccc; /* Viền mặc định */
+    border-radius: 8px;
+    margin: 0 5px;
+    padding: 8px 20px;
+    font-weight: 600;
+    color: #555;
+    transition: all 0.3s;
+}
+
+/* Trạng thái Active (Đang chọn) - Màu xanh lá full */
+.nav.navbar-nav > li.active > a, 
+.nav.navbar-nav > li.active > a:hover, 
+.nav.navbar-nav > li.active > a:focus {
+    background-color: green;
+    border-color: var(--primary-green) !important;
+    color: #fff !important;
+
+}
+
+/* Trạng thái Hover hoặc Button thường - Viền xanh lá */
+.nav.navbar-nav > li > a:hover {
+    border-color: var(--primary-green);
+    color: var(--primary-green);
+    background-color: transparent;
+}
+
+/* Nút Login/Register bên phải */
+.btn-nav-action {
+    border: 2px solid var(--primary-green) !important;
+    color: var(--dark-green) !important;
+    border-radius: 8px;
+}
+
+/* --- HERO SECTION (Banner xanh đậm) --- */
+.hero-section {
+    background-color: var(--dark-green);
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+    margin-bottom: 40px;
+    /* Có thể bo góc dưới nếu muốn giống thiết kế hiện đại */
+}
+
+.hero-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+
+/* Search Box trong Hero */
+.hero-search-box {
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+}
+
+.hero-search-box input {
+    height: 50px;
+    border-radius: 25px 0 0 25px;
+    border: none;
+    padding-left: 20px;
+    width: 100%;
+    color: #000 !important;
+    background-color: #fff !important;
+}
+
+.hero-search-box input::placeholder {
+    color: #6c757d !important;
+    opacity: 1;
+}
+
+.hero-search-box input:focus {
+    color: #000 !important;
+    background-color: #fff !important;
+    outline: none;
+}
+
+.hero-search-box button {
+    height: 50px;
+    border-radius: 0 25px 25px 0;
+    border: none;
+    background-color: var(--primary-green);
+    color: white;
+    padding: 0 25px;
+    font-size: 18px;
+}
+
+/* --- BOOK CARDS --- */
+.section-header {
+    color: var(--dark-green);
+    font-weight: 700;
+    font-size: 24px;
+    margin-bottom: 25px;
+    border-left: 5px solid var(--primary-green);
+    padding-left: 15px;
+}
+
+.book-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.3s;
+    margin-bottom: 30px;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-color: var(--primary-green);
+}
+
+.book-img-wrapper {
+    height: 220px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.book-img {
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+}
+
+.book-title {
+    color: var(--dark-green);
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book-author {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.book-availability {
+    color: var(--primary-green);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* --- CATEGORIES --- */
+.category-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    transition: all 0.3s;
+}
+
+.category-card:hover {
+    background-color: var(--primary-green);
+    color: white;
+}
+
+.category-card:hover i, 
+.category-card:hover h4,
+.category-card:hover span {
+    color: white;
+}
+
+.category-icon {
+    font-size: 30px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* --- FOOTER --- */
+.main-footer {
+    background-color: var(--dark-green);
+    color: white;
+    padding: 40px 0 20px;
+    margin-top: 50px;
+}
+
+/* Notification Item Style */
+
+.notification-bell {
+    position: relative;
+    font-size: 20px;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+}
