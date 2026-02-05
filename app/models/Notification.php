@@ -123,8 +123,8 @@ class Notification extends Model
                         'user_id' => $userId,
                         'transaction_id' => $transactionId,
                         'type' => 'overdue',
-                        'title' => 'Sách đã quá hạn trả',
-                        'message' => "Bạn đã trễ hẹn {$daysOverdue} ngày. Vui lòng trả sách '{$bookTitle}' ngay lập tức."
+                        'title' => 'The book is overdue',
+                        'message' => "You are {$daysOverdue} days overdue. Please return the book '{$bookTitle}' immediately."
                     ]);
                 }
             }
@@ -136,8 +136,8 @@ class Notification extends Model
                         'user_id' => $userId,
                         'transaction_id' => $transactionId,
                         'type' => 'reminder',
-                        'title' => 'Nhắc nhở trả sách',
-                        'message' => "Sách '{$bookTitle}' của bạn sẽ đến hạn trả vào ngày mai. Vui lòng chuẩn bị trả sách."
+                        'title' => 'Reminder to return the book',
+                        'message' => "The book '{$bookTitle}' of yours is due tomorrow. Please prepare to return it."
                     ]);
                 }
             }
