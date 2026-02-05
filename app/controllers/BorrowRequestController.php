@@ -58,8 +58,8 @@ class BorrowRequestController extends Controller
                 'user_id' => $request['user_id'],
                 'transaction_id' => $transactionId,
                 'type' => 'approved',
-                'title' => 'Yêu cầu mượn sách đã được chấp nhận',
-                'message' => 'Yêu cầu mượn sách của bạn đã được chấp nhận, hãy tới thư viện để lấy sách'
+                'title' => 'The book borrowing request has been accepted',
+                'message' => 'Your book borrowing request has been accepted. Please go to the library to pick up your book.'
             ]);
         }
         header('Location: index.php?action=admin_requests');
