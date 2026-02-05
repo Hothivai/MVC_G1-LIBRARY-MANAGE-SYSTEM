@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="/../../public/css/notifications.css">
 
     <div class="notification-wrapper">
-    <h2>Thông báo</h2>
+    <h2>Notification</h2>
 
     <?php if (!empty($notifications)): ?>
         <?php foreach ($notifications as $n): ?>
@@ -17,7 +17,7 @@
         <?php endforeach; ?>
     <?php else: ?>
         <div class="empty">
-            Không có thông báo nào 
+            You have no notifications
         </div>
     <?php endif; ?>
 </div>
